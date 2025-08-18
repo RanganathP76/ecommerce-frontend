@@ -1,0 +1,81 @@
+import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import axios from 'axios';
+import './OrderConfirmation.css';
+import axiosInstance from '../axiosInstance';
+
+const OrderConfirmation = () => {
+  const { id } = useParams(); // order ID from URL
+  const [order, setOrder] = useState(null);
+  const token = localStorage.getItem('token');
+
+  useEffect(() => {
+    if (!id) return;
+
+    const fetchOrder = async () => {
+      try {
+        const res = await axiosInstance.get(`/orders/${id}`); // ✅ no hardcoded URL
+        setOrder(res.data);
+      } catch (err) {
+        console.error('Failed to fetch order:', err);
+      }
+    };
+
+    fetchOrder();
+  }, [id]);
+
+  if (!order) {
+    return <div className="order-confirmation"><p>Loading order details...</p></div>;
+  }
+
+  return (
+    <div className="order-confirmation">
+      <h2>🎉 Order Confirmed!</h2>
+      <p>Your order <strong>#{order._id}</strong> has been placed successfully.</p>
+
+      <div className="order-section">
+        <h3>Shipping Info</h3>
+        <p><strong>Name:</strong> {order.shippingInfo.name}</p>
+        <p><strong>Phone:</strong> {order.shippingInfo.phone}</p>
+        <p><strong>Address:</strong> {order.shippingInfo.address}, {order.shippingInfo.city}, {order.shippingInfo.postalCode}, {order.shippingInfo.country}</p>
+      </div>
+
+      <div className="order-section">
+        <h3>Ordered Items</h3>
+        {order.orderItems.map((item, idx) => (
+          <div key={idx} className="order-item">
+            <img src={item.image || '/placeholder.png'} alt={item.name} />
+            <div>
+              <p><strong>{item.name}</strong></p>
+              <p>₹{item.price} x {item.quantity}</p>
+              {item.customization?.map((c, i) => (
+                <p key={i}><strong>{c.label}:</strong> {c.type === 'file' ? c.value.split('/').pop() : c.value}</p>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="order-section">
+        <h3>Payment Info</h3>
+        <p><strong>Method:</strong> {order.paymentInfo.method}</p>
+        <p><strong>Status:</strong> {order.paymentInfo.status}</p>
+        <p><strong>Amount Paid:</strong> ₹{order.amountPaid}</p>
+        <p><strong>Amount Due:</strong> ₹{order.amountDue}</p>
+      </div>
+
+      <div className="order-section total-summary">
+        <p><strong>Items Total:</strong> ₹{order.itemsPrice}</p>
+        <p><strong>Shipping:</strong> ₹{order.shippingPrice}</p>
+        <p><strong>Discount:</strong> ₹{order.discount}</p>
+        <p><strong>Total Amount:</strong> ₹{order.totalPrice}</p>
+      </div>
+
+      <div style={{ textAlign: 'center', marginTop: '30px' }}>
+        <a href="/" className="continue-shopping-btn">Continue Shopping</a>
+      </div>
+    </div>
+  );
+};
+
+export default OrderConfirmation;

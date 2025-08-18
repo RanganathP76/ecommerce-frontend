@@ -1,0 +1,58 @@
+
+
+
+.collection-header {
+  max-width: 1000px;
+  margin: 0 auto 30px;
+  text-align: center;
+}
+
+.collection-header h2 {
+  font-size: 26px;
+  color: #333;
+}
+
+.collection-header p {
+  color: #666;
+  margin-top: 6px;
+}
+
+.products-grid {
+  max-width: 1000px;
+  margin: auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 20px;
+}
+
+.product-card {
+  background: white;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.05);
+  text-decoration: none;
+  color: inherit;
+  text-align: center;
+  transition: transform 0.2s ease;
+}
+
+.product-card:hover {
+  transform: scale(1.02);
+}
+
+.product-card img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.product-title {
+  font-weight: 500;
+  margin-top: 10px;
+}
+
+.product-price {
+  color: #000;
+  font-weight: bold;
+  margin: 6px 0 12px;
+}

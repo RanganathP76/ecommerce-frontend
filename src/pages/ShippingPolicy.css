@@ -1,0 +1,43 @@
+.shipping-policy {
+  padding: 40px 20px;
+  background: #fff;
+  color: #333;
+}
+
+.shipping-policy .container {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.shipping-policy h1 {
+  font-size: 2rem;
+  margin-bottom: 15px;
+  color: #222;
+  text-align: center;
+}
+
+.shipping-policy h2 {
+  font-size: 1.4rem;
+  margin-top: 25px;
+  margin-bottom: 10px;
+  color: #444;
+}
+
+.shipping-policy p,
+.shipping-policy ul {
+  line-height: 1.6;
+  font-size: 1rem;
+}
+
+.shipping-policy ul {
+  padding-left: 20px;
+}
+
+.shipping-policy a {
+  color: #0073e6;
+  text-decoration: none;
+}
+
+.shipping-policy a:hover {
+  text-decoration: underline;
+}

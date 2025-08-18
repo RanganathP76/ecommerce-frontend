@@ -1,0 +1,124 @@
+.track-page {
+  font-family: 'Segoe UI', sans-serif;
+  background: #f7f9fb;
+  color: #222;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.track-header {
+  background: #1e2a38;
+  color: white;
+  padding: 20px;
+  text-align: center;
+}
+
+.track-header h1 {
+  margin: 0;
+}
+
+.track-header nav {
+  margin-top: 10px;
+}
+
+.track-header nav a {
+  color: #ccc;
+  margin: 0 10px;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.track-header nav a.active,
+.track-header nav a:hover {
+  color: white;
+  font-weight: bold;
+}
+
+.track-main {
+  flex: 1;
+  max-width: 600px;
+  margin: 30px auto;
+  padding: 20px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
+}
+
+.track-main h2 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.track-form {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.track-form input {
+  flex: 1 1 250px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+
+.track-form button {
+  padding: 10px 20px;
+  background-color: #1e2a38;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.track-error {
+  color: red;
+  text-align: center;
+  margin-top: 10px;
+}
+
+.order-card {
+  background: #f1f4f8;
+  padding: 20px;
+  border-radius: 10px;
+}
+
+.order-card h3, .order-card h4 {
+  margin-top: 20px;
+  margin-bottom: 10px;
+  color: #1e2a38;
+}
+
+.item-box {
+  padding: 10px;
+  background: #fff;
+  margin: 10px 0;
+  border: 1px dashed #ccc;
+  border-radius: 6px;
+}
+
+.custom-line {
+  font-size: 13px;
+  margin-left: 10px;
+  color: #555;
+}
+
+.track-footer {
+  background: #1e2a38;
+  color: white;
+  text-align: center;
+  padding: 20px;
+}
+
+.track-footer .footer-icons a {
+  color: #ccc;
+  margin: 0 5px;
+  text-decoration: none;
+}
+
+.track-footer .footer-icons a:hover {
+  color: white;
+}

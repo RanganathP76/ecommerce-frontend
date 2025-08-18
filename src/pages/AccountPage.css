@@ -1,0 +1,48 @@
+
+
+.account-container h2 {
+  margin-bottom: 20px;
+  color: #887c60;
+}
+
+.account-info p {
+  font-size: 16px;
+  margin: 10px 0;
+  color: #333;
+}
+
+.account-actions {
+  margin-top: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.account-actions button {
+  padding: 10px;
+  font-size: 16px;
+  border: none;
+  border-radius: 8px;
+  background-color: #887c60;
+  color: white;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.account-actions button:hover {
+  background-color: #6f664e;
+}
+
+.logout-btn {
+  background-color: #c0392b;
+}
+
+.logout-btn:hover {
+  background-color: #a93226;
+}
+
+.login-link {
+  color: #887c60;
+  cursor: pointer;
+  text-decoration: underline;
+}
