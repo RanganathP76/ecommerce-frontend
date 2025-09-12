@@ -1,42 +1,41 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { useState, useEffect } from 'react';
-import CartContext from './context/CartContext';
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { useState, useEffect } from "react";
+import CartContext from "./context/CartContext";
 
-import LoginPage from './pages/LoginPage';
-import RegisterPage from './pages/RegisterPage';
-import HomePage from './pages/HomePage';
-import CollectionPage from './pages/CollectionPage';
-import CollectionProductsPage from './pages/CollectionProductsPage';
-import ProductDetailPage from './pages/ProductDetailPage';
-import CartPage from './pages/CartPage';
-import CheckoutStep1 from './pages/CheckoutStep1';
-import OrderConfirmation from './pages/Order-Confirmation';
-import ProtectedRoute from './components/ProtectedRoute'; // ⬅️ Import this
-import TrackOrderPublic from './pages/TrackOrderPublic';
-import MyOrdersPage from './pages/MyOrdersPage';
-import AccountPage from './pages/AccountPage';
-import PrivacyPolicy from './pages/PrivacyPolicy';
-import TermsAndConditions from './pages/TermsAndConditions';
-import RefundPolicy from './pages/RefundPolicy';
-import ShippingPolicy from './pages/ShippingPolicy';
+import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
+import HomePage from "./pages/HomePage";
+import CollectionPage from "./pages/CollectionPage";
+import CollectionProductsPage from "./pages/CollectionProductsPage";
+import ProductDetailPage from "./pages/ProductDetailPage";
+import CartPage from "./pages/CartPage";
+import CheckoutStep1 from "./pages/CheckoutStep1";
+import OrderConfirmation from "./pages/Order-Confirmation";
+import TrackOrderPublic from "./pages/TrackOrderPublic";
+import MyOrdersPage from "./pages/MyOrdersPage";
+import AccountPage from "./pages/AccountPage";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsAndConditions from "./pages/TermsAndConditions";
+import RefundPolicy from "./pages/RefundPolicy";
+import ShippingPolicy from "./pages/ShippingPolicy";
 
 function App() {
   const [cartItems, setCartItems] = useState(() => {
-    const stored = localStorage.getItem('cart');
+    const stored = localStorage.getItem("cart");
     return stored ? JSON.parse(stored) : [];
   });
 
   const [shippingDetails, setShippingDetails] = useState(() => {
-    const stored = localStorage.getItem('shipping');
+    const stored = localStorage.getItem("shipping");
     return stored ? JSON.parse(stored) : {};
   });
 
   useEffect(() => {
-    localStorage.setItem('cart', JSON.stringify(cartItems));
+    localStorage.setItem("cart", JSON.stringify(cartItems));
   }, [cartItems]);
 
   useEffect(() => {
-    localStorage.setItem('shipping', JSON.stringify(shippingDetails));
+    localStorage.setItem("shipping", JSON.stringify(shippingDetails));
   }, [shippingDetails]);
 
   const saveShippingDetails = (details) => {
@@ -44,12 +43,20 @@ function App() {
   };
 
   const clearCart = () => {
-  setCartItems([]); // ✅ Clears cart
-  localStorage.removeItem('cart'); // Optional: Clear from storage
-};
+    setCartItems([]); // ✅ Clears cart
+    localStorage.removeItem("cart"); // Optional: Clear from storage
+  };
 
   return (
-    <CartContext.Provider value={{ cartItems, setCartItems, clearCart, shippingDetails, saveShippingDetails }}>
+    <CartContext.Provider
+      value={{
+        cartItems,
+        setCartItems,
+        clearCart,
+        shippingDetails,
+        saveShippingDetails,
+      }}
+    >
       <Router>
         <Routes>
           <Route path="/" element={<HomePage />} />
@@ -66,25 +73,14 @@ function App() {
           <Route path="/terms" element={<TermsAndConditions />} />
           <Route path="/shipping-policy" element={<ShippingPolicy />} />
 
-          {/* 🔒 Protected Routes */}
-          <Route
-            path="/cart"
-            element={
-              <ProtectedRoute>
-                <CartPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/checkoutStep1"
-            element={
-              <ProtectedRoute>
-                <CheckoutStep1 />
-              </ProtectedRoute>
-            }
-          />
+          {/* 🟢 All public now */}
+          <Route path="/cart" element={<CartPage />} />
+          <Route path="/checkoutStep1" element={<CheckoutStep1 />} />
 
-          <Route path="/order-confirmation/:id" element={<OrderConfirmation />} />
+          <Route
+            path="/order-confirmation/:id"
+            element={<OrderConfirmation />}
+          />
         </Routes>
       </Router>
     </CartContext.Provider>

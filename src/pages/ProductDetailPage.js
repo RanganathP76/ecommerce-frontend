@@ -233,6 +233,21 @@ const ProductDetailPage = () => {
             </div>
           )}
 
+          {/* Specifications */}
+         {product.specifications?.length > 0 && (
+          <div className="specifications-block">
+          <h4>Specifications</h4>
+       <ul>
+         {product.specifications.map((spec, idx) => (
+         <li key={idx}>
+          <strong>{spec.key}:</strong> {spec.value}
+         </li>
+        ))}
+    </ul>
+  </div>
+)}
+
+
           {/* Buttons */}
           <div className="action-buttons">
             <button className="buy-now" onClick={buyNow}>

@@ -1,5 +1,5 @@
 import React, { useEffect, useContext } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import "./CartPage.css";
@@ -9,19 +9,18 @@ import CartContext from "../context/CartContext";
 const CartPage = () => {
   const { cartItems, setCartItems } = useContext(CartContext);
   const navigate = useNavigate();
+  const location = useLocation(); // 👈 detect route change
 
-  // Load cart from localStorage once on mount
+  // ✅ Load cart from localStorage every time user navigates to /cart
   useEffect(() => {
-    if (!cartItems || cartItems.length === 0) {
-      const savedCart = JSON.parse(localStorage.getItem("cart")) || [];
-      setCartItems(savedCart);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // only run on mount, remove cartItems from dependencies
+    const savedCart = JSON.parse(localStorage.getItem("cart")) || [];
+    setCartItems(savedCart);
+  }, [location.pathname, setCartItems]); // 👈 runs whenever route changes
 
   const getTotal = () => {
     return cartItems.reduce(
-      (sum, item) => sum + (parseFloat(item.price || 0) * (item.quantity || 1)),
+      (sum, item) =>
+        sum + parseFloat(item.price || 0) * (item.quantity || 1),
       0
     );
   };
@@ -62,7 +61,9 @@ const CartPage = () => {
                       <FaTrashAlt />
                     </button>
                   </div>
-                  <p>Price: ₹{item.price} x {item.quantity || 1}</p>
+                  <p>
+                    Price: ₹{item.price} x {item.quantity || 1}
+                  </p>
                   {item.customization && item.customization.length > 0 && (
                     <div className="customization-details">
                       <h5>Customization:</h5>

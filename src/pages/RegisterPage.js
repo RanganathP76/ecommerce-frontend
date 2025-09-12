@@ -18,7 +18,7 @@ const RegisterPage = () => {
     e.preventDefault();
     setError('');
     try {
-      const res = await axiosInstance.post('/users/register', form); // ✅ no hardcoded URL
+      const res = await axiosInstance.post('/auth/register', form); // ✅ no hardcoded URL
       localStorage.setItem('token', res.data.token);
       localStorage.setItem('user', JSON.stringify(res.data.user)); // ✅ also store user for quick access
       alert('Registration successful!');
