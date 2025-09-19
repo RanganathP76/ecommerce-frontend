@@ -9,13 +9,13 @@ import CartContext from "../context/CartContext";
 const CartPage = () => {
   const { cartItems, setCartItems } = useContext(CartContext);
   const navigate = useNavigate();
-  const location = useLocation(); // 👈 detect route change
+  const location = useLocation();
 
   // ✅ Load cart from localStorage every time user navigates to /cart
   useEffect(() => {
     const savedCart = JSON.parse(localStorage.getItem("cart")) || [];
     setCartItems(savedCart);
-  }, [location.pathname, setCartItems]); // 👈 runs whenever route changes
+  }, [location.pathname, setCartItems]);
 
   const getTotal = () => {
     return cartItems.reduce(
@@ -61,9 +61,24 @@ const CartPage = () => {
                       <FaTrashAlt />
                     </button>
                   </div>
+
                   <p>
                     Price: ₹{item.price} x {item.quantity || 1}
                   </p>
+
+                  {/* ✅ Show selected specification */}
+                  {item.specifications && item.specifications.length > 0 && (
+                    <div className="specification-details">
+                      <h5>Specifications:</h5>
+                      {item.specifications.map((spec, i) => (
+                        <div key={i} className="spec-field">
+                          <strong>{spec.key}:</strong> {spec.value}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* ✅ Show customization if available */}
                   {item.customization && item.customization.length > 0 && (
                     <div className="customization-details">
                       <h5>Customization:</h5>
@@ -71,7 +86,7 @@ const CartPage = () => {
                         <div key={i} className="custom-field">
                           <strong>{field.label}:</strong>
                           {field.type === "file" ? (
-                            <span> {field.value.split("/").pop()}</span>
+                            <span> {field.value?.split("/").pop()}</span>
                           ) : (
                             <span> {field.value}</span>
                           )}
@@ -82,6 +97,7 @@ const CartPage = () => {
                 </div>
               </div>
             ))}
+
             <div className="cart-summary">
               <h3>Total: ₹{getTotal()}</h3>
               <button className="checkout-btn" onClick={handleCheckout}>
