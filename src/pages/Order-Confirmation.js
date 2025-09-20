@@ -1,32 +1,32 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import axios from 'axios';
 import './OrderConfirmation.css';
 import axiosInstance from '../axiosInstance';
 
 const OrderConfirmation = () => {
   const { id } = useParams(); // order ID from URL
   const [order, setOrder] = useState(null);
-  const token = localStorage.getItem('token');
+  const [error, setError] = useState('');
 
   useEffect(() => {
     if (!id) return;
 
     const fetchOrder = async () => {
       try {
-        const res = await axiosInstance.get(`/orders/${id}`); // ✅ no hardcoded URL
+        // ✅ Use public track endpoint
+        const res = await axiosInstance.get(`/orders/track/${id}`);
         setOrder(res.data);
       } catch (err) {
         console.error('Failed to fetch order:', err);
+        setError('Order not found or server error.');
       }
     };
 
     fetchOrder();
   }, [id]);
 
-  if (!order) {
-    return <div className="order-confirmation"><p>Loading order details...</p></div>;
-  }
+  if (error) return <div className="order-confirmation"><p>{error}</p></div>;
+  if (!order) return <div className="order-confirmation"><p>Loading order details...</p></div>;
 
   return (
     <div className="order-confirmation">
@@ -58,8 +58,8 @@ const OrderConfirmation = () => {
 
       <div className="order-section">
         <h3>Payment Info</h3>
-        <p><strong>Method:</strong> {order.paymentInfo.method}</p>
-        <p><strong>Status:</strong> {order.paymentInfo.status}</p>
+        <p><strong>Method:</strong> {order.paymentInfo?.method || 'N/A'}</p>
+        <p><strong>Status:</strong> {order.paymentInfo?.status || 'N/A'}</p>
         <p><strong>Amount Paid:</strong> ₹{order.amountPaid}</p>
         <p><strong>Amount Due:</strong> ₹{order.amountDue}</p>
       </div>

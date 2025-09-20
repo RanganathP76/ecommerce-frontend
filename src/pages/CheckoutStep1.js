@@ -5,8 +5,10 @@ import "./CheckoutStep1.css";
 
 const CheckoutStep1 = () => {
   const { cartItems, clearCart } = useContext(CartContext);
+
   const [shippingInfo, setShippingInfo] = useState({
     name: "",
+    email: "", // mandatory for guests
     phone: "",
     address: "",
     city: "",
@@ -117,25 +119,15 @@ const CheckoutStep1 = () => {
     paymentId = "",
     extraPaymentData = {}
   ) => {
-    const orderItems = cartItems.map((item) => {
-      console.log("🛒 Item being added to order:", {
-        id: item._id,
-        title: item.title,
-        quantity: item.quantity,
-        customization: item.customization,
-        specifications: item.specifications,
-      });
-
-      return {
-        product: item._id, // ✅ backend expects product ID
-        name: item.title,
-        image: item.image || "",
-        price: parseFloat(item.price),
-        quantity: item.quantity ? Number(item.quantity) : 1,
-        customization: item.customization || [],
-        specifications: item.specifications || [],
-      };
-    });
+    const orderItems = cartItems.map((item) => ({
+      product: item._id,
+      name: item.title,
+      image: item.image || "",
+      price: parseFloat(item.price),
+      quantity: item.quantity ? Number(item.quantity) : 1,
+      customization: item.customization || [],
+      specifications: item.specifications || [],
+    }));
 
     const orderData = {
       shippingInfo,
@@ -153,19 +145,15 @@ const CheckoutStep1 = () => {
       orderStatus: "Processing",
     };
 
-    console.log("🟢 Final orderData sending to backend:", JSON.stringify(orderData, null, 2));
-
-
     try {
       const res = await axiosInstance.post("/orders", orderData, {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
-      console.log("✅ Order created successfully:", res.data);
 
       clearCart();
       window.location.href = `/order-confirmation/${res.data._id}`;
     } catch (err) {
-      console.error("❌ Order creation failed:", err);
+      console.error("Order creation failed:", err);
       alert(err.response?.data?.message || "Order creation failed.");
       setProcessing(false);
       clickedOnceRef.current = false;
@@ -178,13 +166,14 @@ const CheckoutStep1 = () => {
 
     if (
       !shippingInfo.name ||
+      !shippingInfo.email || // mandatory for guests
       !shippingInfo.phone ||
       !shippingInfo.address ||
       !shippingInfo.city ||
       !shippingInfo.postalCode ||
       !selectedShipping
     ) {
-      alert("Please fill in all required shipping fields.");
+      alert("Please fill in all required shipping fields (including email).");
       setProcessing(false);
       clickedOnceRef.current = false;
       return;
@@ -197,7 +186,6 @@ const CheckoutStep1 = () => {
       return;
     }
 
-    console.log("🟡 COD Checkout started");
     createOrder("COD", "Pending");
   };
 
@@ -207,13 +195,14 @@ const CheckoutStep1 = () => {
 
     if (
       !shippingInfo.name ||
+      !shippingInfo.email || // mandatory for guests
       !shippingInfo.phone ||
       !shippingInfo.address ||
       !shippingInfo.city ||
       !shippingInfo.postalCode ||
       !selectedShipping
     ) {
-      alert("Please fill in all required shipping fields.");
+      alert("Please fill in all required shipping fields (including email).");
       setProcessing(false);
       clickedOnceRef.current = false;
       return;
@@ -233,42 +222,44 @@ const CheckoutStep1 = () => {
       document.body.appendChild(script);
     }
 
-    console.log("🟡 Creating Razorpay order...");
-    const res = await axiosInstance.post(
-      "/payment/create-order",
-      {
-        amount: payableNow,
-        shippingInfo,
-        itemsPrice,
-        discount,
-        shippingPrice,
-        totalPrice: total,
-      },
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
+    try {
+      const res = await axiosInstance.post(
+        "/payment/create-order",
+        {
+          amount: payableNow,
+          shippingInfo,
+          itemsPrice,
+          discount,
+          shippingPrice,
+          totalPrice: total,
+        },
+        { headers: token ? { Authorization: `Bearer ${token}` } : {} }
+      );
 
-    const { razorpayOrder } = res.data;
-
-    console.log("✅ Razorpay order created:", razorpayOrder);
-
-    const rzp = new window.Razorpay({
-      key: RAZORPAY_KEY,
-      amount: razorpayOrder.amount,
-      currency: "INR",
-      name: "Dignify Deals",
-      description: "Order Payment",
-      order_id: razorpayOrder.id,
-      handler: (response) => {
-        console.log("💳 Razorpay payment success:", response);
-        createOrder("RAZORPAY", "Paid", response.razorpay_payment_id, {
-          razorpay_order_id: response.razorpay_order_id,
-          razorpay_signature: response.razorpay_signature,
-        });
-      },
-      prefill: { name: shippingInfo.name, contact: shippingInfo.phone },
-      theme: { color: "#556B2F" },
-    });
-    rzp.open();
+      const { razorpayOrder } = res.data;
+      const rzp = new window.Razorpay({
+        key: RAZORPAY_KEY,
+        amount: razorpayOrder.amount,
+        currency: "INR",
+        name: "Dignify Deals",
+        description: "Order Payment",
+        order_id: razorpayOrder.id,
+        handler: (response) => {
+          createOrder("RAZORPAY", "Paid", response.razorpay_payment_id, {
+            razorpay_order_id: response.razorpay_order_id,
+            razorpay_signature: response.razorpay_signature,
+          });
+        },
+        prefill: { name: shippingInfo.name, contact: shippingInfo.phone },
+        theme: { color: "#556B2F" },
+      });
+      rzp.open();
+    } catch (err) {
+      console.error("Razorpay order creation failed:", err);
+      alert("Payment initiation failed.");
+      setProcessing(false);
+      clickedOnceRef.current = false;
+    }
   };
 
   return (
@@ -276,64 +267,64 @@ const CheckoutStep1 = () => {
       <h2>Checkout</h2>
 
       {/* Cart Items */}
-      {/* Cart Items */}
-<div className="checkout-cart-wrapper">
-  <h3 className="checkout-cart-title">Your Cart</h3>
-  <div className="checkout-cart-box">
-    {cartItems.map((item, idx) => (
-      <div key={idx} className="checkout-cart-item">
-        <img
-          src={item.image || "/placeholder.png"}
-          alt={item.title}
-          className="checkout-cart-image"
-        />
-        <div className="checkout-cart-details">
-          <strong>{item.title}</strong>
-          <br />
-          <span>₹{item.price} x {item.quantity}</span>
+      <div className="checkout-cart-wrapper">
+        <h3>Your Cart</h3>
+        <div className="checkout-cart-box">
+          {cartItems.map((item, idx) => (
+            <div key={idx} className="checkout-cart-item">
+              <img
+                src={item.image || "/placeholder.png"}
+                alt={item.title}
+                className="checkout-cart-image"
+              />
+              <div className="checkout-cart-details">
+                <strong>{item.title}</strong>
+                <br />
+                <span>
+                  ₹{item.price} x {item.quantity}
+                </span>
 
-          {/* Specifications */}
-          {item.specifications?.length > 0 && (
-            <div className="cart-specs">
-              {item.specifications.map((s, i) => (
-                <div key={i}>
-                  <strong>{s.key}:</strong> {s.value}
-                </div>
-              ))}
-            </div>
-          )}
+                {/* Specifications */}
+                {item.specifications?.length > 0 && (
+                  <div className="cart-specs">
+                    {item.specifications.map((s, i) => (
+                      <div key={i}>
+                        <strong>{s.key}:</strong> {s.value}
+                      </div>
+                    ))}
+                  </div>
+                )}
 
-          {/* Customization */}
-          {item.customization?.length > 0 &&
-            item.customization.map((c, i) => (
-              <div key={i}>
-                <strong>{c.label}:</strong>{" "}
-                {c.type === "file"
-                  ? c.value?.split("/").pop()
-                  : c.value}
+                {/* Customization */}
+                {item.customization?.length > 0 &&
+                  item.customization.map((c, i) => (
+                    <div key={i}>
+                      <strong>{c.label}:</strong>{" "}
+                      {c.type === "file" ? c.value?.split("/").pop() : c.value}
+                    </div>
+                  ))}
               </div>
-            ))}
+            </div>
+          ))}
         </div>
       </div>
-    ))}
-  </div>
-</div>
-
 
       {/* Shipping Info */}
       <div className="shipping-info">
         <h3>Shipping Info</h3>
-        {["name", "phone", "address", "city", "postalCode"].map((field) => (
-          <input
-            key={field}
-            type="text"
-            placeholder={field}
-            value={shippingInfo[field]}
-            onChange={(e) =>
-              setShippingInfo({ ...shippingInfo, [field]: e.target.value })
-            }
-          />
-        ))}
+        {["name", "email", "phone", "address", "city", "postalCode"].map(
+          (field) => (
+            <input
+              key={field}
+              type="text"
+              placeholder={field}
+              value={shippingInfo[field]}
+              onChange={(e) =>
+                setShippingInfo({ ...shippingInfo, [field]: e.target.value })
+              }
+            />
+          )
+        )}
       </div>
 
       {/* Shipping Rates */}
@@ -397,9 +388,7 @@ const CheckoutStep1 = () => {
         <p>Shipping: ₹{shippingPrice}</p>
         {discount > 0 && <p>Discount: -₹{discount}</p>}
         <h4>Total: ₹{total}</h4>
-        {selectedPayment === "partialPayment" && (
-          <p>Pay Now: ₹{payableNow}</p>
-        )}
+        {selectedPayment === "partialPayment" && <p>Pay Now: ₹{payableNow}</p>}
       </div>
 
       {/* Action Button */}
