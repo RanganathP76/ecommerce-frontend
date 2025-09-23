@@ -365,7 +365,7 @@ const CheckoutStep1 = () => {
               checked={selectedPayment === "partialPayment"}
               onChange={() => setSelectedPayment("partialPayment")}
             />
-            Advance Payment (Pay ₹{getAdvance()} now)
+            Advance Payment (Pay ₹{getAdvance()} now and balance at delivery)
           </label>
         )}
         {paymentOptions?.cod?.enabled && (
