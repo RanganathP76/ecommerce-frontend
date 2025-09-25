@@ -239,34 +239,30 @@ const ProductDetailPage = () => {
           <p className="product-price">₹{product.price}</p>
 
           {/* Specifications */}
-          {product.specifications?.length > 0 && (
-            <div className="specifications-block">
-              <h4>Select Specifications</h4>
-              {product.specifications.map((spec, idx) => (
-                <div key={idx} className="spec-group">
-                  <p className="spec-label">{spec.key}:</p>
-                  <div className="spec-options">
-                    {spec.values.map((option, vIdx) => (
-                      <label key={vIdx} className="spec-option">
-                        <input
-                          type="radio"
-                          name={spec.key}
-                          value={option.value}
-                          checked={selectedSpecs[spec.key] === option.value}
-                          disabled={option.stock <= 0}
-                          onChange={() =>
-                            handleSpecChange(spec.key, option.value)
-                          }
-                        />
-                        {option.value}{" "}
-                        {option.stock <= 0 && "(Out of stock)"}
-                      </label>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
+          <div className="specifications-block">
+  <h4>Select Specifications</h4>
+  {product.specifications.map((spec, idx) => (
+    <div key={idx} className="spec-group">
+      <p className="spec-label">{spec.key}:</p>
+      <div className="spec-options">
+        {spec.values.map((option, vIdx) => (
+          <label key={vIdx} className="spec-option">
+            <input
+              type="radio"
+              name={spec.key}
+              value={option.value}
+              checked={selectedSpecs[spec.key] === option.value}
+              disabled={option.stock <= 0}
+              onChange={() => handleSpecChange(spec.key, option.value)}
+            />
+            <span className="spec-option-text">{option.value}</span>
+          </label>
+        ))}
+      </div>
+    </div>
+  ))}
+</div>
+
 
           {/* Customization */}
           {product.isCustomizable && (

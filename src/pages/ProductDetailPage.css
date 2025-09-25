@@ -341,3 +341,69 @@
   background: #3d3d8b;
   transform: scale(1.2);
 }
+
+
+/* Increase gap between Specifications / Customization and Buttons */
+.specifications-block,
+.customization-block {
+  margin-bottom: 2rem; /* was 1.5rem, now more space */
+}
+
+/* Optional: add some extra spacing for buttons themselves */
+.action-buttons {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem; /* was 1rem, now more space below */
+}
+
+
+
+
+
+
+
+/* Spec group */
+.spec-group {
+  margin-bottom: 2rem; /* more space before buttons */
+}
+
+/* Spec label */
+.spec-label {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+/* Spec options container: grid with 6 per row */
+.spec-options {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr); /* 6 options per row */
+  gap: 10px;
+}
+
+/* Each option: radio + text inline */
+.spec-option {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 8px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: border 0.2s ease, background 0.2s ease;
+}
+
+.spec-option input[type="radio"] {
+  margin: 0; /* remove extra space above */
+}
+
+.spec-option:hover {
+  border-color: #3d3d8b;
+  background-color: #f0f0ff;
+}
+
+/* Checked style */
+.spec-option input[type="radio"]:checked + .spec-option-text {
+  font-weight: bold;
+  color: #3d3d8b;
+}
