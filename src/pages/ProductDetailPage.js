@@ -6,6 +6,8 @@ import "./ProductDetailPage.css";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 
+
+
 const ProductDetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -17,7 +19,7 @@ const ProductDetailPage = () => {
   const [comment, setComment] = useState("");
   const [image, setImage] = useState(null);
   const [loading, setLoading] = useState(true);
-
+  const [activeIndex, setActiveIndex] = useState(0); // For image slider
   // Fetch product details
   useEffect(() => {
     const fetchProduct = async () => {
@@ -196,28 +198,40 @@ const ProductDetailPage = () => {
       <Header />
       <div className="product-detail">
         {/* IMAGE SLIDER */}
-        <div className="product-image-slider">
-          <div className="image-slide-wrapper">
-            {product.images && product.images.length > 0 ? (
-              product.images.map((img, idx) => (
-                <img key={idx} src={img} alt={product.title} />
-              ))
-            ) : (
-              <img src="/placeholder.png" alt="No Image" />
-            )}
-          </div>
-          <button
-            className="slider-prev-btn"
-            onClick={() => {
-              document.querySelector(".image-slide-wrapper").scrollBy({
-                left: -360,
-                behavior: "smooth",
-              });
-            }}
-          >
-            ‹
-          </button>
-        </div>
+<div className="product-image-slider-container">
+  <div
+    className="image-slide-wrapper"
+    onScroll={(e) => {
+      const scrollLeft = e.target.scrollLeft;
+      const width = e.target.clientWidth;
+      const currentIndex = Math.round(scrollLeft / width);
+      setActiveIndex(currentIndex);
+    }}
+  >
+    {product.images?.map((img, idx) => (
+      <img key={idx} src={img} alt={product.title} />
+    ))}
+  </div>
+
+  {/* Dots */}
+  <div className="slider-dots">
+    {product.images?.map((_, idx) => (
+      <span
+        key={idx}
+        className={`dot ${activeIndex === idx ? "active" : ""}`}
+        onClick={() => {
+          const slider = document.querySelector(".image-slide-wrapper");
+          slider.scrollTo({
+            left: idx * slider.clientWidth,
+            behavior: "smooth",
+          });
+        }}
+      ></span>
+    ))}
+  </div>
+</div>
+
+
 
         {/* PRODUCT INFO */}
         <div className="product-info">

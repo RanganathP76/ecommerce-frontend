@@ -1,4 +1,6 @@
-/* ProductDetailPage.css */
+/* ================================
+   Product Detail Page
+   ================================ */
 
 .product-detail {
   display: flex;
@@ -7,6 +9,7 @@
   padding: 2rem;
 }
 
+/* ---------- IMAGE SLIDER ---------- */
 .product-image-slider {
   width: 360px;
   height: 360px;
@@ -16,49 +19,55 @@
   background-color: #fff;
   border-radius: 8px;
   margin-bottom: 1rem;
-  display: flex;
-  justify-content: center;
-  align-items: center;
 }
 
 .image-slide-wrapper {
   display: flex;
-  transition: transform 0.5s ease-in-out;
   width: 100%;
   height: 100%;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
 }
 
-.image-slide-wrapper img,
-.image-slide-wrapper .placeholder {
+.image-slide-wrapper::-webkit-scrollbar {
+  display: none; /* Hide scrollbar */
+}
+
+.image-slide-wrapper img {
   flex: 0 0 100%;
   width: 100%;
   height: 100%;
   object-fit: contain;
+  background: #fff;
+  scroll-snap-align: center;
+}
+
+/* Dots under images */
+.slider-dots {
   display: flex;
   justify-content: center;
   align-items: center;
-  color: #aaa;
-  font-size: 1rem;
+  margin-top: 10px;
+  gap: 8px;
 }
 
-.slider-nav {
-  position: absolute;
-  top: 50%;
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  transform: translateY(-50%);
-}
-
-.slider-nav button {
-  background: rgba(0, 0, 0, 0.5);
-  color: white;
-  border: none;
-  padding: 0.5rem 1rem;
+.slider-dots .dot {
+  width: 10px;
+  height: 10px;
+  background: #ccc;
+  border-radius: 50%;
   cursor: pointer;
-  font-size: 1rem;
+  transition: background 0.3s ease, transform 0.3s ease;
 }
 
+.slider-dots .dot.active {
+  background: #3d3d8b; /* Accent color */
+  transform: scale(1.2);
+}
+
+/* ---------- PRODUCT INFO ---------- */
 .product-info {
   max-width: 500px;
   width: 100%;
@@ -81,6 +90,7 @@
   margin-bottom: 1rem;
 }
 
+/* ---------- CUSTOMIZATION ---------- */
 .customization-block {
   margin-bottom: 1.5rem;
 }
@@ -103,6 +113,7 @@
   border: 1px solid #ccc;
 }
 
+/* ---------- ACTION BUTTONS ---------- */
 .action-buttons {
   display: flex;
   gap: 1rem;
@@ -118,25 +129,31 @@
   border: none;
   border-radius: 8px;
   cursor: pointer;
-}
-
-.buy-now {
   background-color: #3d3d8b;
   color: white;
+  transition: background 0.3s ease;
 }
 
-.add-to-cart {
-  background-color: #3d3d8b;
-  color: white;
+.buy-now:hover,
+.add-to-cart:hover {
+  background-color: #2b2b6d;
 }
 
+/* ---------- DESCRIPTION ---------- */
 .product-description {
   font-size: 1rem;
-  line-height: 1.5;
-  color: #555;
+  line-height: 1.6;
+  color: #444;
   margin-top: 1rem;
+  padding: 1rem;
+  border: 1px solid #eee;
+  border-radius: 6px;
+  background: #fafafa;
+  white-space: pre-line;
+  word-wrap: break-word;
 }
 
+/* ---------- REVIEWS ---------- */
 .review-section,
 .existing-reviews {
   margin-top: 2rem;
@@ -155,6 +172,7 @@
 .rating-input svg {
   font-size: 1.5rem;
   margin-right: 0.3rem;
+  cursor: pointer;
 }
 
 .review-section textarea {
@@ -181,12 +199,21 @@
   font-weight: bold;
 }
 
+.review-section button:hover {
+  background-color: #2b2b6d;
+}
+
+/* Review cards */
 .review-list {
   display: flex;
   gap: 1rem;
   overflow-x: auto;
   padding-bottom: 1rem;
   scroll-snap-type: x mandatory;
+}
+
+.review-list::-webkit-scrollbar {
+  display: none;
 }
 
 .review-card {
@@ -213,93 +240,75 @@
   margin-top: 0.5rem;
 }
 
-/* ---------- PRODUCT IMAGE SLIDER ---------- */
-.product-image-slider {
-  width: 360px;
-  height: 360px;
-  position: relative;
-  overflow: hidden;
-  border: 1px solid #ddd;
-  background-color: #fff;
-  border-radius: 8px;
-  margin-bottom: 1rem;
+/* ---------- RESPONSIVE ---------- */
+@media (max-width: 768px) {
+  .product-image-slider {
+    width: 100%;
+    height: 300px;
+  }
+
+  .image-slide-wrapper img {
+    height: 100%;
+  }
+
+  .product-info {
+    padding: 1rem;
+  }
+}
+
+
+
+
+
+
+
+/* ---------- SLIDER DOTS ---------- */
+.slider-dots {
   display: flex;
   justify-content: center;
   align-items: center;
+  gap: 8px;
+  margin-top: 10px; /* Space below the image */
 }
 
-.image-slide-wrapper {
-  display: flex;
-  transition: transform 0.5s ease-in-out;
-  width: 100%;
-  height: 100%;
-}
-
-.image-slide-wrapper img {
-  flex: 0 0 100%;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  background: #fff;
-}
-
-/* Prev Button */
-.slider-prev-btn {
-  position: absolute;
-  top: 50%;
-  left: 10px;
-  transform: translateY(-50%);
-  background: rgba(0, 0, 0, 0.5);
-  color: white;
-  border: none;
-  padding: 0.5rem 0.8rem;
-  cursor: pointer;
-  font-size: 1.2rem;
+.slider-dots .dot {
+  width: 10px;
+  height: 10px;
+  background: #ccc;
   border-radius: 50%;
-  z-index: 2;
-  transition: background 0.3s ease;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.3s ease;
 }
 
-.slider-prev-btn:hover {
-  background: rgba(0, 0, 0, 0.7);
+.slider-dots .dot.active {
+  background: #3d3d8b; /* highlight color */
+  transform: scale(1.2);
 }
 
-/* ---------- PRODUCT DESCRIPTION ---------- */
-.product-description {
-  font-size: 1rem;
-  line-height: 1.6;
-  color: #444;
-  margin-top: 1rem;
-  padding: 1rem;
-  border: 1px solid #eee;
-  border-radius: 6px;
-  background: #fafafa;
-  white-space: pre-line;
-  word-wrap: break-word;
-}
 
-/* ---------- PRODUCT IMAGE SLIDER ---------- */
-.product-image-slider {
-  width: 360px;
-  height: 360px;
-  position: relative;
-  overflow: hidden;
-  border: 1px solid #ddd;
-  background-color: #fff;
-  border-radius: 8px;
-  margin-bottom: 1rem;
+
+
+
+
+
+
+.product-image-slider-container {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
+  width: 360px;
+  position: relative;
 }
 
+/* Slider */
 .image-slide-wrapper {
   display: flex;
   width: 100%;
-  height: 100%;
+  height: 360px;
   overflow-x: auto;
   scroll-snap-type: x mandatory;
   -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
 }
 
 .image-slide-wrapper img {
@@ -308,6 +317,27 @@
   height: 100%;
   object-fit: contain;
   scroll-snap-align: center;
-  background: #fff;
 }
 
+/* Dots */
+.slider-dots {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.slider-dots .dot {
+  width: 10px;
+  height: 10px;
+  background: #ccc;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.3s ease;
+}
+
+.slider-dots .dot.active {
+  background: #3d3d8b;
+  transform: scale(1.2);
+}
