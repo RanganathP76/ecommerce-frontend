@@ -1,6 +1,8 @@
+// src/App.js
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { useState, useEffect } from "react";
 import CartContext from "./context/CartContext";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
@@ -30,10 +32,12 @@ function App() {
     return stored ? JSON.parse(stored) : {};
   });
 
+  // Save cart to localStorage
   useEffect(() => {
     localStorage.setItem("cart", JSON.stringify(cartItems));
   }, [cartItems]);
 
+  // Save shipping details to localStorage
   useEffect(() => {
     localStorage.setItem("shipping", JSON.stringify(shippingDetails));
   }, [shippingDetails]);
@@ -43,47 +47,45 @@ function App() {
   };
 
   const clearCart = () => {
-    setCartItems([]); // ✅ Clears cart
-    localStorage.removeItem("cart"); // Optional: Clear from storage
+    setCartItems([]);
+    localStorage.removeItem("cart");
   };
 
   return (
-    <CartContext.Provider
-      value={{
-        cartItems,
-        setCartItems,
-        clearCart,
-        shippingDetails,
-        saveShippingDetails,
-      }}
-    >
-      <Router>
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
-          <Route path="/collection" element={<CollectionPage />} />
-          <Route path="/collection/:id" element={<CollectionProductsPage />} />
-          <Route path="/product/:id" element={<ProductDetailPage />} />
-          <Route path="/track-order" element={<TrackOrderPublic />} />
-          <Route path="/my-orders" element={<MyOrdersPage />} />
-          <Route path="/account" element={<AccountPage />} />
-          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-          <Route path="/return-policy" element={<RefundPolicy />} />
-          <Route path="/terms" element={<TermsAndConditions />} />
-          <Route path="/shipping-policy" element={<ShippingPolicy />} />
+    <GoogleOAuthProvider clientId="1035657928843-47977kenpehsi3nkr54jrcr3a3h1o9qk.apps.googleusercontent.com">
+      <CartContext.Provider
+        value={{
+          cartItems,
+          setCartItems,
+          clearCart,
+          shippingDetails,
+          saveShippingDetails,
+        }}
+      >
+        <Router>
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
+            <Route path="/collection" element={<CollectionPage />} />
+            <Route path="/collection/:id" element={<CollectionProductsPage />} />
+            <Route path="/product/:id" element={<ProductDetailPage />} />
+            <Route path="/track-order" element={<TrackOrderPublic />} />
+            <Route path="/my-orders" element={<MyOrdersPage />} />
+            <Route path="/account" element={<AccountPage />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+            <Route path="/return-policy" element={<RefundPolicy />} />
+            <Route path="/terms" element={<TermsAndConditions />} />
+            <Route path="/shipping-policy" element={<ShippingPolicy />} />
 
-          {/* 🟢 All public now */}
-          <Route path="/cart" element={<CartPage />} />
-          <Route path="/checkoutStep1" element={<CheckoutStep1 />} />
-
-          <Route
-            path="/order-confirmation/:id"
-            element={<OrderConfirmation />}
-          />
-        </Routes>
-      </Router>
-    </CartContext.Provider>
+            {/* Cart & Checkout */}
+            <Route path="/cart" element={<CartPage />} />
+            <Route path="/checkoutStep1" element={<CheckoutStep1 />} />
+            <Route path="/order-confirmation/:id" element={<OrderConfirmation />} />
+          </Routes>
+        </Router>
+      </CartContext.Provider>
+    </GoogleOAuthProvider>
   );
 }
 

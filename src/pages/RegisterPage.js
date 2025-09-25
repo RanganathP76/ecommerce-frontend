@@ -1,9 +1,9 @@
-// pages/RegisterPage.js
+// src/pages/RegisterPage.js
 import React, { useState } from 'react';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import './RegisterPage.css'; // You can customize this CSS
+import { GoogleLogin } from '@react-oauth/google';
 import axiosInstance from '../axiosInstance';
+import './RegisterPage.css';
 
 const RegisterPage = () => {
   const navigate = useNavigate();
@@ -18,14 +18,29 @@ const RegisterPage = () => {
     e.preventDefault();
     setError('');
     try {
-      const res = await axiosInstance.post('/auth/register', form); // ✅ no hardcoded URL
+      const res = await axiosInstance.post('/auth/register', form);
       localStorage.setItem('token', res.data.token);
-      localStorage.setItem('user', JSON.stringify(res.data.user)); // ✅ also store user for quick access
+      localStorage.setItem('user', JSON.stringify(res.data.user));
       alert('Registration successful!');
       navigate('/');
     } catch (err) {
-      console.error('Registration error:', err);
+      console.error(err);
       setError(err.response?.data?.message || 'Registration failed');
+    }
+  };
+
+  const handleGoogleSuccess = async (credentialResponse) => {
+    try {
+      const res = await axiosInstance.post('/auth/google-login', {
+        tokenId: credentialResponse.credential,
+      });
+      localStorage.setItem('token', res.data.token);
+      localStorage.setItem('user', JSON.stringify(res.data.user));
+      alert('Login successful!');
+      navigate('/');
+    } catch (err) {
+      console.error(err);
+      setError(err.response?.data?.message || 'Google login failed');
     }
   };
 
@@ -39,6 +54,14 @@ const RegisterPage = () => {
         <button type="submit">Register</button>
         {error && <p className="auth-error">{error}</p>}
       </form>
+
+      <div className="google-login">
+        <GoogleLogin
+          onSuccess={handleGoogleSuccess}
+          onError={() => setError('Google login failed')}
+        />
+      </div>
+
       <p className="auth-redirect">
         Already have an account? <a href="/login">Login</a>
       </p>

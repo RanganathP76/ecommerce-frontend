@@ -1,58 +1,67 @@
-/* styles/LoginPage.css */
+/* src/pages/LoginPage.css */
 
 .login-container {
   max-width: 400px;
   margin: 50px auto;
-  padding: 30px;
-  border-radius: 8px;
-  background: #f5f5f5;
-  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  padding: 2rem;
+  background: #fffaf0;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  text-align: center;
+  font-family: 'Segoe UI', sans-serif;
 }
 
 .login-container h2 {
-  text-align: center;
-  margin-bottom: 20px;
-  color: #333;
-}
-
-.login-form {
-  display: flex;
-  flex-direction: column;
+  color: #887c60;
+  margin-bottom: 1.5rem;
 }
 
 .login-form input {
-  padding: 12px;
-  margin-bottom: 15px;
+  width: 100%;
+  padding: 0.6rem;
+  margin-bottom: 1rem;
   border: 1px solid #ccc;
-  border-radius: 4px;
+  border-radius: 6px;
+  font-size: 1rem;
 }
 
 .login-form button {
-  padding: 12px;
-  background-color: #4caf50;
+  width: 100%;
+  padding: 0.8rem;
+  border: none;
+  border-radius: 8px;
+  background-color: #887c60;
   color: white;
   font-weight: bold;
-  border: none;
-  border-radius: 4px;
+  font-size: 1rem;
   cursor: pointer;
+  transition: background 0.3s;
 }
 
 .login-form button:hover {
-  background-color: #45a049;
+  background-color: #6e644f;
 }
 
 .error-text {
   color: red;
-  margin-bottom: 10px;
-  text-align: center;
+  margin-bottom: 0.5rem;
 }
+
 .register-link {
-  text-align: center;
-  margin-top: 10px;
-  font-size: 14px;
+  margin-top: 1rem;
+  font-size: 0.95rem;
 }
 
 .register-link a {
-  color: #556B2F;
+  color: #887c60;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.register-link a:hover {
   text-decoration: underline;
+}
+
+.google-login {
+  margin: 1rem 0;
 }
