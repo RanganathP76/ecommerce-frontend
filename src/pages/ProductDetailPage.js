@@ -6,8 +6,6 @@ import "./ProductDetailPage.css";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 
-
-
 const ProductDetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -20,6 +18,8 @@ const ProductDetailPage = () => {
   const [image, setImage] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeIndex, setActiveIndex] = useState(0); // For image slider
+  const [expandedReviews, setExpandedReviews] = useState({}); // Track expanded reviews
+
   // Fetch product details
   useEffect(() => {
     const fetchProduct = async () => {
@@ -102,7 +102,7 @@ const ProductDetailPage = () => {
     return true;
   };
 
-  // ✅ Build a proper cart item (specifications are passed directly as [{key,value}])
+  // Generate cart item
   const generateCartItem = () => {
     return {
       _id: product._id,
@@ -144,7 +144,6 @@ const ProductDetailPage = () => {
     const newItem = generateCartItem();
     cart.push(newItem);
     localStorage.setItem("cart", JSON.stringify(cart));
-    console.log("🛒 Added to cart:", newItem); // ✅ Debug
     navigate("/cart");
   };
 
@@ -158,7 +157,6 @@ const ProductDetailPage = () => {
     }
     const cartItem = generateCartItem();
     localStorage.setItem("cart", JSON.stringify([cartItem]));
-    console.log("⚡ Buy now cart:", cartItem); // ✅ Debug
     navigate("/cart");
   };
 
@@ -198,40 +196,38 @@ const ProductDetailPage = () => {
       <Header />
       <div className="product-detail">
         {/* IMAGE SLIDER */}
-<div className="product-image-slider-container">
-  <div
-    className="image-slide-wrapper"
-    onScroll={(e) => {
-      const scrollLeft = e.target.scrollLeft;
-      const width = e.target.clientWidth;
-      const currentIndex = Math.round(scrollLeft / width);
-      setActiveIndex(currentIndex);
-    }}
-  >
-    {product.images?.map((img, idx) => (
-      <img key={idx} src={img} alt={product.title} />
-    ))}
-  </div>
+        <div className="product-image-slider-container">
+          <div
+            className="image-slide-wrapper"
+            onScroll={(e) => {
+              const scrollLeft = e.target.scrollLeft;
+              const width = e.target.clientWidth;
+              const currentIndex = Math.round(scrollLeft / width);
+              setActiveIndex(currentIndex);
+            }}
+          >
+            {product.images?.map((img, idx) => (
+              <img key={idx} src={img} alt={product.title} />
+            ))}
+          </div>
 
-  {/* Dots */}
-  <div className="slider-dots">
-    {product.images?.map((_, idx) => (
-      <span
-        key={idx}
-        className={`dot ${activeIndex === idx ? "active" : ""}`}
-        onClick={() => {
-          const slider = document.querySelector(".image-slide-wrapper");
-          slider.scrollTo({
-            left: idx * slider.clientWidth,
-            behavior: "smooth",
-          });
-        }}
-      ></span>
-    ))}
-  </div>
-</div>
-
-
+          {/* Dots */}
+          <div className="slider-dots">
+            {product.images?.map((_, idx) => (
+              <span
+                key={idx}
+                className={`dot ${activeIndex === idx ? "active" : ""}`}
+                onClick={() => {
+                  const slider = document.querySelector(".image-slide-wrapper");
+                  slider.scrollTo({
+                    left: idx * slider.clientWidth,
+                    behavior: "smooth",
+                  });
+                }}
+              ></span>
+            ))}
+          </div>
+        </div>
 
         {/* PRODUCT INFO */}
         <div className="product-info">
@@ -239,30 +235,33 @@ const ProductDetailPage = () => {
           <p className="product-price">₹{product.price}</p>
 
           {/* Specifications */}
-          <div className="specifications-block">
-  <h4>Select Specifications</h4>
-  {product.specifications.map((spec, idx) => (
-    <div key={idx} className="spec-group">
-      <p className="spec-label">{spec.key}:</p>
-      <div className="spec-options">
-        {spec.values.map((option, vIdx) => (
-          <label key={vIdx} className="spec-option">
-            <input
-              type="radio"
-              name={spec.key}
-              value={option.value}
-              checked={selectedSpecs[spec.key] === option.value}
-              disabled={option.stock <= 0}
-              onChange={() => handleSpecChange(spec.key, option.value)}
-            />
-            <span className="spec-option-text">{option.value}</span>
-          </label>
-        ))}
-      </div>
-    </div>
-  ))}
-</div>
-
+          {product.specifications?.length > 0 && (
+            <div className="specifications-block">
+              <h4>Select Specifications</h4>
+              {product.specifications.map((spec, idx) => (
+                <div key={idx} className="spec-group">
+                  <p className="spec-label">{spec.key}:</p>
+                  <div className="spec-options">
+                    {spec.values.map((option, vIdx) => (
+                      <label key={vIdx} className="spec-option">
+                        <input
+                          type="radio"
+                          name={spec.key}
+                          value={option.value}
+                          checked={selectedSpecs[spec.key] === option.value}
+                          disabled={option.stock <= 0}
+                          onChange={() =>
+                            handleSpecChange(spec.key, option.value)
+                          }
+                        />
+                        <span className="spec-option-text">{option.value}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
 
           {/* Customization */}
           {product.isCustomizable && (
@@ -275,10 +274,7 @@ const ProductDetailPage = () => {
                     <input
                       type="file"
                       onChange={(e) =>
-                        handleFileUpload(
-                          `${field.label}-${idx}`,
-                          e.target.files[0]
-                        )
+                        handleFileUpload(`${field.label}-${idx}`, e.target.files[0])
                       }
                     />
                   ) : (
@@ -286,10 +282,7 @@ const ProductDetailPage = () => {
                       type="text"
                       value={customInputs[`${field.label}-${idx}`] || ""}
                       onChange={(e) =>
-                        handleInputChange(
-                          `${field.label}-${idx}`,
-                          e.target.value
-                        )
+                        handleInputChange(`${field.label}-${idx}`, e.target.value)
                       }
                     />
                   )}
@@ -340,27 +333,37 @@ const ProductDetailPage = () => {
               <p>No reviews yet</p>
             ) : (
               <div className="review-list">
-                {product.reviews.map((rev, idx) => (
-                  <div className="review-card" key={idx}>
-                    <p>
-                      <strong>{rev.name}</strong>
-                    </p>
-                    <p>
-                      <strong>Rating:</strong> {"★".repeat(rev.rating)}
-                    </p>
-                    <p>
-                      <strong>Comment:</strong> {rev.comment}
-                    </p>
-                    {rev.images?.map((img, imgIdx) => (
-                      <img
-                        key={imgIdx}
-                        src={img}
-                        alt="review"
-                        className="review-image"
-                      />
-                    ))}
-                  </div>
-                ))}
+                {product.reviews.map((rev, idx) => {
+                  const isExpanded = expandedReviews[idx];
+                  const toggleExpand = () => {
+                    setExpandedReviews((prev) => ({
+                      ...prev,
+                      [idx]: !prev[idx],
+                    }));
+                  };
+                  return (
+                    <div className="review-card" key={idx}>
+                      <p><strong>{rev.name}</strong></p>
+                      <p><strong>Rating:</strong> {"★".repeat(rev.rating)}</p>
+                      <p className={`review-comment ${isExpanded ? "expanded" : ""}`}>
+                        {rev.comment}
+                      </p>
+                      {rev.comment.length > 100 && (
+                        <span className="read-more" onClick={toggleExpand}>
+                          {isExpanded ? "Show less" : "Read more"}
+                        </span>
+                      )}
+                      {rev.images?.map((img, imgIdx) => (
+                        <img
+                          key={imgIdx}
+                          src={img}
+                          alt="review"
+                          className="review-image"
+                        />
+                      ))}
+                    </div>
+                  );
+                })}
               </div>
             )}
           </div>
