@@ -8,7 +8,7 @@ const CheckoutStep1 = () => {
 
   const [shippingInfo, setShippingInfo] = useState({
     name: "",
-    email: "", // mandatory for guests
+    email: "",
     phone: "",
     address: "",
     city: "",
@@ -63,6 +63,15 @@ const CheckoutStep1 = () => {
       : selectedPayment === "fullPrepaid"
       ? total
       : 0;
+
+  // --- Preview values (always visible regardless of selection) ---
+  const previewFullPrepaidTotal = Math.round(
+    itemsPrice + shippingPrice - getDiscount()
+  );
+  const previewFullPrepaidSave = Math.round(getDiscount());
+  const previewPartialNow = Math.round(getAdvance());
+  const previewPartialLater = Math.round(itemsPrice + shippingPrice - getAdvance());
+  const previewCOD = Math.round(itemsPrice + shippingPrice);
 
   // --- Fetch Shipping & Payment Config ---
   useEffect(() => {
@@ -166,7 +175,7 @@ const CheckoutStep1 = () => {
 
     if (
       !shippingInfo.name ||
-      !shippingInfo.email || // mandatory for guests
+      !shippingInfo.email ||
       !shippingInfo.phone ||
       !shippingInfo.address ||
       !shippingInfo.city ||
@@ -195,7 +204,7 @@ const CheckoutStep1 = () => {
 
     if (
       !shippingInfo.name ||
-      !shippingInfo.email || // mandatory for guests
+      !shippingInfo.email ||
       !shippingInfo.phone ||
       !shippingInfo.address ||
       !shippingInfo.city ||
@@ -346,6 +355,7 @@ const CheckoutStep1 = () => {
       {/* Payment Methods */}
       <div className="payment-method">
         <h3>Payment Method</h3>
+
         {paymentOptions?.fullPrepaid?.enabled && (
           <label>
             <input
@@ -354,9 +364,13 @@ const CheckoutStep1 = () => {
               checked={selectedPayment === "fullPrepaid"}
               onChange={() => setSelectedPayment("fullPrepaid")}
             />
-            Full Prepaid (Save ₹{getDiscount()})
+            Full Prepaid: ₹{previewFullPrepaidTotal}{" "}
+            <span className="payment-note">
+              (Save ₹{previewFullPrepaidSave})
+            </span>
           </label>
         )}
+
         {paymentOptions?.partialPayment?.enabled && (
           <label>
             <input
@@ -365,9 +379,13 @@ const CheckoutStep1 = () => {
               checked={selectedPayment === "partialPayment"}
               onChange={() => setSelectedPayment("partialPayment")}
             />
-            Advance Payment (Pay ₹{getAdvance()} now and balance at delivery)
+            Advance Payment: ₹{previewPartialNow}{" "}
+            <span className="payment-note">
+              (Pay ₹{previewPartialNow} now and ₹{previewPartialLater} at delivery)
+            </span>
           </label>
         )}
+
         {paymentOptions?.cod?.enabled && (
           <label>
             <input
@@ -376,7 +394,8 @@ const CheckoutStep1 = () => {
               checked={selectedPayment === "COD"}
               onChange={() => setSelectedPayment("COD")}
             />
-            Cash on Delivery
+            COD: ₹{previewCOD}{" "}
+            <span className="payment-note">(Pay full at delivery)</span>
           </label>
         )}
       </div>
@@ -384,11 +403,25 @@ const CheckoutStep1 = () => {
       {/* Summary */}
       <div className="summary-box">
         <h3>Summary</h3>
-        <p>Items: ₹{itemsPrice}</p>
-        <p>Shipping: ₹{shippingPrice}</p>
-        {discount > 0 && <p>Discount: -₹{discount}</p>}
-        <h4>Total: ₹{total}</h4>
-        {selectedPayment === "partialPayment" && <p>Pay Now: ₹{payableNow}</p>}
+        <p>Items: ₹{Math.round(itemsPrice)}</p>
+        <p>Shipping: ₹{Math.round(shippingPrice)}</p>
+        {discount > 0 && <p>Discount: -₹{Math.round(discount)}</p>}
+        <h4>Total: ₹{Math.round(total)}</h4>
+
+        {selectedPayment === "partialPayment" && (
+          <>
+            <p>Pay Now: ₹{Math.round(advance)}</p>
+            <p>Balance at Delivery: ₹{Math.round(total - advance)}</p>
+          </>
+        )}
+
+        {selectedPayment === "fullPrepaid" && (
+          <p>Pay Now: ₹{Math.round(total)}</p>
+        )}
+
+        {selectedPayment === "COD" && (
+          <p>Pay at Delivery: ₹{Math.round(total)}</p>
+        )}
       </div>
 
       {/* Action Button */}

@@ -28,189 +28,7 @@
   padding-bottom: 0.5rem;
 }
 
-.checkout-cart-box {
-  margin-bottom: 1.5rem;
-}
-
-.checkout-cart-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 1rem;
-  margin-bottom: 1rem;
-  padding: 1rem;
-  border-radius: 12px;
-  background: #fafafa;
-  border: 1px solid #eee;
-  transition: 0.2s ease;
-}
-
-.checkout-cart-item:hover {
-  background: #f5f9ff;
-  border-color: #cddffb;
-}
-
-.checkout-cart-image {
-  width: 70px;
-  height: 70px;
-  border-radius: 10px;
-  object-fit: cover;
-  border: 1px solid #ddd;
-}
-
-.shipping-info input {
-  width: 100%;
-  padding: 0.9rem;
-  margin: 0.5rem 0;
-  border-radius: 10px;
-  border: 1px solid #ccc;
-  font-size: 0.95rem;
-  transition: border 0.2s;
-}
-
-.shipping-info input:focus {
-  border-color: #556b2f;
-  outline: none;
-  background: #f9fff6;
-}
-
-.shipping-method label,
-.payment-method label {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  margin-bottom: 0.7rem;
-  cursor: pointer;
-  padding: 0.6rem 0.8rem;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  transition: 0.2s ease;
-}
-
-.shipping-method label:hover,
-.payment-method label:hover {
-  background: #f8fafc;
-  border-color: #bbb;
-}
-
-.shipping-method input,
-.payment-method input {
-  accent-color: #556b2f;
-  transform: scale(1.2);
-}
-
-.summary-box {
-  margin-top: 2rem;
-  padding: 1.2rem;
-  border-radius: 12px;
-  background: #f7fdf9;
-  border: 1px solid #d2ebd6;
-}
-
-.summary-box p,
-.summary-box h4 {
-  margin: 0.3rem 0;
-  font-size: 1rem;
-}
-
-.summary-box h4 {
-  font-size: 1.3rem;
-  font-weight: 700;
-  color: #2c5e3f;
-}
-
-.place-order-btn,
-.pay-order-btn {
-  width: 100%;
-  padding: 1rem;
-  margin-top: 1.5rem;
-  font-size: 1.05rem;
-  font-weight: 600;
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: background 0.3s ease, transform 0.15s ease;
-}
-
-.place-order-btn {
-  background: #556b2f;
-  color: #fff;
-}
-
-.place-order-btn:hover {
-  background: #465b26;
-  transform: translateY(-2px);
-}
-
-.pay-order-btn {
-  background: #0070f3;
-  color: #fff;
-}
-
-.pay-order-btn:hover {
-  background: #0059c9;
-  transform: translateY(-2px);
-}
-
-.place-order-btn:disabled,
-.pay-order-btn:disabled {
-  background: #ccc;
-  cursor: not-allowed;
-  transform: none;
-}
-
-
-
-
-.checkout-cart-box {
-  display: flex;
-  overflow-x: auto;
-  gap: 1rem;
-  padding-bottom: 1rem;
-  margin-bottom: 1.5rem;
-  scrollbar-width: thin;
-  scrollbar-color: #ccc transparent;
-}
-
-.checkout-cart-box::-webkit-scrollbar {
-  height: 8px;
-}
-
-.checkout-cart-box::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.checkout-cart-box::-webkit-scrollbar-thumb {
-  background-color: #bbb;
-  border-radius: 4px;
-}
-
-.checkout-cart-item {
-  flex: 0 0 220px; /* card width */
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  background: #fafafa;
-  border: 1px solid #eee;
-  border-radius: 12px;
-  padding: 1rem;
-  transition: 0.2s ease;
-}
-
-.checkout-cart-item:hover {
-  background: #f5f9ff;
-  border-color: #cddffb;
-}
-
-.checkout-cart-image {
-  width: 100%;
-  height: 150px;
-  object-fit: cover;
-  border-radius: 10px;
-  margin-bottom: 0.8rem;
-}
- 
-
-
+/* Cart Section */
 .checkout-cart-wrapper {
   margin-bottom: 2rem;
 }
@@ -236,12 +54,15 @@
 }
 
 .checkout-cart-box::-webkit-scrollbar-thumb {
-  background: #bbb;
+  background-color: #bbb;
   border-radius: 4px;
 }
 
 .checkout-cart-item {
-  flex: 0 0 220px; /* card width */
+  flex: 0 0 220px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
   background: #fff;
   border: 1px solid #eee;
   border-radius: 12px;
@@ -250,7 +71,7 @@
 }
 
 .checkout-cart-item:hover {
-  box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
   border-color: #d0e0ff;
 }
 
@@ -272,7 +93,46 @@
   font-size: 0.85rem;
   color: #555;
 }
-  
+
+/* Shipping Info */
+.shipping-info input {
+  width: 100%;
+  padding: 0.9rem;
+  margin: 0.5rem 0;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  font-size: 0.95rem;
+  transition: border 0.2s;
+}
+
+.shipping-info input:focus {
+  border-color: #556b2f;
+  outline: none;
+  background: #f9fff6;
+}
+
+/* Shipping Methods */
+.shipping-method label {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.7rem;
+  cursor: pointer;
+  padding: 0.6rem 0.8rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  transition: 0.2s ease;
+}
+
+.shipping-method label:hover {
+  background: #f8fafc;
+  border-color: #bbb;
+}
+
+.shipping-method input {
+  accent-color: #556b2f;
+  transform: scale(1.2);
+}
 
 /* Payment Method Section */
 .payment-method {
@@ -290,11 +150,10 @@
   color: #333;
 }
 
-/* Payment Option Labels */
 .payment-method label {
   display: flex;
-  align-items: flex-start;
-  gap: 12px;
+  flex-direction: column;
+  gap: 6px;
   padding: 14px 16px;
   margin-bottom: 12px;
   border: 1px solid #ddd;
@@ -306,32 +165,152 @@
   color: #444;
 }
 
-/* Hover and Active States */
 .payment-method label:hover {
-  border-color: #6a9e3a;
-  background: #f4fff2;
+  border-color: #887c60;
+  background: #f9f7f0;
 }
 
 .payment-method input[type="radio"] {
-  margin-top: 4px;
-  accent-color: #6a9e3a; /* Modern green accent */
+  accent-color: #887c60;
   transform: scale(1.2);
   cursor: pointer;
 }
 
-/* Selected Option Highlight */
-.payment-method input[type="radio"]:checked + span,
-.payment-method label:has(input[type="radio"]:checked) {
-  border-color: #6a9e3a;
-  background: #f0fff0;
-  font-weight: 600;
-  color: #2d5a27;
-}
-
-/* Description Text (Optional if you add <small>) */
-.payment-method small {
+.payment-note {
   display: block;
   font-size: 0.9rem;
-  color: #777;
-  margin-top: 4px;
+  color: #887c60;
+  margin-left: 22px; /* aligns text below radio input */
 }
+
+/* Summary Box */
+.summary-box {
+  margin-top: 2rem;
+  padding: 1.2rem;
+  border-radius: 12px;
+  background: #f7fdf9;
+  border: 1px solid #d2ebd6;
+}
+
+.summary-box p,
+.summary-box h4 {
+  margin: 0.3rem 0;
+  font-size: 1rem;
+}
+
+.summary-box h4 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #2c5e3f;
+}
+
+/* Buttons */
+.place-order-btn,
+.pay-order-btn {
+  width: 100%;
+  padding: 1rem;
+  margin-top: 1.5rem;
+  font-size: 1.05rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.15s ease;
+}
+
+.place-order-btn {
+  background: #887c60;
+  color: #fff;
+}
+
+.place-order-btn:hover {
+  background: #75694f;
+  transform: translateY(-2px);
+}
+
+.pay-order-btn {
+  background: #0070f3;
+  color: #fff;
+}
+
+.pay-order-btn:hover {
+  background: #0059c9;
+  transform: translateY(-2px);
+}
+
+.place-order-btn:disabled,
+.pay-order-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Scrollbar Styling */
+.checkout-cart-box {
+  display: flex;
+  overflow-x: auto;
+  gap: 1rem;
+  padding-bottom: 0.5rem;
+  scrollbar-width: thin;
+  scrollbar-color: #ccc transparent;
+}
+
+.checkout-cart-box::-webkit-scrollbar {
+  height: 8px;
+}
+
+.checkout-cart-box::-webkit-scrollbar-thumb {
+  background-color: #bbb;
+  border-radius: 4px;
+}
+
+
+
+
+.payment-method label {
+  display: flex;
+  flex-direction: column; /* vertical stacking */
+  align-items: flex-start; /* left align all content */
+  gap: 6px; /* space between radio and note */
+  padding: 14px 16px;
+  margin-bottom: 12px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  background: #fafafa;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  font-size: 1rem;
+  color: #444;
+  position: relative;
+}
+
+.payment-method input[type="radio"] {
+  accent-color: #887c60;
+  transform: scale(1.2);
+  cursor: pointer;
+  margin-bottom: 4px;
+}
+
+.payment-method .payment-note {
+  font-size: 0.9rem;
+  color: #887c60;
+  line-height: 1.2;
+  margin-left: 0; /* aligns nicely under text */
+}
+
+/* Highlight selected */
+.payment-method input[type="radio"]:checked + .payment-note,
+.payment-method input[type="radio"]:checked ~ .payment-note {
+  color: #5a4f3b;
+  font-weight: 600;
+}
+
+.payment-method label:hover {
+  border-color: #887c60;
+  background: #f9f7f0;
+}
+
+
+
+
+
