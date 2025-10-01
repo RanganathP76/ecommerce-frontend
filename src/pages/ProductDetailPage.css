@@ -462,3 +462,24 @@
 
 
 
+.current-price {
+  font-weight: bold;
+  color: #e60023; /* red for discounted price */
+  margin-right: 10px;
+}
+
+.compare-price {
+  text-decoration: line-through;
+  color: #999;
+}
+
+
+
+
+
+
+
+
+
+
+

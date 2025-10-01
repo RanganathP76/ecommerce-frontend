@@ -108,6 +108,7 @@ const ProductDetailPage = () => {
       _id: product._id,
       title: product.title,
       price: product.price,
+      comparePrice: product.comparePrice || null, // include compare price in cart
       image: product.images[0],
       quantity: 1,
       specifications:
@@ -232,7 +233,18 @@ const ProductDetailPage = () => {
         {/* PRODUCT INFO */}
         <div className="product-info">
           <h2>{product.title}</h2>
-          <p className="product-price">₹{product.price}</p>
+
+          {/* Price with Compare Price */}
+          <p className="product-price">
+            {product.comparePrice && product.comparePrice > product.price ? (
+              <>
+                <span className="current-price">₹{product.price}</span>
+                <span className="compare-price">₹{product.comparePrice}</span>
+              </>
+            ) : (
+              <span className="current-price">₹{product.price}</span>
+            )}
+          </p>
 
           {/* Specifications */}
           {product.specifications?.length > 0 && (
