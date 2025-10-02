@@ -1,7 +1,7 @@
 // facebookPixel.js
 
 // Get Pixel ID from environment variable
-const PIXEL_ID = process.env.META_PIXEL_ID;
+const PIXEL_ID = process.env.REACT_APP_META_PIXEL_ID;
 
 export const initFacebookPixel = () => {
   if (!PIXEL_ID) {
