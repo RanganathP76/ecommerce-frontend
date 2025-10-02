@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import CartContext from "./context/CartContext";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 
+// Import pages
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import HomePage from "./pages/HomePage";
@@ -20,6 +21,9 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsAndConditions from "./pages/TermsAndConditions";
 import RefundPolicy from "./pages/RefundPolicy";
 import ShippingPolicy from "./pages/ShippingPolicy";
+
+// ✅ Import our Facebook Pixel utility
+import { initFacebookPixel } from "./utils/facebookPixel";
 
 function App() {
   const [cartItems, setCartItems] = useState(() => {
@@ -50,6 +54,11 @@ function App() {
     setCartItems([]);
     localStorage.removeItem("cart");
   };
+
+  // ✅ Initialize Facebook Pixel once on App load
+  useEffect(() => {
+    initFacebookPixel(); // PageView will fire on all pages
+  }, []);
 
   return (
     <GoogleOAuthProvider clientId="1035657928843-47977kenpehsi3nkr54jrcr3a3h1o9qk.apps.googleusercontent.com">

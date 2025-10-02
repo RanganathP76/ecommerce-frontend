@@ -6,6 +6,9 @@ import "./ProductDetailPage.css";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 
+// ✅ Import Pixel tracking function
+import { trackEvent } from "../utils/facebookPixel";
+
 const ProductDetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -26,6 +29,14 @@ const ProductDetailPage = () => {
       try {
         const { data } = await axiosInstance.get(`/products/${id}`);
         setProduct(data);
+
+        // ✅ Fire ViewContent event
+        trackEvent("ViewContent", {
+          content_name: data.title,
+          content_ids: [data._id],
+          value: data.price,
+          currency: "INR",
+        });
 
         // Init customization fields
         if (data.isCustomizable && Array.isArray(data.customizationFields)) {
@@ -108,7 +119,7 @@ const ProductDetailPage = () => {
       _id: product._id,
       title: product.title,
       price: product.price,
-      comparePrice: product.comparePrice || null, // include compare price in cart
+      comparePrice: product.comparePrice || null,
       image: product.images[0],
       quantity: 1,
       specifications:
@@ -141,8 +152,19 @@ const ProductDetailPage = () => {
       );
       return;
     }
-    const cart = JSON.parse(localStorage.getItem("cart")) || [];
+
     const newItem = generateCartItem();
+
+    // ✅ Track AddToCart event
+    trackEvent("AddToCart", {
+      content_name: newItem.title,
+      content_ids: [newItem._id],
+      value: newItem.price,
+      currency: "INR",
+      quantity: 1,
+    });
+
+    const cart = JSON.parse(localStorage.getItem("cart")) || [];
     cart.push(newItem);
     localStorage.setItem("cart", JSON.stringify(cart));
     navigate("/cart");
@@ -156,7 +178,18 @@ const ProductDetailPage = () => {
       );
       return;
     }
+
     const cartItem = generateCartItem();
+
+    // ✅ Track AddToCart for Buy Now as well (optional)
+    trackEvent("AddToCart", {
+      content_name: cartItem.title,
+      content_ids: [cartItem._id],
+      value: cartItem.price,
+      currency: "INR",
+      quantity: 1,
+    });
+
     localStorage.setItem("cart", JSON.stringify([cartItem]));
     navigate("/cart");
   };
@@ -387,4 +420,3 @@ const ProductDetailPage = () => {
 };
 
 export default ProductDetailPage;
-

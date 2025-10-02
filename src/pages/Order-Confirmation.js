@@ -3,6 +3,9 @@ import { useParams } from 'react-router-dom';
 import './OrderConfirmation.css';
 import axiosInstance from '../axiosInstance';
 
+// ✅ Import Pixel tracking function
+import { trackEvent } from '../utils/facebookPixel';
+
 const OrderConfirmation = () => {
   const { id } = useParams(); // order ID from URL
   const [order, setOrder] = useState(null);
@@ -13,9 +16,23 @@ const OrderConfirmation = () => {
 
     const fetchOrder = async () => {
       try {
-        // ✅ Use public track endpoint
+        // ✅ Fetch order details
         const res = await axiosInstance.get(`/orders/track/${id}`);
-        setOrder(res.data);
+        const orderData = res.data;
+        setOrder(orderData);
+
+        // ✅ Fire Purchase event
+        if (orderData?.orderItems?.length > 0) {
+          orderData.orderItems.forEach((item) => {
+            trackEvent("Purchase", {
+              content_name: item.name,
+              content_ids: [item._id],
+              value: item.price * item.quantity,
+              currency: "INR",
+              quantity: item.quantity,
+            });
+          });
+        }
       } catch (err) {
         console.error('Failed to fetch order:', err);
         setError('Order not found or server error.');
