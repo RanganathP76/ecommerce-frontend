@@ -200,76 +200,89 @@ const CheckoutStep1 = () => {
 
   // --- Prepaid Checkout ---
   const handlePrepaid = async () => {
-    if (!guardClick()) return;
+  if (!guardClick()) return;
 
-    if (
-      !shippingInfo.name ||
-      !shippingInfo.email ||
-      !shippingInfo.phone ||
-      !shippingInfo.address ||
-      !shippingInfo.city ||
-      !shippingInfo.postalCode ||
-      !selectedShipping
-    ) {
-      alert("Please fill in all required shipping fields (including email).");
-      setProcessing(false);
-      clickedOnceRef.current = false;
-      return;
-    }
+  if (
+    !shippingInfo.name ||
+    !shippingInfo.email ||
+    !shippingInfo.phone ||
+    !shippingInfo.address ||
+    !shippingInfo.city ||
+    !shippingInfo.postalCode ||
+    !selectedShipping
+  ) {
+    alert("Please fill in all required shipping fields (including email).");
+    setProcessing(false);
+    clickedOnceRef.current = false;
+    return;
+  }
 
-    if (!validateStock()) {
-      alert("Some items are out of stock.");
-      setProcessing(false);
-      clickedOnceRef.current = false;
-      return;
-    }
+  if (!validateStock()) {
+    alert("Some items are out of stock.");
+    setProcessing(false);
+    clickedOnceRef.current = false;
+    return;
+  }
 
-    if (!razorpayLoaded) {
-      const script = document.createElement("script");
-      script.src = "https://checkout.razorpay.com/v1/checkout.js";
-      script.onload = () => setRazorpayLoaded(true);
-      document.body.appendChild(script);
-    }
+  if (!razorpayLoaded) {
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.onload = () => setRazorpayLoaded(true);
+    document.body.appendChild(script);
+    // Wait a bit for script to load
+    await new Promise((resolve) => (script.onload = resolve));
+  }
 
-    try {
-      const res = await axiosInstance.post(
-        "/payment/create-order",
-        {
-          amount: payableNow,
-          shippingInfo,
-          itemsPrice,
-          discount,
-          shippingPrice,
-          totalPrice: total,
+  try {
+    const res = await axiosInstance.post(
+      "/payment/create-order",
+      {
+        amount: payableNow,
+        shippingInfo,
+        itemsPrice,
+        discount,
+        shippingPrice,
+        totalPrice: total,
+      },
+      { headers: token ? { Authorization: `Bearer ${token}` } : {} }
+    );
+
+    const { razorpayOrder } = res.data;
+
+    const rzp = new window.Razorpay({
+      key: RAZORPAY_KEY,
+      amount: razorpayOrder.amount,
+      currency: "INR",
+      name: "Dignify Deals",
+      description: "Order Payment",
+      order_id: razorpayOrder.id,
+      handler: (response) => {
+        createOrder("RAZORPAY", "Paid", response.razorpay_payment_id, {
+          razorpay_order_id: response.razorpay_order_id,
+          razorpay_signature: response.razorpay_signature,
+        });
+      },
+      prefill: { name: shippingInfo.name, contact: shippingInfo.phone },
+      theme: { color: "#556B2F" },
+      modal: {
+        ondismiss: function () {
+          // Reset processing state if user cancels the payment
+          setProcessing(false);
+          clickedOnceRef.current = false;
+          alert("Payment was cancelled.");
         },
-        { headers: token ? { Authorization: `Bearer ${token}` } : {} }
-      );
+      },
+    });
 
-      const { razorpayOrder } = res.data;
-      const rzp = new window.Razorpay({
-        key: RAZORPAY_KEY,
-        amount: razorpayOrder.amount,
-        currency: "INR",
-        name: "Dignify Deals",
-        description: "Order Payment",
-        order_id: razorpayOrder.id,
-        handler: (response) => {
-          createOrder("RAZORPAY", "Paid", response.razorpay_payment_id, {
-            razorpay_order_id: response.razorpay_order_id,
-            razorpay_signature: response.razorpay_signature,
-          });
-        },
-        prefill: { name: shippingInfo.name, contact: shippingInfo.phone },
-        theme: { color: "#556B2F" },
-      });
-      rzp.open();
-    } catch (err) {
-      console.error("Razorpay order creation failed:", err);
-      alert("Payment initiation failed.");
-      setProcessing(false);
-      clickedOnceRef.current = false;
-    }
-  };
+    rzp.open();
+  } catch (err) {
+    console.error("Razorpay order creation failed:", err);
+    alert("Payment initiation failed.");
+    setProcessing(false);
+    clickedOnceRef.current = false;
+  }
+};
+
 
   return (
     <div className="checkout-container">
