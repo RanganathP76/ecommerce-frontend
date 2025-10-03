@@ -47,6 +47,19 @@ const ProductDetailPage = () => {
           });
           setCustomInputs(initState);
         }
+
+         // ✅ Auto-select first available spec option
+      if (Array.isArray(data.specifications) && data.specifications.length > 0) {
+        const autoSpecs = {};
+        data.specifications.forEach((spec) => {
+          const firstAvailable = (spec.values || []).find(v => v.stock > 0);
+          if (firstAvailable) {
+            autoSpecs[spec.key] = firstAvailable.value;
+          }
+        });
+        setSelectedSpecs(autoSpecs);
+      }
+
       } catch (error) {
         console.error("Failed to fetch product", error);
       } finally {
