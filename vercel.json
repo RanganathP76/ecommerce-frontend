@@ -1,0 +1,14 @@
+{
+  "redirects": [
+    {
+      "source": "/sitemap.xml",
+      "destination": "https://ecommerce-backend-8wv0.onrender.com/api/sitemap.xml",
+      "permanent": true
+    },
+    {
+      "source": "/robots.txt",
+      "destination": "/robots.txt",
+      "permanent": true
+    }
+  ]
+}

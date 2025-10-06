@@ -5,7 +5,7 @@ import CartContext from "./context/CartContext";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 
 // Import pages
-import SitemapPage from "./pages/SitemapPage";
+
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import HomePage from "./pages/HomePage";
@@ -74,7 +74,7 @@ function App() {
       >
         <Router>
           <Routes>
-            <Route path="/sitemap" element={<SitemapPage />} />
+            
             <Route path="/" element={<HomePage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
