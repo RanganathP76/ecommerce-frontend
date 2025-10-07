@@ -478,6 +478,36 @@
 
 
 
+.extra-product-info {
+  margin-bottom: 10px;
+  font-size: 15px;
+  color: #333;
+}
+
+.extra-product-info p {
+  margin: 3px 0;
+}
+
+.delivery-info {
+  color: #2ecc71;
+  font-weight: 500;
+}
+
+.cod-info {
+  color: #f39c12;
+  font-weight: 500;
+}
+
+.return-policy {
+  margin-top: 8px;
+  color: #2980b9;
+  font-size: 14px;
+  text-align: center;
+}
+
+
+
+
 
 
 

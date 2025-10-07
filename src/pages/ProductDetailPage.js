@@ -281,16 +281,23 @@ const ProductDetailPage = () => {
           <h2>{product.title}</h2>
 
           {/* Price with Compare Price */}
-          <p className="product-price">
-            {product.comparePrice && product.comparePrice > product.price ? (
-              <>
-                <span className="current-price">₹{product.price}</span>
-                <span className="compare-price">₹{product.comparePrice}</span>
-              </>
-            ) : (
-              <span className="current-price">₹{product.price}</span>
-            )}
-          </p>
+<p className="product-price">
+  {product.comparePrice && product.comparePrice > product.price ? (
+    <>
+      <span className="current-price">₹{product.price}</span>
+      <span className="compare-price">₹{product.comparePrice}</span>
+    </>
+  ) : (
+    <span className="current-price">₹{product.price}</span>
+  )}
+</p>
+
+{/* ✅ Add below price info */}
+<div className="extra-product-info">
+  <p className="delivery-info">🚚 Free Delivery</p>
+  <p className="cod-info">💰 Cash on Delivery Available</p>
+</div>
+
 
           {/* Specifications */}
           {product.specifications?.length > 0 && (
@@ -350,14 +357,18 @@ const ProductDetailPage = () => {
           )}
 
           {/* Buttons */}
-          <div className="action-buttons">
-            <button className="buy-now" onClick={buyNow}>
-              Buy Now
-            </button>
-            <button className="add-to-cart" onClick={addToCart}>
-              Add to Cart
-            </button>
-          </div>
+         <div className="action-buttons">
+  <button className="buy-now" onClick={buyNow}>
+    Buy Now
+  </button>
+  <button className="add-to-cart" onClick={addToCart}>
+    Add to Cart
+  </button>
+</div>
+
+{/* ✅ Place return policy OUTSIDE buttons */}
+<p className="return-policy">🕒 7 Days Easy Return</p>
+
 
           {/* Description */}
           <p className="product-description">{product.description}</p>
