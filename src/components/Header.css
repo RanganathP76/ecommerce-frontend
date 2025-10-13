@@ -1,5 +1,8 @@
+@import url('https://fonts.googleapis.com/css2?family=Pacifico&display=swap');
+
+
 :root {
-  --primary-dark: #887c60;
+  --primary-dark: #94855d;
   --light-text: white;
   --muted-text: #ccc;
   --highlight-color: #ffffff;
@@ -114,4 +117,51 @@
   .icon-link {
     font-size: 20px;
   }
+}
+
+
+
+
+.logo {
+  font-family: 'Pacifico', cursive;
+  font-size: 2.1rem;
+  font-weight: 600;
+  color: #ffffff;
+  letter-spacing: 2px;
+  text-decoration: none;
+  transition: transform 0.2s ease, color 0.3s ease;
+}
+
+.logo:hover {
+  transform: scale(1.05);
+  color: #ffffff;
+}
+
+/* Icon styles */
+.icon-link {
+  color: #ffffff;
+  font-size: 1.6rem;
+  text-decoration: none;
+  margin: 0 8px;
+  position: relative;
+  transition: color 0.3s ease;
+}
+
+.icon-link:hover {
+  color: #fffefd;
+}
+
+.icon {
+  vertical-align: middle;
+}
+
+.cart-count {
+  position: absolute;
+  top: -6px;
+  right: -8px;
+  background: #867d68;
+  color: white;
+  font-size: 0.7rem;
+  padding: 2px 5px;
+  border-radius: 50%;
 }
