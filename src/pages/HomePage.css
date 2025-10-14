@@ -1,7 +1,7 @@
 
 .homepage {
   font-family: 'Segoe UI', sans-serif;
-  background-color: #5c62916b;
+  background-color: #ffffff;
   color: #333;
 }
 
@@ -76,7 +76,7 @@
 /* ===== Featured Section ===== */
 .featured {
   padding: 1.5rem 0;
-  background: linear-gradient(to bottom #5c62916b, #f3f4f6);
+  background: linear-gradient(to bottom #ffffff, #f3f4f6);
 }
 
 /* ===== FAQ Section ===== */
