@@ -2,11 +2,11 @@
 
 
 :root {
-  --primary-dark: #94855d;
+  --primary-dark: #5c6291;
   --light-text: white;
   --muted-text: #ccc;
   --highlight-color: #ffffff;
-  --active-color: white;
+  --active-color: rgb(247, 240, 240);
 }
 
 .main-header {
@@ -159,7 +159,7 @@
   position: absolute;
   top: -6px;
   right: -8px;
-  background: #867d68;
+  background: #a43535;
   color: white;
   font-size: 0.7rem;
   padding: 2px 5px;
