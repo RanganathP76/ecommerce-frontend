@@ -12,7 +12,7 @@
 }
 
 .login-container h2 {
-  color: #887c60;
+  color: #5c6291;
   margin-bottom: 1.5rem;
 }
 
@@ -30,7 +30,7 @@
   padding: 0.8rem;
   border: none;
   border-radius: 8px;
-  background-color: #887c60;
+  background-color: #5c6291;
   color: white;
   font-weight: bold;
   font-size: 1rem;
@@ -39,7 +39,7 @@
 }
 
 .login-form button:hover {
-  background-color: #6e644f;
+  background-color: #5c6291;
 }
 
 .error-text {
@@ -53,7 +53,7 @@
 }
 
 .register-link a {
-  color: #887c60;
+  color: #5c6291;
   font-weight: 600;
   text-decoration: none;
 }

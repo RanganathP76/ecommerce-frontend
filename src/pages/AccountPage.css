@@ -2,7 +2,7 @@
 
 .account-container h2 {
   margin-bottom: 20px;
-  color: #887c60;
+  color: #5c6291;
 }
 
 .account-info p {
@@ -30,7 +30,7 @@
 }
 
 .account-actions button:hover {
-  background-color: #6f664e;
+  background-color: #5c6291;
 }
 
 .logout-btn {
@@ -42,7 +42,7 @@
 }
 
 .login-link {
-  color: #887c60;
+  color: #5c6291;
   cursor: pointer;
   text-decoration: underline;
 }

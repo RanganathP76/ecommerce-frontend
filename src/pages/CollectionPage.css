@@ -72,7 +72,7 @@
   .collection-page {
     width: 100%;
     min-height: 100vh;
-    background: #fafafa;
+    background: #5c62916b;
     font-family: 'Arial', sans-serif;
     color: #333;
   }
@@ -98,8 +98,8 @@
   }
 
   .collection-page .card {
-    background: #fff;
-    border: 1px solid #e0e0e0;
+    background: #5c62916b;
+    border: 1px solid #5c62916b;
     border-radius: 8px;
     text-decoration: none;
     color: inherit;
