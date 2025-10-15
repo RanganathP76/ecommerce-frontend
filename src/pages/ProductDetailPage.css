@@ -509,6 +509,28 @@
 
 
 
+.whatsapp-order {
+  background-color: #25D366; /* WhatsApp green */
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  cursor: pointer;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 16px;
+  transition: background-color 0.3s, transform 0.2s;
+  width: 100%; /* full width under the other buttons */
+  text-align: center;
+}
+
+.whatsapp-order:hover {
+  background-color: #1ebe5d; /* darker green on hover */
+  transform: scale(1.05); /* subtle zoom effect */
+}
+
+.whatsapp-button-container {
+  margin-top: 10px; /* space below Add to Cart/Buy Now buttons */
+}
 
 
 

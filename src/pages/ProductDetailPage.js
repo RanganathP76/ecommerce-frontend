@@ -238,6 +238,27 @@ const ProductDetailPage = () => {
   if (loading) return <p>Loading...</p>;
   if (!product) return <p>Product not found</p>;
 
+  const handleWhatsAppOrder = () => {
+  // Your product name
+  const productName = product?.title;
+
+  // Current product page URL (optional, you can also use a specific link)
+  const productLink = window.location.href;
+
+  // Pre-filled message
+  const message = `Hi, I would like to order this product: ${productName}. Here is the link: ${productLink}`;
+
+  // Encode the message for URL
+  const encodedMessage = encodeURIComponent(message);
+
+  // WhatsApp URL (replace country code if needed)
+  const whatsappURL = `https://wa.me/918050084991?text=${encodedMessage}`;
+
+  // Open WhatsApp
+  window.open(whatsappURL, "_blank");
+};
+
+
   return (
     <div>
       <Header />
@@ -295,7 +316,7 @@ const ProductDetailPage = () => {
 {/* ✅ Add below price info */}
 <div className="extra-product-info">
   <p className="delivery-info">🚚 Free Delivery</p>
-  <p className="cod-info">💰 Cash on Delivery Available</p>
+  <p className="cod-info">💰 Partial COD Available</p>
 </div>
 
 
@@ -357,7 +378,8 @@ const ProductDetailPage = () => {
           )}
 
           {/* Buttons */}
-         <div className="action-buttons">
+
+  <div className="action-buttons">
   <button className="buy-now" onClick={buyNow}>
     Buy Now
   </button>
@@ -366,8 +388,12 @@ const ProductDetailPage = () => {
   </button>
 </div>
 
-{/* ✅ Place return policy OUTSIDE buttons */}
-<p className="return-policy">🕒 7 Days Easy Return</p>
+{/* WhatsApp button below */}
+  <div className="whatsapp-button-container">
+    <button className="whatsapp-order" onClick={handleWhatsAppOrder}>
+      Order via WhatsApp
+    </button>
+  </div>
 
 
           {/* Description */}

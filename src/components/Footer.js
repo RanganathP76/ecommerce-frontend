@@ -25,10 +25,10 @@ const Footer = () => {
 
         {/* Social Icons */}
         <div className="footer-icons">
-          <a href="https://www.instagram.com/dignifydeals?utm_source=ig_web_button_share_sheet&igsh=a2l5bjU4b3ltMTRl" target="_blank" rel="noopener noreferrer">
+          <a href="https://www.instagram.com/dignifydeals" target="_blank" rel="noopener noreferrer">
             <FaInstagram />
           </a>
-          <a href="https://m.facebook.com/profile.php?id=61574254927966&name=xhp_nt__fb__action__open_user" target="_blank" rel="noopener noreferrer">
+          <a href="https://m.facebook.com/profile.php?id=61574254927966" target="_blank" rel="noopener noreferrer">
             <FaFacebook />
           </a>
           <a href="https://wa.me/918050084991" target="_blank" rel="noopener noreferrer">

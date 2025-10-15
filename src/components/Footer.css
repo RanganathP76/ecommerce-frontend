@@ -1,32 +1,45 @@
+/* =========================
+   Footer Styling
+   ========================= */
 
 .footer {
-  background: #5c629180;
+  background-color: #8187b3;
   color: #fff;
   padding: 25px 15px;
   text-align: center;
+  font-family: "Inter", sans-serif;
 }
 
 .footer-container {
   max-width: 1100px;
-  margin: auto;
+  margin: 0 auto;
 }
 
+/* Footer Links - Two per row */
 .footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
   margin-bottom: 12px;
+  gap: 10px; /* space between links */
 }
 
 .footer-links a {
+  flex: 0 0 50%; /* two links per row */
+  max-width: 50%;
+  text-align: center;
   color: #141212;
-  margin: 0 10px;
   font-size: 14px;
   text-decoration: none;
   transition: color 0.3s ease;
+  box-sizing: border-box;
 }
 
 .footer-links a:hover {
   color: #fff;
 }
 
+/* Footer Contact */
 .footer-contact {
   font-size: 14px;
   margin-bottom: 12px;
@@ -35,12 +48,14 @@
 .footer-contact a {
   color: #120f0f;
   text-decoration: none;
+  transition: color 0.3s ease;
 }
 
 .footer-contact a:hover {
   color: #fff;
 }
 
+/* Footer Social Icons */
 .footer-icons {
   margin-bottom: 12px;
 }
@@ -56,14 +71,17 @@
   color: #fff;
 }
 
+/* Footer Bottom Text */
 .footer-bottom {
   font-size: 12px;
   color: #888;
 }
 
+/* Responsive: stack links on mobile */
 @media (max-width: 600px) {
   .footer-links a {
-    display: block;
+    flex: 0 0 100%; /* full width on small screens */
+    max-width: 100%;
     margin: 5px 0;
   }
 }
