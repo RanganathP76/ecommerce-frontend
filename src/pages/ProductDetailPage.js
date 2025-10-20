@@ -257,6 +257,10 @@ const ProductDetailPage = () => {
   // Open WhatsApp
   window.open(whatsappURL, "_blank");
 };
+const slides = [
+  ...(product?.images || []),
+  ...(product?.videos || [])
+];
 
 
   return (
@@ -266,35 +270,41 @@ const ProductDetailPage = () => {
         {/* IMAGE SLIDER */}
         <div className="product-image-slider-container">
           <div
-            className="image-slide-wrapper"
-            onScroll={(e) => {
-              const scrollLeft = e.target.scrollLeft;
-              const width = e.target.clientWidth;
-              const currentIndex = Math.round(scrollLeft / width);
-              setActiveIndex(currentIndex);
-            }}
-          >
-            {product.images?.map((img, idx) => (
-              <img key={idx} src={img} alt={product.title} />
-            ))}
-          </div>
+  className="image-slide-wrapper"
+  onScroll={(e) => {
+    const scrollLeft = e.target.scrollLeft;
+    const width = e.target.clientWidth;
+    const currentIndex = Math.round(scrollLeft / width);
+    setActiveIndex(currentIndex);
+  }}
+>
+  {slides.map((item, idx) =>
+    product.images?.includes(item) ? (
+      <img key={`img-${idx}`} src={item} alt={product.title} />
+    ) : (
+      <video key={`vid-${idx}`} src={item} controls className="product-video" />
+    )
+  )}
+</div>
 
-          {/* Dots */}
-          <div className="slider-dots">
-            {product.images?.map((_, idx) => (
-              <span
-                key={idx}
-                className={`dot ${activeIndex === idx ? "active" : ""}`}
-                onClick={() => {
-                  const slider = document.querySelector(".image-slide-wrapper");
-                  slider.scrollTo({
-                    left: idx * slider.clientWidth,
-                    behavior: "smooth",
-                  });
-                }}
-              ></span>
-            ))}
-          </div>
+{/* Dots */}
+<div className="slider-dots">
+  {slides.map((_, idx) => (
+    <span
+      key={idx}
+      className={`dot ${activeIndex === idx ? "active" : ""}`}
+      onClick={() => {
+        const slider = document.querySelector(".image-slide-wrapper");
+        slider.scrollTo({
+          left: idx * slider.clientWidth,
+          behavior: "smooth",
+        });
+      }}
+    ></span>
+  ))}
+</div>
+
+
         </div>
 
         {/* PRODUCT INFO */}
@@ -394,6 +404,21 @@ const ProductDetailPage = () => {
       Order via WhatsApp
     </button>
   </div>
+
+  {product.videos?.length > 0 && (
+  <div className="product-video-gallery">
+    <h4>Product Videos</h4>
+    {product.videos.map((vid, idx) => (
+      <video
+        key={idx}
+        src={vid}
+        controls
+        className="product-detail-video"
+      />
+    ))}
+  </div>
+)}
+
 
 
           {/* Description */}
