@@ -6,6 +6,7 @@ import "./ProductDetailPage.css";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 
+
 // ✅ Import Pixel tracking function
 import { trackEvent } from "../utils/facebookPixel";
 
@@ -22,6 +23,10 @@ const ProductDetailPage = () => {
   const [loading, setLoading] = useState(true);
   const [activeIndex, setActiveIndex] = useState(0); // For image slider
   const [expandedReviews, setExpandedReviews] = useState({}); // Track expanded reviews
+  const [showPopup, setShowPopup] = useState(false);
+  const [uploadingFiles, setUploadingFiles] = useState({});
+
+
 
   // Fetch product details
   useEffect(() => {
@@ -69,6 +74,9 @@ const ProductDetailPage = () => {
     fetchProduct();
   }, [id]);
 
+  
+
+
   // Handle spec change
   const handleSpecChange = (key, value) => {
     setSelectedSpecs((prev) => ({ ...prev, [key]: value }));
@@ -76,27 +84,42 @@ const ProductDetailPage = () => {
 
   // Handle file upload
   const handleFileUpload = async (key, file) => {
-    try {
-      const formData = new FormData();
-      formData.append("file", file);
+  try {
+    // mark as uploading
+    setUploadingFiles((prev) => ({ ...prev, [key]: true }));
 
-      const { data } = await axiosInstance.post("/upload/temp", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+    const formData = new FormData();
+    formData.append("file", file);
 
-      setCustomInputs((prev) => ({
-        ...prev,
-        [key]: {
-          type: "file",
-          url: data.url,
-          public_id: data.public_id,
-        },
-      }));
-    } catch (err) {
-      console.error("File upload failed:", err);
-      alert("Image upload failed");
-    }
-  };
+    const { data } = await axiosInstance.post("/upload/temp", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+
+    setCustomInputs((prev) => ({
+      ...prev,
+      [key]: {
+        type: "file",
+        url: data.url,
+        public_id: data.public_id,
+      },
+    }));
+  } catch (err) {
+    console.error("File upload failed:", err);
+    alert("Image upload failed");
+  } finally {
+    // mark as uploaded
+    setUploadingFiles((prev) => ({ ...prev, [key]: false }));
+  }
+};
+const isAnyFileUploading = Object.values(uploadingFiles).some(Boolean);
+
+const removeFile = (key) => {
+  setCustomInputs((prev) => ({
+    ...prev,
+    [key]: null,
+  }));
+};
+
 
   // Handle text input
   const handleInputChange = (key, value) => {
@@ -160,10 +183,8 @@ const ProductDetailPage = () => {
   // Add to cart
   const addToCart = () => {
     if (!validateSelections()) {
-      alert(
-        "Please complete all required selections (customization & specifications)."
-      );
-      return;
+      setShowPopup(true); // open the popup instead of alert
+    return;
     }
 
     const newItem = generateCartItem();
@@ -185,27 +206,25 @@ const ProductDetailPage = () => {
 
   // Buy now
   const buyNow = () => {
-    if (!validateSelections()) {
-      alert(
-        "Please complete all required selections (customization & specifications)."
-      );
-      return;
-    }
+  if (!validateSelections()) {
+    setShowPopup(true); // open the popup instead of alert
+    return;
+  }
 
-    const cartItem = generateCartItem();
+  const cartItem = generateCartItem();
 
-    // ✅ Track AddToCart for Buy Now as well (optional)
-    trackEvent("AddToCart", {
-      content_name: cartItem.title,
-      content_ids: [cartItem._id],
-      value: cartItem.price,
-      currency: "INR",
-      quantity: 1,
-    });
+  trackEvent("AddToCart", {
+    content_name: cartItem.title,
+    content_ids: [cartItem._id],
+    value: cartItem.price,
+    currency: "INR",
+    quantity: 1,
+  });
 
-    localStorage.setItem("cart", JSON.stringify([cartItem]));
-    navigate("/cart");
-  };
+  localStorage.setItem("cart", JSON.stringify([cartItem]));
+  navigate("/cart");
+};
+
 
   // Submit review
   const submitReview = async () => {
@@ -360,50 +379,82 @@ const slides = [
           )}
 
           {/* Customization */}
-          {product.isCustomizable && (
-            <div className="customization-block">
-              <h4>Customization</h4>
-              {product.customizationFields.map((field, idx) => (
-                <div key={`${field.label}-${idx}`} className="custom-input">
-                  <label>{field.label}</label>
-                  {field.type === "file" ? (
-                    <input
-                      type="file"
-                      onChange={(e) =>
-                        handleFileUpload(`${field.label}-${idx}`, e.target.files[0])
-                      }
-                    />
-                  ) : (
-                    <input
-                      type="text"
-                      value={customInputs[`${field.label}-${idx}`] || ""}
-                      onChange={(e) =>
-                        handleInputChange(`${field.label}-${idx}`, e.target.value)
-                      }
-                    />
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
+{product.isCustomizable && (
+  <div className="customization-block">
+    <h4>Customization</h4>
+    {product.customizationFields.map((field, idx) => (
+      <div key={`${field.label}-${idx}`} className="custom-input">
+        <label>{field.label}</label>
+
+        {field.type === "file" ? (
+          <div className="file-upload-wrapper">
+            {!customInputs[`${field.label}-${idx}`] ? (
+              <input
+                type="file"
+                onChange={(e) =>
+                  handleFileUpload(`${field.label}-${idx}`, e.target.files[0])
+                }
+              />
+            ) : (
+              <div className="file-info-line">
+                {/* Tiny preview */}
+                <img
+                  src={customInputs[`${field.label}-${idx}`].url}
+                  alt="preview"
+                  className="tiny-preview"
+                />
+                <span className="file-name">
+                  {customInputs[`${field.label}-${idx}`].url.split("/").pop()}
+                </span>
+                <button
+                  type="button"
+                  className="remove-file-btn"
+                  onClick={() => removeFile(`${field.label}-${idx}`)}
+                >
+                  Remove
+                </button>
+              </div>
+            )}
+          </div>
+        ) : (
+          <input
+            type="text"
+            value={customInputs[`${field.label}-${idx}`] || ""}
+            onChange={(e) =>
+              handleInputChange(`${field.label}-${idx}`, e.target.value)
+            }
+          />
+        )}
+      </div>
+    ))}
+  </div>
+)}
 
           {/* Buttons */}
 
   <div className="action-buttons">
-  <button className="buy-now" onClick={buyNow}>
-    Buy Now
-  </button>
-  <button className="add-to-cart" onClick={addToCart}>
-    Add to Cart
-  </button>
+  {isAnyFileUploading ? (
+    <p style={{ color: "#007bff" }}>Uploading file(s)...</p>
+  ) : (
+    <>
+      <button className="buy-now" onClick={buyNow}>Buy Now</button>
+      <button className="add-to-cart" onClick={addToCart}>Add to Cart</button>
+    </>
+  )}
 </div>
+
 
 {/* WhatsApp button below */}
   <div className="whatsapp-button-container">
+  {isAnyFileUploading ? (
+    <p style={{ color: "#007bff" }}>please wait....</p>
+  ) : (
     <button className="whatsapp-order" onClick={handleWhatsAppOrder}>
       Order via WhatsApp
     </button>
-  </div>
+  )}
+</div>
+
 
   {product.videos?.length > 0 && (
   <div className="product-video-gallery">
@@ -489,7 +540,125 @@ const slides = [
           </div>
         </div>
       </div>
+
+    
+
+
       <Footer />
+
+    {showPopup && (
+  <div className="popup-overlay">
+    <div className="popup-content">
+      <h3>Complete Your Selections</h3>
+
+      {product.specifications?.length > 0 && (
+        <div className="popup-section">
+          <h4>Specifications</h4>
+          {product.specifications.map((spec, idx) => (
+            <div key={idx} className="popup-spec">
+              <p>{spec.key}:</p>
+              <div className="popup-options">
+                {spec.values.map((option, vIdx) => (
+                  <label key={vIdx} className="popup-option">
+                    <input
+                      type="radio"
+                      name={`popup-${spec.key}`}
+                      value={option.value}
+                      checked={selectedSpecs[spec.key] === option.value}
+                      disabled={option.stock <= 0}
+                      onChange={() =>
+                        handleSpecChange(spec.key, option.value)
+                      }
+                    />
+                    <span>{option.value}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {product.isCustomizable && (
+  <div className="popup-section">
+    <h4>Customization</h4>
+    {product.customizationFields.map((field, idx) => (
+      <div key={`${field.label}-${idx}`} className="popup-input">
+        <label>{field.label}</label>
+
+        {field.type === "file" ? (
+          <div className="file-upload-wrapper">
+            {!customInputs[`${field.label}-${idx}`] ? (
+              <input
+                type="file"
+                onChange={(e) =>
+                  handleFileUpload(`${field.label}-${idx}`, e.target.files[0])
+                }
+              />
+            ) : (
+              <div className="file-info-line">
+                <img
+                  src={customInputs[`${field.label}-${idx}`].url}
+                  alt="preview"
+                  className="tiny-preview"
+                />
+                <span className="file-name">
+                  {customInputs[`${field.label}-${idx}`].url.split("/").pop()}
+                </span>
+                <button
+                  type="button"
+                  className="remove-file-btn"
+                  onClick={() => removeFile(`${field.label}-${idx}`)}
+                >
+                  Remove
+                </button>
+              </div>
+            )}
+          </div>
+        ) : (
+          <input
+            type="text"
+            value={customInputs[`${field.label}-${idx}`] || ""}
+            onChange={(e) =>
+              handleInputChange(`${field.label}-${idx}`, e.target.value)
+            }
+          />
+        )}
+      </div>
+    ))}
+  </div>
+)}
+
+
+      <div className="popup-buttons">
+  {isAnyFileUploading ? (
+    <p style={{ color: "#007bff" }}>Uploading file(s), please wait...</p>
+  ) : (
+    <>
+      <button
+        className="popup-continue"
+        onClick={() => {
+          if (validateSelections()) {
+            setShowPopup(false);
+            buyNow();
+          } else {
+            alert("Please complete all required selections before continuing.");
+          }
+        }}
+      >
+        Continue
+      </button>
+      <button className="popup-cancel" onClick={() => setShowPopup(false)}>
+        Cancel
+      </button>
+    </>
+  )}
+</div>
+
+    </div>
+  </div>
+)}
+
     </div>
   );
 };
