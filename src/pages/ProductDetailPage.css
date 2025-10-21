@@ -826,3 +826,43 @@
 .remove-file-btn:hover {
   background-color: #d9363e;
 }
+
+.product-description-section {
+  margin-top: 20px;
+  padding: 15px;
+  background: #fafafa;
+  border-radius: 8px;
+}
+
+.description-part {
+  margin-bottom: 25px;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 15px;
+}
+
+.desc-headline {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.desc-text {
+  color: #444;
+  margin-bottom: 10px;
+}
+
+.desc-image {
+  width: 100%;
+  max-width: 500px;
+  display: block;
+  margin: 10px 0;
+  border-radius: 6px;
+}
+
+.desc-video {
+  width: 100%;
+  max-width: 500px;
+  display: block;
+  margin: 10px 0;
+  border-radius: 6px;
+}

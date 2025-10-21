@@ -455,25 +455,43 @@ const slides = [
   )}
 </div>
 
-
-  {product.videos?.length > 0 && (
-  <div className="product-video-gallery">
-    <h4>Product Videos</h4>
-    {product.videos.map((vid, idx) => (
-      <video
-        key={idx}
-        src={vid}
-        controls
-        className="product-detail-video"
-      />
-    ))}
-  </div>
+                {/* Description */}
+          {/* ✅ Multi-Part Product Description */}
+{Array.isArray(product.description) && product.description.length > 0 ? (
+  <div className="product-description-section">
+    {product.description.map((part, index) => (
+      <div key={index} className="description-part">
+        {part.headline && <h3 className="desc-headline">{part.headline}</h3>}
+{part.text && (
+  <p
+    className="desc-text"
+    style={{ whiteSpace: "pre-line" }}
+  >
+    {part.text}
+  </p>
 )}
 
+        {part.image && (
+          <img
+            src={part.image}
+            alt={part.headline || `desc-${index}`}
+            className="desc-image"
+          />
+        )}
+        {part.video && (
+          <video
+            src={part.video}
+            controls
+            className="desc-video"
+          />
+        )}
+      </div>
+    ))}
+  </div>
+) : (
+  <p className="product-description">{product.description || "No description available."}</p>
+)}
 
-
-          {/* Description */}
-          <p className="product-description">{product.description}</p>
 
           {/* Review Section */}
           <div className="review-section">
