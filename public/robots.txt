@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://dignifydeals-45.vercel.app/sitemap.xml
+Sitemap: https://cuzto-45.vercel.app/sitemap.xml
