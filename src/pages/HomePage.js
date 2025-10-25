@@ -3,6 +3,7 @@ import axiosInstance from "../axiosInstance";
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import './HomePage.css';
+import { Link } from "react-router-dom";
 
 export default function HomePage() {
   const [collections, setCollections] = useState([]);
@@ -91,13 +92,18 @@ export default function HomePage() {
   <h2>Shop by Collection</h2>
   <div className="collection-carousel">
     {collections.map((col) => (
-      <div className="collection-item" key={col._id}>
+      <Link
+        to={`/collection/${col._id}`}
+        className="collection-item"
+        key={col._id}
+      >
         <img src={col.image?.url || '/placeholder.png'} alt={col.name} />
         <div className="collection-item-text">{col.name}</div>
-      </div>
+      </Link>
     ))}
   </div>
 </section>
+
 
 
        {/* === Banner Slider === */}

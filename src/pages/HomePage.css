@@ -563,3 +563,28 @@
     font-size: 0.9rem;
   }
 }
+
+
+
+
+.collection-item {
+  display: block;
+  text-align: center;
+  text-decoration: none; /* removes underline */
+  color: inherit; /* inherits text color instead of default blue */
+  cursor: pointer;
+}
+
+.collection-item img {
+  border-radius: 0.8rem;
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+}
+
+.collection-item-text {
+  margin-top: 0.5rem;
+  font-weight: 500;
+  font-size: 1rem;
+  color: #333; /* choose your desired color */
+}
