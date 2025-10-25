@@ -1,11 +1,13 @@
-
+/* === Global Styles === */
 .homepage {
   font-family: 'Segoe UI', sans-serif;
   background-color: #ffffff;
   color: #333;
+  margin: 0;
+  padding: 0;
 }
 
-/* ===== Section Titles ===== */
+/* === Section Titles === */
 .hero h2,
 .featured h2,
 .faq h2 {
@@ -16,7 +18,163 @@
   text-align: center;
 }
 
-/* ===== Grid Layout ===== */
+/* === Hero Banner (Desktop Rectangle / Mobile Full) === */
+.hero-banner {
+  position: relative;
+  width: 70%;
+  max-width: 1200px;
+  margin: 10px auto 25px; /* reduced top spacing */
+  overflow: hidden;
+  aspect-ratio: 1.85 / 1;
+  border-radius: 24px;
+  box-shadow: 0 6px 25px rgba(0,0,0,0.25);
+  background: #000;
+}
+
+.hero-banner-wrapper {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.6s ease-in-out;
+}
+
+.hero-banner-slide {
+  min-width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-banner-slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  border-radius: 24px;
+}
+
+/* === Banner Text === */
+.hero-banner-text {
+  position: absolute;
+  bottom: 16px;
+  left: 20px;
+  right: 20px;
+  padding: 12px 20px;
+  background: rgba(0, 0, 0, 0.45);
+  color: #fff;
+  border-radius: 12px;
+  backdrop-filter: blur(6px);
+  z-index: 2;
+}
+
+.hero-banner-text h2 {
+  font-size: 1.6rem;
+  margin: 0 0 6px;
+  font-weight: 600;
+}
+
+.hero-banner-text p {
+  font-size: 1rem;
+  margin: 0;
+  opacity: 0.9;
+}
+
+/* === Banner Dots === */
+.banner-dots {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  z-index: 3;
+}
+
+.banner-dots .dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  transition: background 0.3s, transform 0.3s;
+}
+
+.banner-dots .dot.active {
+  background: white;
+  transform: scale(1.3);
+}
+
+/* === Shop by Collection (Circle Carousel) === */
+.hero {
+  padding: 0.5rem 0 1.5rem; /* reduced top spacing */
+  background-color: #f9fafb;
+}
+
+.hero h2 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 1.8rem;
+  color: #111827;
+}
+
+/* Horizontal scroll */
+.collection-carousel {
+  display: flex;
+  gap: 1.5rem;
+  overflow-x: auto;
+  padding-left: 1rem;
+  scroll-behavior: smooth;
+}
+
+.collection-carousel::-webkit-scrollbar {
+  display: none;
+}
+
+/* Individual Collection */
+.collection-item {
+  flex: 0 0 auto;
+  width: 120px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: transform 0.3s ease;
+}
+
+.collection-item:hover {
+  transform: translateY(-5px);
+}
+
+.collection-item img {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.collection-item img:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+}
+
+.collection-item-text {
+  margin-top: 10px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #111827;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* === Featured Products === */
+.featured {
+  padding: 0.5rem 0 1.5rem; /* reduced spacing */
+  background: linear-gradient(to bottom, #ffffff, #f3f4f6);
+}
+
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
@@ -24,11 +182,9 @@
   padding: 0 1rem;
 }
 
-/* ===== Card ===== */
 .card {
-  background: 5c62916b;
+  background: #fff;
   border-radius: 10px;
-  overflow: hidden;
   text-decoration: none;
   color: inherit;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
@@ -43,7 +199,6 @@
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
 }
 
-/* ===== Card Image ===== */
 .card-image {
   width: 100%;
   height: 160px;
@@ -59,7 +214,6 @@
   object-fit: cover;
 }
 
-/* ===== Card Text ===== */
 .card h3 {
   font-size: 1rem;
   padding: 0.6rem;
@@ -73,15 +227,9 @@
   padding-bottom: 0.8rem;
 }
 
-/* ===== Featured Section ===== */
-.featured {
-  padding: 1.5rem 0;
-  background: linear-gradient(to bottom #ffffff, #f3f4f6);
-}
-
-/* ===== FAQ Section ===== */
+/* === FAQ Section === */
 .faq {
-  padding: 1.5rem 1rem;
+  padding: 1.5rem 1rem 2rem;
 }
 
 .faq ul {
@@ -104,16 +252,32 @@
   color: #1a73e8;
 }
 
-/* ===== Mobile Optimization ===== */
-@media (max-width: 600px) {
-  .card-image {
-    height: 140px;
-  }
+/* === Responsive Adjustments === */
+@media (max-width: 1024px) {
+  .hero-banner { width: 95%; max-width: 100%; }
+  .hero-banner-text h2 { font-size: 1.4rem; }
+  .hero-banner-text p { font-size: 0.95rem; }
+
+  .collection-item { width: 100px; }
+  .collection-item img { width: 90px; height: 90px; }
+  .collection-item-text { font-size: 0.95rem; }
 }
 
+@media (max-width: 768px) {
+  .hero-banner { width: 98%; }
+  .hero-banner-text { bottom: 10px; padding: 8px 12px; }
+  .hero-banner-text h2 { font-size: 1.2rem; }
+  .hero-banner-text p { font-size: 0.9rem; }
 
+  .collection-item { width: 90px; }
+  .collection-item img { width: 80px; height: 80px; }
+}
 
+@media (max-width: 480px) {
+  .hero-banner-text h2 { font-size: 1.1rem; }
+  .hero-banner-text p { font-size: 0.85rem; }
 
-
-
-
+  .collection-item { width: 80px; }
+  .collection-item img { width: 70px; height: 70px; }
+  .collection-item-text { font-size: 0.85rem; }
+}
