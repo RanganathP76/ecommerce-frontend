@@ -147,22 +147,59 @@ export default function HomePage() {
 
       {/* Featured Products */}
       <section className="featured">
-        <h2> Featured products</h2>
-        <div className="grid">
-          {products.map((prod) => (
-            <a href={`/product/${prod._id}`} className="card" key={prod._id}>
-              <div className="card-image">
-                <img
-                  src={prod.image || (prod.images && prod.images[0]) || '/placeholder.png'}
-                  alt={prod.title}
-                />
-              </div>
-              <h3>{prod.title}</h3>
-              <p>₹{prod.price}</p>
-            </a>
-          ))}
-        </div>
-      </section>
+  <h2>Recently Added Products</h2>
+  <div className="grid upgraded-grid">
+    {products.map((prod) => {
+      const hasDiscount = prod.comparePrice && prod.comparePrice > prod.price;
+      const discountPercent = hasDiscount
+        ? Math.round(((prod.comparePrice - prod.price) / prod.comparePrice) * 100)
+        : 0;
+
+      return (
+        <a href={`/product/${prod._id}`} className="product-card" key={prod._id}>
+          <div className="media-wrapper">
+            {prod.video ? (
+              <video
+                src={prod.video}
+                muted
+                autoPlay
+                loop
+                playsInline
+                preload="auto"
+                className="product-video"
+              />
+            ) : (
+              <img
+                src={
+                  prod.image ||
+                  (prod.images && prod.images[0]) ||
+                  "/placeholder.png"
+                }
+                alt={prod.title}
+                className="product-img"
+              />
+            )}
+
+            {hasDiscount && (
+              <span className="discount-badge">-{discountPercent}%</span>
+            )}
+          </div>
+
+          <div className="product-info">
+            <h3 className="product-title">{prod.title}</h3>
+            <div className="price-section">
+              <span className="price">₹{prod.price}</span>
+              {hasDiscount && (
+                <span className="compare-price">₹{prod.comparePrice}</span>
+              )}
+            </div>
+          </div>
+        </a>
+      );
+    })}
+  </div>
+</section>
+
 
       {/* FAQ */}
       <section className="faq">
