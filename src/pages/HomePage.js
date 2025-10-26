@@ -106,50 +106,47 @@ export default function HomePage() {
 
 
 
-       {/* === Banner Slider === */}
-      {banners.length > 0 && (
-        <section
-          className="hero-banner"
-          ref={slideRef}
-          onTouchStart={handleTouchStart}
-          onTouchEnd={handleTouchEnd}
+       {/* === Banner Slider (Image Only) === */}
+{banners.length > 0 && (
+  <section
+    className="hero-banner"
+    ref={slideRef}
+    onTouchStart={handleTouchStart}
+    onTouchEnd={handleTouchEnd}
+  >
+    <div
+      className="hero-banner-wrapper"
+      style={{
+        transform: `translateX(-${currentIndex * 100}%)`,
+      }}
+    >
+      {banners.map((banner) => (
+        <a
+          href={banner.link || "#"}
+          key={banner._id}
+          className="hero-banner-slide"
         >
-          <div
-            className="hero-banner-wrapper"
-            style={{
-              transform: `translateX(-${currentIndex * 100}%)`,
-            }}
-          >
-            {banners.map((banner) => (
-              <a
-                href={banner.link || "#"}
-                key={banner._id}
-                className="hero-banner-slide"
-              >
-                <img
-                  src={banner.image?.url || "/placeholder.png"}
-                  alt={banner.title}
-                />
-                <div className="hero-banner-text">
-                  <h2>{banner.title}</h2>
-                  <p>{banner.subtitle}</p>
-                </div>
-              </a>
-            ))}
-          </div>
+          <img
+            src={banner.image?.url || "/placeholder.png"}
+            alt={banner.title || "Banner"}
+          />
+        </a>
+      ))}
+    </div>
 
-          {/* Dots */}
-          <div className="banner-dots">
-            {banners.map((_, index) => (
-              <span
-                key={index}
-                className={`dot ${index === currentIndex ? "active" : ""}`}
-                onClick={() => goToSlide(index)}
-              />
-            ))}
-          </div>
-        </section>
-      )}
+    {/* Dots */}
+    <div className="banner-dots">
+      {banners.map((_, index) => (
+        <span
+          key={index}
+          className={`dot ${index === currentIndex ? "active" : ""}`}
+          onClick={() => goToSlide(index)}
+        />
+      ))}
+    </div>
+  </section>
+)}
+
 
       {/* Featured Products */}
       <section className="featured">
