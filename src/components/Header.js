@@ -20,7 +20,7 @@ const Header = () => {
         </div>
 
         <div className="header-center">
-          <NavLink to="/" className="logo">Cuzto</NavLink>
+          <NavLink to="/" className="logo">Cuztory</NavLink>
         </div>
 
         <div className="header-right">
