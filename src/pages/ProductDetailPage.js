@@ -27,6 +27,21 @@ const ProductDetailPage = () => {
   const [uploadingFiles, setUploadingFiles] = useState({});
 
 
+  //✅ Always define the hook — don't wrap it in an if-statement
+useEffect(() => {
+  // Just safely check inside it
+  if (!product?.reviews || product.reviews.length === 0) return;
+
+  const interval = setInterval(() => {
+    setActiveIndex((prev) =>
+      prev + 1 < product.reviews.length ? prev + 1 : 0
+    );
+  }, 4000);
+
+  return () => clearInterval(interval);
+}, [product?.reviews]);
+
+
 
   // Fetch product details
   useEffect(() => {
@@ -282,6 +297,7 @@ const slides = [
 ];
 
 
+
   return (
     <div>
       <Header />
@@ -515,49 +531,59 @@ const slides = [
             <button onClick={submitReview}>Submit Review</button>
           </div>
 
-          {/* Existing Reviews */}
-          <div className="existing-reviews">
-            <h3>Reviews</h3>
-            {product.reviews?.length === 0 ? (
-              <p>No reviews yet</p>
-            ) : (
-              <div className="review-list">
-                {product.reviews.map((rev, idx) => {
-                  const isExpanded = expandedReviews[idx];
-                  const toggleExpand = () => {
-                    setExpandedReviews((prev) => ({
-                      ...prev,
-                      [idx]: !prev[idx],
-                    }));
-                  };
-                  return (
-                    <div className="review-card" key={idx}>
-                      <p><strong>{rev.name}</strong></p>
-                      <p><strong>Rating:</strong> {"★".repeat(rev.rating)}</p>
-                      <p className={`review-comment ${isExpanded ? "expanded" : ""}`}>
-                        {rev.comment}
-                      </p>
-                      {rev.comment.length > 100 && (
-                        <span className="read-more" onClick={toggleExpand}>
-                          {isExpanded ? "Show less" : "Read more"}
-                        </span>
-                      )}
-                      {rev.images?.map((img, imgIdx) => (
-                        <img
-                          key={imgIdx}
-                          src={img}
-                          alt="review"
-                          className="review-image"
-                        />
-                      ))}
-                    </div>
-                  );
-                })}
-              </div>
-            )}
+          {/* ✅ Updated Existing Reviews Section with Auto Swipe Carousel */}
+<div className="existing-reviews">
+  <h3>Customer Reviews</h3>
+
+  {(!product.reviews || product.reviews.length === 0) ? (
+    <p>No reviews yet</p>
+  ) : (
+    <div className="review-carousel-container">
+      <div
+        className="review-carousel"
+        style={{
+          transform: `translateX(-${activeIndex * 100}%)`,
+          transition: "transform 0.6s ease-in-out",
+        }}
+      >
+        {product.reviews.map((rev, idx) => (
+          <div className="review-card" key={idx}>
+            <p className="reviewer-name"><strong>{rev.name}</strong></p>
+            <p className="review-rating">
+              {Array.from({ length: rev.rating }).map((_, i) => (
+                <FaStar key={i} color="gold" />
+              ))}
+            </p>
+            <p className="review-comment">{rev.comment}</p>
+            <div className="review-images">
+              {rev.images?.map((img, imgIdx) => (
+                <img
+                  key={imgIdx}
+                  src={img}
+                  alt="review"
+                  className="review-image"
+                />
+              ))}
+            </div>
           </div>
-        </div>
+        ))}
       </div>
+
+      {/* Carousel Dots */}
+      <div className="review-dots">
+        {product.reviews.map((_, idx) => (
+          <span
+            key={idx}
+            className={`review-dot ${activeIndex === idx ? "active" : ""}`}
+            onClick={() => setActiveIndex(idx)}
+          ></span>
+        ))}
+      </div>
+    </div>
+  )}
+</div>
+</div>
+</div>
 
     
 

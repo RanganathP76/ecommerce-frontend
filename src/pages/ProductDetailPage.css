@@ -865,3 +865,77 @@
   margin: 10px 0;
   border-radius: 6px;
 }
+
+/* Review Carousel Styling */
+.review-carousel-container {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  margin-top: 1.5rem;
+}
+
+.review-carousel {
+  display: flex;
+  width: 100%;
+}
+
+.review-card {
+  flex: 0 0 100%;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  padding: 1.5rem;
+  text-align: left;
+  min-height: 220px;
+  transition: transform 0.5s ease;
+}
+
+.reviewer-name {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.review-rating {
+  margin: 0.3rem 0;
+}
+
+.review-comment {
+  color: #374151;
+  line-height: 1.5;
+  margin-bottom: 0.8rem;
+}
+
+.review-images {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.review-image {
+  width: 70px;
+  height: 70px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
+}
+
+.review-dots {
+  display: flex;
+  justify-content: center;
+  margin-top: 0.8rem;
+  gap: 0.4rem;
+}
+
+.review-dot {
+  width: 10px;
+  height: 10px;
+  background: #d1d5db;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.review-dot.active {
+  background: #2563eb;
+}
