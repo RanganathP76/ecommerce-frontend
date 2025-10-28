@@ -494,31 +494,9 @@ const slides = [
 )}
 
 
-          {/* Review Section */}
-          <div className="review-section">
-            <h3>Give a Review</h3>
-            <div className="rating-input">
-              {[1, 2, 3, 4, 5].map((star) => (
-                <FaStar
-                  key={star}
-                  color={star <= rating ? "gold" : "#ccc"}
-                  onClick={() => setRating(star)}
-                  style={{ cursor: "pointer" }}
-                />
-              ))}
-            </div>
-            <textarea
-              placeholder="Write your comment"
-              value={comment}
-              onChange={(e) => setComment(e.target.value)}
-            ></textarea>
-            <input type="file" onChange={(e) => setImage(e.target.files[0])} />
-            <button onClick={submitReview}>Submit Review</button>
-          </div>
-
           {/* ✅ REVIEWS SLIDER SECTION */}
 <div className="existing-reviews">
-  <h3>Customer Reviews</h3>
+  <h2>Customer Reviews</h2>
   {(!product.reviews || product.reviews.length === 0) ? (
     <p>No reviews yet</p>
   ) : (
@@ -599,6 +577,30 @@ const slides = [
     </div>
   )}
 </div>
+
+          {/* Review Section */}
+          <div className="review-section">
+            <h3>Give a Review</h3>
+            <div className="rating-input">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <FaStar
+                  key={star}
+                  color={star <= rating ? "gold" : "#ccc"}
+                  onClick={() => setRating(star)}
+                  style={{ cursor: "pointer" }}
+                />
+              ))}
+            </div>
+            <textarea
+              placeholder="Write your comment"
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+            ></textarea>
+            <input type="file" onChange={(e) => setImage(e.target.files[0])} />
+            <button onClick={submitReview}>Submit Review</button>
+          </div>
+
+          
         </div>
       </div>
 
