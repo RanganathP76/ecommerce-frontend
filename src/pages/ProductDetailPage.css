@@ -944,3 +944,60 @@
 .review-slider-dots .dot.active {
   background-color: #007bff;
 }
+
+
+/* === IMAGE SLIDER POSITION & DOT SPACING === */
+
+.product-image-slider-container {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  margin-top: -15px; /* ✅ Move slider upward — adjust as needed (-10 to -30px) */
+}
+
+.image-slide-wrapper {
+  display: flex;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.image-slide-wrapper::-webkit-scrollbar {
+  display: none;
+}
+
+.image-slide-wrapper img,
+.image-slide-wrapper video {
+  flex: 0 0 100%;
+  width: 100%;
+  height: auto;
+  scroll-snap-align: center;
+  object-fit: cover;
+  border-radius: 12px;
+}
+
+/* ✅ Dots closer to image */
+.slider-dots {
+  text-align: center;
+  margin-top: 4px; /* smaller gap between image and dots */
+  margin-bottom: 10px; /* optional, reduces space below */
+}
+
+.slider-dots .dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: #ccc;
+  margin: 0 4px; /* tighter spacing between dots */
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.slider-dots .dot.active {
+  background-color: #333;
+  transform: scale(1.2);
+}
