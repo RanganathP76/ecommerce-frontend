@@ -346,7 +346,6 @@ const slides = [
 {/* ✅ Add below price info */}
 <div className="extra-product-info">
   <p className="delivery-info">🚚 Free Delivery</p>
-  <p className="cod-info">💰 Partial COD Available</p>
 </div>
 
 
