@@ -253,7 +253,7 @@ const CheckoutStep1 = () => {
       key: RAZORPAY_KEY,
       amount: razorpayOrder.amount,
       currency: "INR",
-      name: "Dignify Deals",
+      name: "Cuztory",
       description: "Order Payment",
       order_id: razorpayOrder.id,
       handler: (response) => {
