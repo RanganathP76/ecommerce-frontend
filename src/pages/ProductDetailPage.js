@@ -445,16 +445,7 @@ const slides = [
 </div>
 
 
-{/* WhatsApp button below */}
-  <div className="whatsapp-button-container">
-  {isAnyFileUploading ? (
-    <p style={{ color: "#007bff" }}>please wait....</p>
-  ) : (
-    <button className="whatsapp-order" onClick={handleWhatsAppOrder}>
-      Order via WhatsApp
-    </button>
-  )}
-</div>
+
 
                 {/* Description */}
           {/* ✅ Multi-Part Product Description */}
