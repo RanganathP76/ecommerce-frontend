@@ -369,20 +369,53 @@ const CheckoutStep1 = () => {
       <div className="payment-method">
         <h3>Payment Method</h3>
 
-        {paymentOptions?.fullPrepaid?.enabled && (
-          <label>
-            <input
-              type="radio"
-              name="payment"
-              checked={selectedPayment === "fullPrepaid"}
-              onChange={() => setSelectedPayment("fullPrepaid")}
-            />
-            Full Prepaid: ₹{previewFullPrepaidTotal}{" "}
-            <span className="payment-note">
-              (Save ₹{previewFullPrepaidSave})
-            </span>
-          </label>
+       {paymentOptions?.fullPrepaid?.enabled && (
+  <label
+    className={`payment-option prepaid-option ${
+      selectedPayment === "fullPrepaid" ? "selected" : ""
+    }`}
+  >
+    <input
+      type="radio"
+      name="payment"
+      checked={selectedPayment === "fullPrepaid"}
+      onChange={() => setSelectedPayment("fullPrepaid")}
+    />
+
+    <div className="payment-option-content">
+      {/* Header */}
+      <div className="payment-title-row">
+        <div className="payment-title">
+          <strong>Pay Online (UPI / Card)</strong>
+        </div>
+
+        {previewFullPrepaidSave > 0 && (
+          <div className="discount-badge">
+            ₹{previewFullPrepaidSave} OFF
+          </div>
         )}
+      </div>
+
+      {/* Payment Icons */}
+      <div className="payment-icons">
+        <img src="/payment-icons/gpay.png" alt="Google Pay" />
+        <img src="/payment-icons/phonepe.png" alt="PhonePe" />
+        <img src="/payment-icons/paytm.png" alt="Paytm" />
+        <img src="/payment-icons/card.png" alt="Card" />
+        <img src="/payment-icons/upi.png" alt="UPI" />
+      </div>
+
+      {/* Details */}
+      <div className="payment-details">
+        <span className="price">
+          Pay ₹{previewFullPrepaidTotal}
+        </span>
+        <small className="secure-text">Secure payment via Razorpay</small>
+      </div>
+    </div>
+  </label>
+)}
+
 
         {paymentOptions?.partialPayment?.enabled && (
           <label>
@@ -414,28 +447,56 @@ const CheckoutStep1 = () => {
       </div>
 
       {/* Summary */}
-      <div className="summary-box">
-        <h3>Summary</h3>
-        <p>Items: ₹{Math.round(itemsPrice)}</p>
-        <p>Shipping: ₹{Math.round(shippingPrice)}</p>
-        {discount > 0 && <p>Discount: -₹{Math.round(discount)}</p>}
-        <h4>Total: ₹{Math.round(total)}</h4>
+<div className="summary-box">
+  <h3>Order Summary</h3>
 
-        {selectedPayment === "partialPayment" && (
-          <>
-            <p>Pay Now: ₹{Math.round(advance)}</p>
-            <p>Balance at Delivery: ₹{Math.round(total - advance)}</p>
-          </>
-        )}
+  <div className="summary-row">
+    <span>Items Total:</span>
+    <span>₹{Math.round(itemsPrice)}</span>
+  </div>
 
-        {selectedPayment === "fullPrepaid" && (
-          <p>Pay Now: ₹{Math.round(total)}</p>
-        )}
+  <div className="summary-row">
+    <span>Shipping Charge:</span>
+    <span>₹{Math.round(shippingPrice)}</span>
+  </div>
 
-        {selectedPayment === "COD" && (
-          <p>Pay at Delivery: ₹{Math.round(total)}</p>
-        )}
-      </div>
+  <div className="summary-row">
+    <strong>Total (Before Discount):</strong>
+    <strong>₹{Math.round(itemsPrice + shippingPrice)}</strong>
+  </div>
+
+  {discount > 0 && (
+    <div className="summary-row discount-row">
+      <span>Discount:</span>
+      <span>- ₹{Math.round(discount)}</span>
+    </div>
+  )}
+
+  <div className="summary-final">
+    <strong>Final Total:</strong>
+    <strong>₹{Math.round(total)}</strong>
+  </div>
+
+  {selectedPayment === "partialPayment" && (
+    <div className="summary-row payment-breakdown">
+      <p>Pay Now: ₹{Math.round(advance)}</p>
+      <p>Balance at Delivery: ₹{Math.round(total - advance)}</p>
+    </div>
+  )}
+
+  {selectedPayment === "fullPrepaid" && (
+    <div className="summary-row payment-breakdown">
+      <p>Pay Now: ₹{Math.round(total)}</p>
+    </div>
+  )}
+
+  {selectedPayment === "COD" && (
+    <div className="summary-row payment-breakdown">
+      <p>Pay at Delivery: ₹{Math.round(total)}</p>
+    </div>
+  )}
+</div>
+
 
       {/* Action Button */}
       {selectedPayment === "COD" ? (

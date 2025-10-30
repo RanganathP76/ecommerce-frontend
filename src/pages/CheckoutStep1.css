@@ -31,7 +31,7 @@
 
 .checkout-container h3 {
   font-size: 1.3rem;
-  margin: 1.8rem 0 1rem;
+  margin: 1.2rem 0 0.8rem;
   font-weight: 600;
   color: #3a3a3a;
   border-bottom: 2px solid #eee;
@@ -192,8 +192,8 @@
    ========================== */
 .payment-method {
   width: 100%;
-  margin: 2rem 0;
-  padding: 1.5rem;
+  margin: 1rem 0 1.5rem;
+  padding: 1.2rem;
   background: #ffffff;
   border-radius: 14px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
@@ -367,5 +367,137 @@
 }
 
 
+.summary-box {
+  background: #f9fafb;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  margin-top: 20px;
+}
+
+.summary-box h3 {
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 8px;
+  margin-bottom: 12px;
+  font-size: 18px;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  margin: 6px 0;
+  font-size: 15px;
+}
+
+.summary-row strong {
+  font-weight: 600;
+}
+
+.discount-row {
+  color: #d9534f;
+}
+
+.summary-final {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 12px;
+  font-size: 17px;
+  font-weight: 700;
+  border-top: 1px solid #ccc;
+  padding-top: 8px;
+}
+
+.payment-breakdown p {
+  margin: 4px 0;
+  font-size: 14px;
+  color: #444;
+}
+
+
+
+
+.payment-option {
+  display: flex;
+  align-items: flex-start;
+  background: #fff;
+  border: 2px solid #ddd;
+  border-radius: 12px;
+  padding: 15px 18px;
+  margin-bottom: 12px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  position: relative;
+}
+
+.payment-option.selected {
+  border-color: #2e7d32;
+  background: #f9fff9;
+  box-shadow: 0 0 0 2px rgba(46, 125, 50, 0.2);
+}
+
+.payment-option input {
+  margin-right: 14px;
+  margin-top: 10px;
+  transform: scale(1.1);
+}
+
+.payment-option-content {
+  flex: 1;
+}
+
+.payment-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.payment-title {
+  font-size: 16px;
+  color: #222;
+  font-weight: 600;
+}
+
+.discount-badge {
+  background: #2e7d32;
+  color: white;
+  font-weight: 600;
+  font-size: 12px;
+  border-radius: 6px;
+  padding: 4px 8px;
+  margin-left: 8px;
+}
+
+.payment-icons {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 8px 0;
+}
+
+.payment-icons img {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+  border: 1px solid #eee;
+  border-radius: 6px;
+  background: #fff;
+}
+
+.payment-details {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.payment-details .price {
+  font-size: 15px;
+  font-weight: 500;
+  color: #111;
+}
+
+.secure-text {
+  font-size: 12px;
+  color: #777;
+}
 
 
