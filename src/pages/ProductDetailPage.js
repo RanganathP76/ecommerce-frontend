@@ -5,6 +5,8 @@ import axiosInstance from "../axiosInstance";
 import "./ProductDetailPage.css";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import PageLoader from "../components/PageLoader";
+
 
 
 // ✅ Import Pixel tracking function
@@ -255,7 +257,8 @@ const removeFile = (key) => {
     }
   };
 
-  if (loading) return <p>Loading...</p>;
+  if (loading) return <PageLoader text="Fetching product details..." />;
+
   if (!product) return <p>Product not found</p>;
 
   const handleWhatsAppOrder = () => {

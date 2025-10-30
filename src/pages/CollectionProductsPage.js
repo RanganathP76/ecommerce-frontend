@@ -4,26 +4,35 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import axiosInstance from "../axiosInstance";
 import "./CollectionProductsPage.css";
+import PageLoader from "../components/PageLoader";
+
+;
+
 
 const CollectionProductsPage = () => {
   const { id } = useParams();
   const [collectionData, setCollectionData] = useState(null);
+  const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    const fetchCollection = async () => {
-      try {
-        const res = await axiosInstance.get(`/collections/${id}`);
-        setCollectionData(res.data);
-        document.title = res.data.collection?.name || "Collection";
-      } catch (err) {
-        console.error("Error fetching collection:", err);
-      }
-    };
+ useEffect(() => {
+  const fetchCollection = async () => {
+    try {
+      const res = await axiosInstance.get(`/collections/${id}`);
+      setCollectionData(res.data);
+      document.title = res.data.collection?.name || "Collection";
+    } catch (err) {
+      console.error("Error fetching collection:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    fetchCollection();
-  }, [id]);
+  fetchCollection();
+}, [id]);
 
-  if (!collectionData) return <div>Loading...</div>;
+
+  if (loading) return <PageLoader text="Loading collection..." />;
+  if (!collectionData) return <p>Collection not found.</p>;
 
   const { collection, products } = collectionData;
 

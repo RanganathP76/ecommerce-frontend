@@ -4,6 +4,7 @@ import Header from '../components/Header';
 import Footer from '../components/Footer';
 import './HomePage.css';
 import { Link } from "react-router-dom";
+import PageLoader from "../components/PageLoader";
 
 export default function HomePage() {
   const [collections, setCollections] = useState([]);
@@ -11,33 +12,37 @@ export default function HomePage() {
   const [banners, setBanners] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const slideRef = useRef(null);
+  const [loading, setLoading] = useState(true);
   const slideInterval = useRef(null);
 
   
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-         // Fetch banners
-        const bannerRes = await axiosInstance.get('/banners');
-        setBanners(bannerRes.data);
+  const fetchData = async () => {
+    try {
+      const [bannerRes, colRes, prodRes] = await Promise.all([
+        axiosInstance.get('/banners'),
+        axiosInstance.get('/collections'),
+        axiosInstance.get('/products'),
+      ]);
 
-        // Fetch collections
-       const colRes = await axiosInstance.get('/collections');
-        setCollections(colRes.data);
+      setBanners(bannerRes.data);
+      setCollections(colRes.data);
 
-        // Fetch products and sort by createdAt (newest first)
-        const prodRes =await axiosInstance.get('/products');
-        const sorted = prodRes.data.sort(
-          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-        );
-        setProducts(sorted.slice(0, 4)); // Only latest 4
-      } catch (error) {
-        console.error('Error fetching homepage data', error);
-      }
-    };
-    fetchData();
-  }, []);
+      const sorted = prodRes.data.sort(
+        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+      );
+      setProducts(sorted.slice(0, 4));
+    } catch (error) {
+      console.error("Error fetching homepage data", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchData();
+}, []);
+
 
   // Auto-slide every 4s
   useEffect(() => {
@@ -82,6 +87,9 @@ export default function HomePage() {
     }
     slideRef.current.startX = null;
   };
+
+if (loading) return <PageLoader text="Loading your store..." />;
+
 
   return (
     <div className="homepage">
