@@ -28,6 +28,7 @@ const ProductDetailPage = () => {
   const [showPopup, setShowPopup] = useState(false);
   const [uploadingFiles, setUploadingFiles] = useState({});
   const [activeReviewIndex, setActiveReviewIndex] = useState(0);
+  const [estimatedDelivery, setEstimatedDelivery] = useState("");
 
 
 
@@ -45,6 +46,9 @@ const ProductDetailPage = () => {
           value: data.price,
           currency: "INR",
         });
+
+        setEstimatedDelivery(getEstimatedDelivery());
+
 
         // Init customization fields
         if (data.isCustomizable && Array.isArray(data.customizationFields)) {
@@ -77,7 +81,25 @@ const ProductDetailPage = () => {
     fetchProduct();
   }, [id]);
 
-  
+  // Utility: Get estimated delivery range (e.g., 3–7 days)
+const getEstimatedDelivery = () => {
+  const today = new Date();
+  const startDate = new Date(today);
+  const endDate = new Date(today);
+
+  // e.g., deliver between 3–7 business days
+  startDate.setDate(today.getDate() + 5);
+  endDate.setDate(today.getDate() + 8);
+
+  const formatDate = (date) =>
+    date.toLocaleDateString("en-IN", {
+      day: "numeric",
+      month: "short",
+    });
+
+  return `Between ${formatDate(startDate)} – ${formatDate(endDate)}`;
+};
+
 
 
   // Handle spec change
@@ -346,10 +368,15 @@ const slides = [
   )}
 </p>
 
-{/* ✅ Add below price info */}
 <div className="extra-product-info">
   <p className="delivery-info">🚚 Free Delivery</p>
+  {estimatedDelivery && (
+    <p className="estimated-delivery">
+      📦 Estimated Delivery: <strong>{estimatedDelivery}</strong>
+    </p>
+  )}
 </div>
+
 
 
           {/* Specifications */}
