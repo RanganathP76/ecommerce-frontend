@@ -100,6 +100,42 @@ const getEstimatedDelivery = () => {
   return `Between ${formatDate(startDate)} – ${formatDate(endDate)}`;
 };
 
+const handleThumbnailClick = (idx) => {
+  setActiveIndex(idx);
+
+  const mainSlider = document.querySelector(".image-slide-wrapper");
+  const thumbScroll = document.getElementById("thumbnailScroll");
+  const thumbnails = thumbScroll.querySelectorAll(".thumbnail");
+
+  // Scroll the main image slider
+  mainSlider.scrollTo({
+    left: idx * mainSlider.clientWidth,
+    behavior: "smooth",
+  });
+
+  // ✅ Smart auto-scroll preview behavior
+  const thumb = thumbnails[idx];
+  const thumbRect = thumb.getBoundingClientRect();
+  const containerRect = thumbScroll.getBoundingClientRect();
+
+  const buffer = 20; // small margin so it’s not flush
+  const visibleRight = containerRect.right - buffer;
+  const visibleLeft = containerRect.left + buffer;
+
+  if (thumbRect.right > visibleRight) {
+    // move scroll slightly so user sees next items
+    thumbScroll.scrollBy({
+      left: thumbRect.right - visibleRight + 40,
+      behavior: "smooth",
+    });
+  } else if (thumbRect.left < visibleLeft) {
+    // scroll back if user clicks earlier thumbnail
+    thumbScroll.scrollBy({
+      left: thumbRect.left - visibleLeft - 40,
+      behavior: "smooth",
+    });
+  }
+};
 
 
   // Handle spec change
@@ -410,9 +446,30 @@ const slides = [
     ></span>
   ))}
 </div>
+</div>
+
+{/* ✅ Swipeable Thumbnail Gallery */}
+<div className="thumbnail-container">
+  <div className="thumbnail-scroll" id="thumbnailScroll">
+    {slides.map((item, idx) => (
+      <div
+        key={idx}
+        className={`thumbnail ${activeIndex === idx ? "active" : ""}`}
+        onClick={() => handleThumbnailClick(idx)}
+      >
+        {item.endsWith(".mp4") ? (
+          <video src={item} muted playsInline />
+        ) : (
+          <img src={item} alt={`thumb-${idx}`} loading="lazy" />
+        )}
+      </div>
+    ))}
+  </div>
+</div>
 
 
-        </div>
+
+
 
         {/* PRODUCT INFO */}
         <div className="product-info">

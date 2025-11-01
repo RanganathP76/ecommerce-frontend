@@ -1038,3 +1038,76 @@
     font-size: 0.95rem;
   }
 }
+
+/* ✅ Outer container ensures no overflow */
+.thumbnail-container {
+  width: 100%;
+  overflow: hidden;
+  padding: 10px 0;
+  box-sizing: border-box;
+  background: #fff;
+}
+
+/* ✅ Scrollable inner container */
+.thumbnail-scroll {
+  display: flex;
+  align-items: center;
+  overflow-x: auto;
+  gap: 10px;
+  padding: 0 12px;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+.thumbnail-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+/* ✅ Thumbnail items */
+.thumbnail {
+  flex: 0 0 auto;
+  width: 70px;
+  height: 70px;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 2px solid transparent;
+  background-color: #f9f9f9;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.thumbnail img,
+.thumbnail video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* ✅ Highlight active thumbnail */
+.thumbnail.active {
+  border-color: #007bff;
+  transform: scale(1.05);
+}
+
+/* ✅ Mobile tweaks (perfect fit on small screens) */
+@media (max-width: 768px) {
+  .thumbnail {
+    width: 60px;
+    height: 60px;
+    border-radius: 8px;
+  }
+
+  .thumbnail-scroll {
+    gap: 8px;
+    padding: 0 8px;
+  }
+}
+
+/* ✅ Prevent edge overflow illusion */
+.thumbnail-scroll::before,
+.thumbnail-scroll::after {
+  content: "";
+  flex: 0 0 8px;
+}
