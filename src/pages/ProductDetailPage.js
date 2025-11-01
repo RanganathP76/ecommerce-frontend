@@ -251,6 +251,68 @@ const removeFile = (key) => {
 };
 
 
+// ✅ Subcomponent for Expandable Descriptions
+const DescriptionSections = ({ parts }) => {
+  const [expandedIndex, setExpandedIndex] = useState(0); // first open by default
+
+  return (
+    <div className="product-description-section">
+      {parts.map((part, index) => {
+        const isExpanded = expandedIndex === index;
+
+        return (
+          <div key={index} className="desc-wrapper">
+            {/* Header with toggle */}
+            <div
+              className="desc-header"
+              onClick={() =>
+                setExpandedIndex(isExpanded ? null : index)
+              }
+            >
+              <h3 className="desc-headline">
+                {part.headline || `Section ${index + 1}`}
+              </h3>
+              <span className={`arrow ${isExpanded ? "up" : "down"}`}>
+                {isExpanded ? "▲" : "▼"}
+              </span>
+            </div>
+
+            {/* Expanded Content */}
+            {isExpanded && (
+              <div className="desc-content">
+                {part.text && (
+                  <p
+                    className="desc-text"
+                    style={{ whiteSpace: "pre-line" }}
+                  >
+                    {part.text}
+                  </p>
+                )}
+                {part.image && (
+                  <img
+                    src={part.image}
+                    alt={part.headline || `desc-${index}`}
+                    className="desc-image"
+                  />
+                )}
+                {part.video && (
+                  <video
+                    src={part.video}
+                    controls
+                    className="desc-video"
+                  />
+                )}
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
+
+
   // Submit review
   const submitReview = async () => {
     try {
@@ -479,126 +541,79 @@ const slides = [
 
 
                 {/* Description */}
-          {/* ✅ Multi-Part Product Description */}
+         {/* ✅ Multi-Part Product Description with Expand-on-Click */}
+{/* ✅ Multi-Part Product Description with Expand-on-Click (No Hook Error) */}
 {Array.isArray(product.description) && product.description.length > 0 ? (
-  <div className="product-description-section">
-    {product.description.map((part, index) => (
-      <div key={index} className="description-part">
-        {part.headline && <h3 className="desc-headline">{part.headline}</h3>}
-{part.text && (
-  <p
-    className="desc-text"
-    style={{ whiteSpace: "pre-line" }}
-  >
-    {part.text}
+  <DescriptionSections parts={product.description} />
+) : (
+  <p className="product-description">
+    {product.description || "No description available."}
   </p>
 )}
 
-        {part.image && (
-          <img
-            src={part.image}
-            alt={part.headline || `desc-${index}`}
-            className="desc-image"
-          />
-        )}
-        {part.video && (
-          <video
-            src={part.video}
-            controls
-            className="desc-video"
-          />
-        )}
-      </div>
-    ))}
-  </div>
-) : (
-  <p className="product-description">{product.description || "No description available."}</p>
-)}
 
 
-          {/* ✅ REVIEWS SLIDER SECTION */}
+
+          {/* ✅ REVIEWS SECTION — show 5 first, then show more */}
 <div className="existing-reviews">
   <h2>Customer Reviews</h2>
+
   {(!product.reviews || product.reviews.length === 0) ? (
     <p>No reviews yet</p>
   ) : (
-    <div className="review-slider-container">
-      <div
-        className="review-slide-wrapper"
-        onScroll={(e) => {
-          const scrollLeft = e.target.scrollLeft;
-          const width = e.target.clientWidth;
-          const currentIndex = Math.round(scrollLeft / width);
-          setActiveReviewIndex(currentIndex);
-        }}
-      >
-        {product.reviews.map((rev, idx) => {
-          const isExpanded = expandedReviews[idx];
-          const toggleExpand = () => {
-            setExpandedReviews((prev) => ({
-              ...prev,
-              [idx]: !prev[idx],
-            }));
-          };
-
-          return (
-            <div className="review-slide" key={idx}>
-              <div className="review-card">
-                <p><strong>{rev.name}</strong></p>
-                <div className="review-rating">
-                  {[...Array(5)].map((_, i) => (
-                    <FaStar
-                      key={i}
-                      color={i < rev.rating ? "gold" : "#ccc"}
-                    />
-                  ))}
-                </div>
-                <p className={`review-comment ${isExpanded ? "expanded" : ""}`}>
-                  {rev.comment}
-                </p>
-                {rev.comment.length > 100 && (
-                  <span className="read-more" onClick={toggleExpand}>
-                    {isExpanded ? "Show less" : "Read more"}
-                  </span>
-                )}
-
-                {rev.images?.length > 0 && (
-                  <div className="review-images">
-                    {rev.images.map((img, imgIdx) => (
-                      <img
-                        key={imgIdx}
-                        src={img}
-                        alt="review"
-                        className="review-image"
-                      />
-                    ))}
-                  </div>
-                )}
+    <>
+      {product.reviews
+        .slice(0, expandedReviews.showAll ? product.reviews.length : 5)
+        .map((rev, idx) => (
+          <div key={idx} className="review-card">
+            <div className="review-header">
+              <strong>{rev.name}</strong>
+              <div className="review-rating">
+                {[...Array(5)].map((_, i) => (
+                  <FaStar key={i} color={i < rev.rating ? "gold" : "#ccc"} />
+                ))}
               </div>
             </div>
-          );
-        })}
-      </div>
 
-      {/* Dots Navigation */}
-      <div className="review-slider-dots">
-        {product.reviews.map((_, idx) => (
-          <span
-            key={idx}
-            className={`dot ${activeReviewIndex === idx ? "active" : ""}`}
-            onClick={() => {
-              const slider = document.querySelector(".review-slide-wrapper");
-              slider.scrollTo({
-                left: idx * slider.clientWidth,
-                behavior: "smooth",
-              });
-            }}
-          ></span>
+            <p className="review-comment">
+              {rev.comment.length > 200
+                ? `${rev.comment.slice(0, 200)}...`
+                : rev.comment}
+            </p>
+
+            {rev.images?.length > 0 && (
+              <div className="review-images">
+                {rev.images.map((img, imgIdx) => (
+                  <img
+                    key={imgIdx}
+                    src={img}
+                    alt="review"
+                    className="review-image"
+                  />
+                ))}
+              </div>
+            )}
+          </div>
         ))}
-      </div>
-    </div>
+
+      {/* Show More / Show Less Button */}
+      {product.reviews.length > 5 && (
+        <button
+          className="show-more-reviews-btn"
+          onClick={() =>
+            setExpandedReviews((prev) => ({
+              ...prev,
+              showAll: !prev.showAll,
+            }))
+          }
+        >
+          {expandedReviews.showAll ? "Show Less" : "Show More Reviews"}
+        </button>
+      )}
+    </>
   )}
 </div>
+
 
           {/* Review Section */}
           <div className="review-section">
