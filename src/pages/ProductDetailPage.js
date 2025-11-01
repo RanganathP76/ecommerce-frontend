@@ -377,7 +377,18 @@ const slides = [
   )}
 </div>
 
+ {/* Buttons */}
 
+  <div className="action-buttons">
+  {isAnyFileUploading ? (
+    <p style={{ color: "#007bff" }}>Uploading file(s)...</p>
+  ) : (
+    <>
+      <button className="buy-now" onClick={buyNow}>Buy Now</button>
+      <button className="add-to-cart" onClick={addToCart}>Add to Cart</button>
+    </>
+  )}
+</div>
 
           {/* Specifications */}
           {product.specifications?.length > 0 && (
@@ -407,6 +418,8 @@ const slides = [
               ))}
             </div>
           )}
+
+          
 
           {/* Customization */}
 {product.isCustomizable && (
@@ -460,18 +473,7 @@ const slides = [
   </div>
 )}
 
-          {/* Buttons */}
-
-  <div className="action-buttons">
-  {isAnyFileUploading ? (
-    <p style={{ color: "#007bff" }}>Uploading file(s)...</p>
-  ) : (
-    <>
-      <button className="buy-now" onClick={buyNow}>Buy Now</button>
-      <button className="add-to-cart" onClick={addToCart}>Add to Cart</button>
-    </>
-  )}
-</div>
+         
 
 
 

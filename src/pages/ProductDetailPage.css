@@ -463,7 +463,7 @@
 
 .current-price {
   font-weight: bold;
-  color: #e60023; /* red for discounted price */
+  color: #1d4287; /* red for discounted price */
   margin-right: 10px;
 }
 
