@@ -1111,3 +1111,30 @@
   content: "";
   flex: 0 0 8px;
 }
+
+
+.customize-btn {
+  background: linear-gradient(90deg, #ff7b00, #ff4d00);
+  color: white;
+  border: none;
+  padding: 14px 28px;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  width: 100%;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(255, 100, 0, 0.3);
+}
+
+.customize-btn:hover {
+  background: linear-gradient(90deg, #ff4d00, #ff7b00);
+  transform: scale(1.03);
+}
+
+@media (max-width: 768px) {
+  .customize-btn {
+    padding: 12px 20px;
+    font-size: 15px;
+  }
+}

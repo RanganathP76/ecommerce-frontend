@@ -496,20 +496,7 @@ const slides = [
   )}
 </div>
 
- {/* Buttons */}
-
-  <div className="action-buttons">
-  {isAnyFileUploading ? (
-    <p style={{ color: "#007bff" }}>Uploading file(s)...</p>
-  ) : (
-    <>
-      <button className="buy-now" onClick={buyNow}>Buy Now</button>
-      <button className="add-to-cart" onClick={addToCart}>Add to Cart</button>
-    </>
-  )}
-</div>
-
-          {/* Specifications */}
+{/* Specifications */}
           {product.specifications?.length > 0 && (
             <div className="specifications-block">
               <h4>Select Specifications</h4>
@@ -537,64 +524,32 @@ const slides = [
               ))}
             </div>
           )}
+ 
 
-          
-
-          {/* Customization */}
-{product.isCustomizable && (
-  <div className="customization-block">
-    <h4>Customization</h4>
-    {product.customizationFields.map((field, idx) => (
-      <div key={`${field.label}-${idx}`} className="custom-input">
-        <label>{field.label}</label>
-
-        {field.type === "file" ? (
-          <div className="file-upload-wrapper">
-            {!customInputs[`${field.label}-${idx}`] ? (
-              <input
-                type="file"
-                onChange={(e) =>
-                  handleFileUpload(`${field.label}-${idx}`, e.target.files[0])
-                }
-              />
-            ) : (
-              <div className="file-info-line">
-                {/* Tiny preview */}
-                <img
-                  src={customInputs[`${field.label}-${idx}`].url}
-                  alt="preview"
-                  className="tiny-preview"
-                />
-                <span className="file-name">
-                  {customInputs[`${field.label}-${idx}`].url.split("/").pop()}
-                </span>
-                <button
-                  type="button"
-                  className="remove-file-btn"
-                  onClick={() => removeFile(`${field.label}-${idx}`)}
-                >
-                  Remove
-                </button>
-              </div>
-            )}
-          </div>
-        ) : (
-          <input
-            type="text"
-            value={customInputs[`${field.label}-${idx}`] || ""}
-            onChange={(e) =>
-              handleInputChange(`${field.label}-${idx}`, e.target.value)
-            }
-          />
-        )}
-      </div>
-    ))}
-  </div>
-)}
-
-         
-
-
+    {/* Buttons */}
+  <div className="action-buttons">
+  {isAnyFileUploading ? (
+    <p style={{ color: "#007bff" }}>Uploading file(s)...</p>
+  ) : product.isCustomizable ? (
+    // ✅ If customizable, show only "Customize" button
+    <button
+      className="customize-btn"
+      onClick={() => setShowPopup(true)}
+    >
+      ✨ Customize
+    </button>
+  ) : (
+    // ✅ Otherwise show normal Buy Now / Add to Cart
+    <>
+      <button className="buy-now" onClick={buyNow}>
+        Buy Now
+      </button>
+      <button className="add-to-cart" onClick={addToCart}>
+        Add to Cart
+      </button>
+    </>
+  )}
+</div>
 
 
                 {/* Description */}
