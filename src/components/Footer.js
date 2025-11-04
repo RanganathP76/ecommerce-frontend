@@ -25,7 +25,7 @@ const Footer = () => {
 
         {/* Social Icons */}
         <div className="footer-icons">
-          <a href="https://www.instagram.com/dignifydeals" target="_blank" rel="noopener noreferrer">
+          <a href="https://www.instagram.com/cuztory_official/?__pwa=1" target="_blank" rel="noopener noreferrer">
             <FaInstagram />
           </a>
           <a href="https://m.facebook.com/profile.php?id=61574254927966" target="_blank" rel="noopener noreferrer">
