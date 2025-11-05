@@ -5,10 +5,11 @@
       "destination": "https://ecommerce-backend-8wv0.onrender.com/api/sitemap.xml"
     }
   ],
-  "routes": [
+  "redirects": [
     {
-      "src": "/robots.txt",
-      "dest": "/robots.txt"
+      "source": "/robots.txt",
+      "destination": "/robots.txt",
+      "permanent": true
     }
   ]
 }
