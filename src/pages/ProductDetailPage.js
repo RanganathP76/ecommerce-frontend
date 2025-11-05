@@ -6,6 +6,7 @@ import "./ProductDetailPage.css";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import PageLoader from "../components/PageLoader";
+import { Helmet } from "react-helmet-async";
 
 
 
@@ -409,6 +410,78 @@ const slides = [
   return (
     <div>
       <Header />
+<Helmet>
+  <title>{product?.title ? `${product.title} | Cuzto` : "Cuzto Product"}</title>
+
+  <meta
+    name="description"
+    content={
+      typeof product?.description === "string"
+        ? `${product.description.substring(0, 150)}...`
+        : "Shop customized gifts from Cuzto — Personalized lamps, keychains, and more."
+    }
+  />
+
+  <meta
+    name="keywords"
+    content={`${product?.title || ""}, custom gifts, personalized gifts, ${
+      product?.category || ""
+    }, Cuzto`}
+  />
+  <link rel="canonical" href={`https://cuztory.in/product/${product?._id}`} />
+
+  {/* ✅ Open Graph (Facebook, WhatsApp) */}
+  <meta property="og:type" content="product" />
+  <meta property="og:title" content={`${product?.title || "Cuzto Product"} | Cuzto`} />
+  <meta
+    property="og:description"
+    content={
+      typeof product?.description === "string"
+        ? product.description.substring(0, 150)
+        : "Shop personalized products at Cuzto."
+    }
+  />
+  <meta property="og:image" content={product?.images?.[0]} />
+  <meta property="og:url" content={`https://cuztory.in/product/${product?._id}`} />
+
+  {/* ✅ Twitter Card */}
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content={`${product?.title || "Cuzto Product"} | Cuzto`} />
+  <meta
+    name="twitter:description"
+    content={
+      typeof product?.description === "string"
+        ? product.description.substring(0, 150)
+        : "Shop personalized products at Cuzto."
+    }
+  />
+  <meta name="twitter:image" content={product?.images?.[0]} />
+
+  {/* ✅ JSON-LD structured data for SEO */}
+  <script type="application/ld+json">
+    {JSON.stringify({
+      "@context": "https://schema.org/",
+      "@type": "Product",
+      name: product?.title,
+      image: product?.images,
+      description:
+        typeof product?.description === "string"
+          ? product.description
+          : "Personalized product from Cuzto.",
+      brand: { "@type": "Brand", name: "Cuzto" },
+      offers: {
+        "@type": "Offer",
+        url: `https://cuztory.in/product/${product?._id}`,
+        priceCurrency: "INR",
+        price: product?.price,
+        availability: "https://schema.org/InStock",
+      },
+    })}
+  </script>
+</Helmet>
+
+
+
       <div className="product-detail">
         {/* IMAGE SLIDER */}
         <div className="product-image-slider-container">

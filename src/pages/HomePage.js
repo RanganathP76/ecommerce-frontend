@@ -5,6 +5,8 @@ import Footer from '../components/Footer';
 import './HomePage.css';
 import { Link } from "react-router-dom";
 import PageLoader from "../components/PageLoader";
+import { Helmet } from "react-helmet-async";
+
 
 export default function HomePage() {
   const [collections, setCollections] = useState([]);
@@ -94,6 +96,85 @@ if (loading) return <PageLoader text="Loading your store..." />;
   return (
     <div className="homepage">
       <Header />
+      
+      <Helmet>
+  {/* === Basic SEO === */}
+  <title>Cuzto | Custom Gifts, Personalized Lamps, Keychains & More</title>
+  <meta
+    name="description"
+    content="Shop personalized gifts at Cuzto — from custom photo lamps to keychains and name boards. Create your memories with high-quality personalized products."
+  />
+  <meta
+    name="keywords"
+    content="Cuzto, personalized gifts, custom gifts, custom photo lamps, custom keychains, personalized products India, Cuzto store"
+  />
+  <link rel="canonical" href="https://cuztory.in/" />
+
+  {/* === Open Graph (Facebook, WhatsApp, Instagram preview) === */}
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Cuzto" />
+  <meta property="og:url" content="https://cuztory.in/" />
+  <meta
+    property="og:title"
+    content="Cuzto | Custom Gifts & Personalized Products"
+  />
+  <meta
+    property="og:description"
+    content="Shop custom photo lamps, personalized keychains, and gifts for every occasion at Cuzto."
+  />
+  <meta property="og:image" content="https://cuztory.in/banner.png" />
+
+  {/* === Twitter Card === */}
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Cuzto | Personalized Gifts Store" />
+  <meta
+    name="twitter:description"
+    content="Create your own personalized gifts with Cuzto. Unique, memorable, and made just for you."
+  />
+  <meta name="twitter:image" content="https://cuztory.in/banner.png" />
+
+  {/* === JSON-LD Structured Data for Homepage === */}
+  <script type="application/ld+json">
+    {JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "Store",
+      name: "Cuzto",
+      url: "https://cuztory.in/",
+      logo: "https://cuztory.in/logo.png",
+      description:
+        "Cuzto offers personalized gifts like photo lamps, keychains, name boards, and more. Customize your gifts easily online.",
+      sameAs: [
+        "https://www.instagram.com/cuzto_official",
+        "https://www.facebook.com/CuztoOfficial",
+      ],
+      potentialAction: {
+        "@type": "SearchAction",
+        target: "https://cuztory.in/search?q={search_term_string}",
+        "query-input": "required name=search_term_string",
+      },
+      hasOfferCatalog: {
+        "@type": "OfferCatalog",
+        name: "Featured Products",
+        itemListElement: products.map((prod) => ({
+          "@type": "Product",
+          name: prod.title,
+          image:
+            prod.image ||
+            (prod.images && prod.images[0]) ||
+            "https://cuztory.in/placeholder.png",
+          offers: {
+            "@type": "Offer",
+            priceCurrency: "INR",
+            price: prod.price,
+            url: `https://cuztory.in/product/${prod._id}`,
+            availability: "https://schema.org/InStock",
+          },
+        })),
+      },
+    })}
+  </script>
+</Helmet>
+
 
     {/* Collections */}
       <section className="hero">

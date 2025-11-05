@@ -100,7 +100,7 @@
 
 .cart-summary h3 {
   font-size: 1.4rem;
-  color: #307f40;
+  color: #d81b60;
   margin-bottom: 0.75rem;
 }
 
@@ -121,12 +121,3 @@
   transform: translateY(-2px);
 }
 
-@media (max-width: 600px) {
-  .cart-summary {
-    margin-top: 0.75rem;
-  }
-
-  .checkout-btn {
-    width: 100%;
-  }
-}
