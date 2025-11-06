@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { lazy, Suspense, useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { FaStar } from "react-icons/fa";
 import axiosInstance from "../axiosInstance";
@@ -16,6 +16,8 @@ import { trackEvent } from "../utils/facebookPixel";
 const ProductDetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const Header = lazy(() => import("../components/Header"));
+  const Footer = lazy(() => import("../components/Footer"));
 
   const [product, setProduct] = useState(null);
   const [customInputs, setCustomInputs] = useState({});
@@ -409,9 +411,12 @@ const slides = [
 
   return (
     <div>
-      <Header />
+      <Suspense fallback={<div>Loading header...</div>}>
+  <Header />
+</Suspense>
 <Helmet>
   <title>{product?.title ? `${product.title} | Cuzto` : "Cuzto Product"}</title>
+  <link rel="preload" as="image" href={product.images?.[0]} />
 
   <meta
     name="description"
@@ -496,9 +501,27 @@ const slides = [
 >
   {slides.map((item, idx) =>
     product.images?.includes(item) ? (
-      <img key={`img-${idx}`} src={item} alt={product.title} />
+      <img 
+  key={`img-${idx}`} 
+  src={item} 
+  alt={product.title} 
+  loading="lazy" 
+  width="600" 
+  height="600"
+/>
+
     ) : (
-      <video key={`vid-${idx}`} src={item} controls className="product-video" />
+      <video
+  key={`vid-${idx}`}
+  src={item}
+  controls
+  className="product-video"
+  preload="metadata"
+  width="600"
+  height="400"
+  poster={product.images?.[0]} // optional: first image as poster
+/>
+
     )
   )}
 </div>
@@ -669,12 +692,14 @@ const slides = [
             {rev.images?.length > 0 && (
               <div className="review-images">
                 {rev.images.map((img, imgIdx) => (
-                  <img
-                    key={imgIdx}
-                    src={img}
-                    alt="review"
-                    className="review-image"
-                  />
+                  <img 
+  src={img} 
+  alt="review" 
+  className="review-image" 
+  width="120" 
+  height="120" 
+  loading="lazy"
+/>
                 ))}
               </div>
             )}
@@ -729,7 +754,9 @@ const slides = [
     
 
 
-      <Footer />
+      <Suspense fallback={<div>Loading footer...</div>}>
+  <Footer />
+</Suspense>
 
     {showPopup && (
   <div className="popup-overlay">
@@ -782,11 +809,14 @@ const slides = [
               />
             ) : (
               <div className="file-info-line">
-                <img
-                  src={customInputs[`${field.label}-${idx}`].url}
-                  alt="preview"
-                  className="tiny-preview"
-                />
+                <img 
+  src={customInputs[`${field.label}-${idx}`].url} 
+  alt="preview" 
+  className="tiny-preview" 
+  width="60" 
+  height="60" 
+  loading="lazy"
+/>
                 <span className="file-name">
                   {customInputs[`${field.label}-${idx}`].url.split("/").pop()}
                 </span>
