@@ -411,9 +411,9 @@ const slides = [
 
   return (
     <div>
-      <Suspense fallback={<div>Loading header...</div>}>
+      
   <Header />
-</Suspense>
+
 <Helmet>
   <title>{product?.title ? `${product.title} | Cuzto` : "Cuzto Product"}</title>
   <link rel="preload" as="image" href={product.images?.[0]} />
@@ -754,9 +754,9 @@ const slides = [
     
 
 
-      <Suspense fallback={<div>Loading footer...</div>}>
+      
   <Footer />
-</Suspense>
+
 
     {showPopup && (
   <div className="popup-overlay">
