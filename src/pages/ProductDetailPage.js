@@ -94,7 +94,10 @@ useEffect(() => {
     offerEnd = new Date(savedEndTime);
   } else {
     offerEnd = new Date();
-    offerEnd.setDate(offerEnd.getDate() + 1); // 1 day from now
+    const offerEnd = new Date();
+offerEnd.setDate(offerEnd.getDate() + 1);  // +1 day
+offerEnd.setMinutes(offerEnd.getMinutes() + 25); // +25 minutes
+
     localStorage.setItem("offerEndTime", offerEnd.toISOString());
   }
 
