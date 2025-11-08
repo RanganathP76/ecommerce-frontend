@@ -1138,3 +1138,35 @@
     font-size: 15px;
   }
 }
+
+
+.offer-timer {
+  margin-top: 10px;
+  font-size: 1rem;
+  color: #ff3b30;
+  font-weight: 600;
+  background: #fff5f5;
+  padding: 8px 12px;
+  border-radius: 10px;
+  display: inline-block;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.offer-ended {
+  color: gray;
+}
+
+.offer-countdown strong {
+  color: #e60023;
+}
+
+.offer-timer {
+  background-color: #ffe9e9;
+  color: #d93025;
+  font-weight: 600;
+  padding: 8px 12px;
+  border-radius: 8px;
+  text-align: center;
+  display: inline-block;
+  margin-top: 8px;
+}
