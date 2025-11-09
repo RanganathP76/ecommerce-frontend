@@ -89,17 +89,16 @@ useEffect(() => {
   // Check if an offer end time already exists
   const savedEndTime = localStorage.getItem("offerEndTime");
 
-  let offerEnd;
-  if (savedEndTime) {
-    offerEnd = new Date(savedEndTime);
-  } else {
-    offerEnd = new Date();
-    const offerEnd = new Date();
-offerEnd.setDate(offerEnd.getDate() + 1);  // +1 day
-offerEnd.setMinutes(offerEnd.getMinutes() + 25); // +25 minutes
+ let offerEnd;
+if (savedEndTime) {
+  offerEnd = new Date(savedEndTime);
+} else {
+  offerEnd = new Date();
+  offerEnd.setDate(offerEnd.getDate() + 1);   // +1 day
+  offerEnd.setMinutes(offerEnd.getMinutes() + 25); // +25 minutes
 
-    localStorage.setItem("offerEndTime", offerEnd.toISOString());
-  }
+  localStorage.setItem("offerEndTime", offerEnd.toISOString());
+}
 
   const timer = setInterval(() => {
     const now = new Date().getTime();
