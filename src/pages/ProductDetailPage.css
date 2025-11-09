@@ -79,13 +79,13 @@
 
 .product-info h2 {
   margin-bottom: 0.5rem;
-  font-size: 1.8rem;
+  font-size: 1.3rem;
   color: #222;
 }
 
 .product-price {
-  font-size: 1.4rem;
-  color: #e63946;
+  font-size: 1.5rem;
+  color: #a43c45;
   font-weight: bold;
   margin-bottom: 1rem;
 }
@@ -420,7 +420,7 @@
 
 .current-price {
   font-weight: bold;
-  color: #1d4287; /* red for discounted price */
+  color: #1d238b; /* red for discounted price */
   margin-right: 10px;
 }
 
@@ -1141,15 +1141,15 @@
 
 
 .offer-timer {
-  margin-top: 10px;
-  font-size: 1rem;
+  margin-top: 4px;
+  font-size: 0.85rem;
   color: #ff3b30;
   font-weight: 600;
   background: #fff5f5;
-  padding: 8px 12px;
-  border-radius: 10px;
+  padding: 8px 8px;
+  border-radius: 3px;
   display: inline-block;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
 }
 
 .offer-ended {
@@ -1163,9 +1163,9 @@
 .offer-timer {
   background-color: #ffe9e9;
   color: #d93025;
-  font-weight: 600;
+  font-weight: 500;
   padding: 8px 12px;
-  border-radius: 8px;
+  border-radius: 4px;
   text-align: center;
   display: inline-block;
   margin-top: 8px;
