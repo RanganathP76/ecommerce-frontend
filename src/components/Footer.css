@@ -1,87 +1,175 @@
-/* =========================
-   Footer Styling
-   ========================= */
-
 .footer {
-  background-color: #8187b3;
-  color: #fff;
-  padding: 25px 15px;
+  background-color: #ffffff;
+  color: #333;
   text-align: center;
-  font-family: "Inter", sans-serif;
+  font-family: "Poppins", sans-serif;
+  border-top: 1px solid #ddd;
+  padding: 40px 20px 0 20px;
 }
 
-.footer-container {
-  max-width: 1100px;
-  margin: 0 auto;
+/* Trust Section */
+.trust-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 60px;
+  flex-wrap: wrap;
+  margin-bottom: 30px;
 }
 
-/* Footer Links - Two per row */
+.trust-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.trust-icon {
+  font-size: 36px;
+  color: #7b4bff; /* Purple accent */
+}
+
+.trust-badge p {
+  font-weight: 600;
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+/* Contact Section */
+.contact-section {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.contact-section h3 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 15px;
+}
+
+.contact-item {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin: 5px 0;
+}
+
+.contact-icon {
+  color: #276da2;
+  font-size: 18px;
+}
+
+.contact-item p {
+  margin: 0;
+  color: #555;
+  font-size: 0.95rem;
+}
+
+/* Social Icons */
+.social-icons {
+  margin-top: 10px;
+}
+
+.social-icons a {
+  color: #19206f;
+  font-size: 1.3rem;
+  margin: 0 10px;
+  transition: 0.3s;
+}
+
+.social-icons a:hover {
+  color: #242b92ad;
+}
+
+/* Purple Policy Footer */
+.policy-footer {
+  background-color: #4920c3;
+  color: #fff;
+  padding: 25px 10px;
+  margin-top: 40px;
+}
+
 .footer-links {
   display: flex;
-  flex-wrap: wrap;
   justify-content: center;
-  margin-bottom: 12px;
-  gap: 10px; /* space between links */
+  flex-wrap: wrap;
+  gap: 25px;
+  margin-bottom: 10px;
 }
 
 .footer-links a {
-  flex: 0 0 50%; /* two links per row */
-  max-width: 50%;
-  text-align: center;
-  color: #141212;
-  font-size: 14px;
   text-decoration: none;
-  transition: color 0.3s ease;
-  box-sizing: border-box;
+  color: #fff;
+  font-weight: 500;
+  transition: opacity 0.3s;
 }
 
 .footer-links a:hover {
-  color: #fff;
+  opacity: 0.8;
 }
 
-/* Footer Contact */
-.footer-contact {
-  font-size: 14px;
-  margin-bottom: 12px;
-}
-
-.footer-contact a {
-  color: #120f0f;
-  text-decoration: none;
-  transition: color 0.3s ease;
-}
-
-.footer-contact a:hover {
-  color: #fff;
-}
-
-/* Footer Social Icons */
-.footer-icons {
-  margin-bottom: 12px;
-}
-
-.footer-icons a {
-  color: #0b0909;
-  font-size: 20px;
-  margin: 0 8px;
-  transition: color 0.3s ease;
-}
-
-.footer-icons a:hover {
-  color: #fff;
-}
-
-/* Footer Bottom Text */
+/* Copyright */
 .footer-bottom {
-  font-size: 12px;
-  color: #888;
+  font-size: 0.85rem;
+  margin-top: 10px;
+  color: #eaeaea;
 }
 
-/* Responsive: stack links on mobile */
+/* Responsive */
 @media (max-width: 600px) {
-  .footer-links a {
-    flex: 0 0 100%; /* full width on small screens */
-    max-width: 100%;
-    margin: 5px 0;
+  .trust-section {
+    gap: 40px;
+  }
+
+  .footer-links {
+    gap: 15px;
+  }
+}
+
+
+/* Trust Section */
+.trust-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 40px;
+  margin-bottom: 30px;
+  flex-wrap: nowrap; /* force single line */
+}
+
+.trust-badge {
+  flex: 1;
+  min-width: 80px;
+  max-width: 150px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.trust-icon {
+  font-size: 30px;
+  color: #4423a0;
+}
+
+.trust-badge p {
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+/* Mobile responsive fix */
+@media (max-width: 480px) {
+  .trust-section {
+    gap: 15px; /* tighter spacing */
+  }
+
+  .trust-icon {
+    font-size: 26px; /* slightly smaller */
+  }
+
+  .trust-badge p {
+    font-size: 0.8rem;
   }
 }

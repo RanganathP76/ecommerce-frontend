@@ -1,14 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { FaStar } from "react-icons/fa";
+import { FaStar, FaLock, FaShippingFast, FaHeadset } from "react-icons/fa";
 import axiosInstance from "../axiosInstance";
 import "./ProductDetailPage.css";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import PageLoader from "../components/PageLoader";
 import { Helmet } from "react-helmet-async";
-
-
 
 // ✅ Import Pixel tracking function
 import { trackEvent } from "../utils/facebookPixel";
@@ -28,9 +26,7 @@ const ProductDetailPage = () => {
   const [expandedReviews, setExpandedReviews] = useState({}); // Track expanded reviews
   const [showPopup, setShowPopup] = useState(false);
   const [uploadingFiles, setUploadingFiles] = useState({});
-  const [activeReviewIndex, setActiveReviewIndex] = useState(0);
   const [estimatedDelivery, setEstimatedDelivery] = useState("");
-
 
 
   // Fetch product details
@@ -421,25 +417,7 @@ const DescriptionSections = ({ parts }) => {
 
   if (!product) return <p>Product not found</p>;
 
-  const handleWhatsAppOrder = () => {
-  // Your product name
-  const productName = product?.title;
-
-  // Current product page URL (optional, you can also use a specific link)
-  const productLink = window.location.href;
-
-  // Pre-filled message
-  const message = `Hi, I would like to order this product: ${productName}. Here is the link: ${productLink}`;
-
-  // Encode the message for URL
-  const encodedMessage = encodeURIComponent(message);
-
-  // WhatsApp URL (replace country code if needed)
-  const whatsappURL = `https://wa.me/918050084991?text=${encodedMessage}`;
-
-  // Open WhatsApp
-  window.open(whatsappURL, "_blank");
-};
+  
 const slides = [
   ...(product?.images || []),
   ...(product?.videos || [])
@@ -450,14 +428,14 @@ const slides = [
     <div>
       <Header />
 <Helmet>
-  <title>{product?.title ? `${product.title} | Cuzto` : "Cuzto Product"}</title>
+  <title>{product?.title ? `${product.title} | Cuztory` : "Cuztory Product"}</title>
 
   <meta
     name="description"
     content={
       typeof product?.description === "string"
         ? `${product.description.substring(0, 150)}...`
-        : "Shop customized gifts from Cuzto — Personalized lamps, keychains, and more."
+        : "Shop customized gifts from Cuztory — Personalized lamps, keychains, and more."
     }
   />
 
@@ -465,19 +443,19 @@ const slides = [
     name="keywords"
     content={`${product?.title || ""}, custom gifts, personalized gifts, ${
       product?.category || ""
-    }, Cuzto`}
+    }, Cuztory`}
   />
   <link rel="canonical" href={`https://cuztory.in/product/${product?._id}`} />
 
   {/* ✅ Open Graph (Facebook, WhatsApp) */}
   <meta property="og:type" content="product" />
-  <meta property="og:title" content={`${product?.title || "Cuzto Product"} | Cuzto`} />
+  <meta property="og:title" content={`${product?.title || "Cuztory Product"} | Cuztory`} />
   <meta
     property="og:description"
     content={
       typeof product?.description === "string"
         ? product.description.substring(0, 150)
-        : "Shop personalized products at Cuzto."
+        : "Shop personalized products at Cuztory."
     }
   />
   <meta property="og:image" content={product?.images?.[0]} />
@@ -485,13 +463,13 @@ const slides = [
 
   {/* ✅ Twitter Card */}
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content={`${product?.title || "Cuzto Product"} | Cuzto`} />
+  <meta name="twitter:title" content={`${product?.title || "Cuzto Product"} | Cuztory`} />
   <meta
     name="twitter:description"
     content={
       typeof product?.description === "string"
         ? product.description.substring(0, 150)
-        : "Shop personalized products at Cuzto."
+        : "Shop personalized products at Cuztory."
     }
   />
   <meta name="twitter:image" content={product?.images?.[0]} />
@@ -506,8 +484,8 @@ const slides = [
       description:
         typeof product?.description === "string"
           ? product.description
-          : "Personalized product from Cuzto.",
-      brand: { "@type": "Brand", name: "Cuzto" },
+          : "Personalized product from Cuztory.",
+      brand: { "@type": "Brand", name: "Cuztory" },
       offers: {
         "@type": "Offer",
         url: `https://cuztory.in/product/${product?._id}`,
@@ -587,27 +565,24 @@ const slides = [
         <div className="product-info">
           <h2>{product.title}</h2>
 
-          {/* 🕒 Offer Timer Display */}
-<div className="offer-timer">
-  {timeLeft.days > 0 ? (
-    <p>🔥 Hurry! Offer ends in {timeLeft.days} day{timeLeft.days > 1 ? "s" : ""} {timeLeft.hours > 0 && `${timeLeft.hours} hr`} {timeLeft.minutes > 0 && `${timeLeft.minutes} min`}!</p>
-  ) : (
-    <p>🔥 Hurry! Offer ends in {timeLeft.hours} hr {timeLeft.minutes} min!</p>
-  )}
+          {/* 💰 Price + Compare + Offer Timer (All in One Line, Mobile-Friendly) */}
+<div className="price-offer-line">
+  <div className="price-section">
+    <span className="current-price">₹{product.price}</span>
+    {product.comparePrice && product.comparePrice > product.price && (
+      <span className="compare-price">₹{product.comparePrice}</span>
+    )}
+  </div>
+
+  <div className="offer-pill">
+    {timeLeft.days > 0 ? (
+      <p>🔥Hurry {timeLeft.days}d {timeLeft.hours}h left</p>
+    ) : (
+      <p>🔥Hurry {timeLeft.hours}h {timeLeft.minutes}m left</p>
+    )}
+  </div>
 </div>
 
-
-          {/* Price with Compare Price */}
-<p className="product-price">
-{product.comparePrice && product.comparePrice > product.price ? (
-    <>
-      <span className="current-price">₹{product.price}</span>
-      <span className="compare-price">₹{product.comparePrice}</span>
-    </>
-  ) : (
-    <span className="current-price">₹{product.price}</span>
-  )}
-</p>
 
 
 <div className="extra-product-info">
@@ -673,7 +648,24 @@ const slides = [
     </>
   )}
 </div>
-
+ 
+ {/* ✅ TRUST BADGES SECTION */}
+<div className="trust-badges-section">
+  <div className="trust-badge">
+    <FaLock className="trust-icon" />
+    <p>Secure Payments</p>
+  </div>
+  <div className="trust-badge">
+    <FaShippingFast className="trust-icon" />
+    <p>Fast Shipping</p>
+  </div>
+ 
+  <div className="trust-badge">
+    <FaHeadset className="trust-icon" />
+    <p>24/7 Support</p>
+  </div>
+</div>
+  
 
                 {/* Description */}
          {/* ✅ Multi-Part Product Description with Expand-on-Click */}
@@ -685,8 +677,6 @@ const slides = [
     {product.description || "No description available."}
   </p>
 )}
-
-
 
 
           {/* ✅ REVIEWS SECTION — show 5 first, then show more */}
@@ -748,9 +738,8 @@ const slides = [
     </>
   )}
 </div>
-
-
-          {/* Review Section */}
+         
+         {/* Review Section */}
           <div className="review-section">
             <h3>Give a Review</h3>
             <div className="rating-input">
@@ -772,13 +761,8 @@ const slides = [
             <button onClick={submitReview}>Submit Review</button>
           </div>
 
-          
         </div>
       </div>
-
-    
-
-
       <Footer />
 
     {showPopup && (

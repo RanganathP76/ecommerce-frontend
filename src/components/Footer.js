@@ -1,48 +1,64 @@
 import React from "react";
-import { FaInstagram, FaFacebook, FaWhatsapp } from "react-icons/fa";
+import {
+  FaInstagram,
+  FaFacebook,
+  FaWhatsapp,
+  FaMapMarkerAlt,
+  FaEnvelope,
+  FaPhoneAlt,
+} from "react-icons/fa";
 import "./Footer.css";
 
 const Footer = () => {
   return (
     <footer className="footer">
-      <div className="footer-container">
-        
-        {/* Links */}
+
+      
+
+      {/* Contact Section */}
+      <div className="contact-section">
+        <h3>Contact Us</h3>
+        <div className="contact-item">
+          <FaMapMarkerAlt className="contact-icon" />
+          <p> #24, Muddinapalya, Bengaluru, Karnataka, India</p>
+        </div>
+        <div className="contact-item">
+          <FaEnvelope className="contact-icon" />
+          <p>support@cuztory.in</p>
+        </div>
+        <div className="contact-item">
+          <FaPhoneAlt className="contact-icon" />
+          <p>+91 80-500 84991</p>
+        </div>
+
+        <div className="social-icons">
+          <a href="https://www.instagram.com/cuztory_official?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" target="_blank" rel="noreferrer">
+            <FaInstagram />
+          </a>
+          <a href="https://facebook.com" target="_blank" rel="noreferrer">
+            <FaFacebook />
+          </a>
+          <a href="https://wa.me/918050084991" target="_blank" rel="noreferrer">
+            <FaWhatsapp />
+          </a>
+        </div>
+      </div>
+
+      {/* Purple Footer Links Section */}
+      <div className="policy-footer">
         <div className="footer-links">
           <a href="/privacy-policy">Privacy Policy</a>
           <a href="/return-policy">Return Policy</a>
           <a href="/terms">Terms & Conditions</a>
           <a href="/shipping-policy">Shipping Policy</a>
         </div>
-
-        {/* Contact */}
-        <div className="footer-contact">
-          <p>
-            📧 <a href="mailto:dignifydeals@gmail.com">support@dignifydeals.com</a> | 
-            📞 <a href="tel:+918050084991">+91-8050084991</a>
-          </p>
-        </div>
-
-        {/* Social Icons */}
-        <div className="footer-icons">
-          <a href="https://www.instagram.com/cuztory_official/?__pwa=1" target="_blank" rel="noopener noreferrer">
-            <FaInstagram />
-          </a>
-          <a href="https://m.facebook.com/profile.php?id=61574254927966" target="_blank" rel="noopener noreferrer">
-            <FaFacebook />
-          </a>
-          <a href="https://wa.me/918050084991" target="_blank" rel="noopener noreferrer">
-            <FaWhatsapp />
-          </a>
-        </div>
-
-        {/* Bottom */}
-        <div className="footer-bottom">
-          © {new Date().getFullYear()} DignifyDeals
-        </div>
+        <p className="footer-bottom">
+          © {new Date().getFullYear()} Cuztory.in | All Rights Reserved.
+        </p>
       </div>
     </footer>
   );
 };
 
 export default Footer;
+
