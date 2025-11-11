@@ -323,65 +323,6 @@ const removeFile = (key) => {
 };
 
 
-// ✅ Subcomponent for Expandable Descriptions
-const DescriptionSections = ({ parts }) => {
-  const [expandedIndex, setExpandedIndex] = useState(0); // first open by default
-
-  return (
-    <div className="product-description-section">
-      {parts.map((part, index) => {
-        const isExpanded = expandedIndex === index;
-
-        return (
-          <div key={index} className="desc-wrapper">
-            {/* Header with toggle */}
-            <div
-              className="desc-header"
-              onClick={() =>
-                setExpandedIndex(isExpanded ? null : index)
-              }
-            >
-              <h3 className="desc-headline">
-                {part.headline || `Section ${index + 1}`}
-              </h3>
-              <span className={`arrow ${isExpanded ? "up" : "down"}`}>
-                {isExpanded ? "▲" : "▼"}
-              </span>
-            </div>
-
-            {/* Expanded Content */}
-            {isExpanded && (
-              <div className="desc-content">
-                {part.text && (
-                  <p
-                    className="desc-text"
-                    style={{ whiteSpace: "pre-line" }}
-                  >
-                    {part.text}
-                  </p>
-                )}
-                {part.image && (
-                  <img
-                    src={part.image}
-                    alt={part.headline || `desc-${index}`}
-                    className="desc-image"
-                  />
-                )}
-                {part.video && (
-                  <video
-                    src={part.video}
-                    controls
-                    className="desc-video"
-                  />
-                )}
-              </div>
-            )}
-          </div>
-        );
-      })}
-    </div>
-  );
-};
 
 
 
@@ -881,5 +822,60 @@ const slides = [
     </div>
   );
 };
+
+// ✅ Subcomponent for Expandable Descriptions
+const DescriptionSections = ({ parts }) => {
+  const [expandedIndex, setExpandedIndex] = useState(0); // First open by default
+
+  const handleToggle = (index) => {
+    setExpandedIndex(prev => (prev === index ? null : index));
+  };
+
+  return (
+    <div className="product-description-section">
+      {parts.map((part, index) => {
+        const isExpanded = expandedIndex === index;
+        return (
+          <div key={index} className="desc-wrapper">
+            <div
+              className="desc-header"
+              onClick={() => handleToggle(index)}
+            >
+              <h3 className="desc-headline">{part.headline || `Section ${index + 1}`}</h3>
+              <span className={`arrow ${isExpanded ? "up" : "down"}`}>
+                {isExpanded ? "▲" : "▼"}
+              </span>
+            </div>
+
+            {/* ✅ Keep content mounted but hide via CSS to prevent flicker */}
+            <div className={`desc-content ${isExpanded ? "show" : "hide"}`}>
+              {part.text && <p className="desc-text">{part.text}</p>}
+
+              {part.image && (
+                <img
+                  src={part.image}
+                  alt={part.headline || `desc-${index}`}
+                  className="desc-image"
+                />
+              )}
+
+              {part.video && (
+                <video
+                  src={part.video}
+                  controls
+                  preload="metadata"
+                  playsInline
+                  crossOrigin="anonymous"
+                  className="desc-video"
+                />
+              )}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
 
 export default ProductDetailPage;
