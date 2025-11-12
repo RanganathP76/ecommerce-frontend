@@ -100,7 +100,7 @@ function App() {
             <Route path="/terms" element={<TermsAndConditions />} />
             <Route path="/shipping-policy" element={<ShippingPolicy />} />
             <Route path="/facebook-feed" element={<FacebookFeed />} />
-            <Route path="/facebook-feed-download" element={<FacebookFeedDownload />} />
+            <Route path="/facebook-feed-download.csv" element={<FacebookFeedDownload />} />
             {/* Cart & Checkout */}
             <Route path="/cart" element={<CartPage />} />
             <Route path="/checkoutStep1" element={<CheckoutStep1 />} />
