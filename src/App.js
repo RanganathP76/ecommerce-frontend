@@ -21,7 +21,8 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsAndConditions from "./pages/TermsAndConditions";
 import RefundPolicy from "./pages/RefundPolicy";
 import ShippingPolicy from "./pages/ShippingPolicy";
-
+import FacebookFeed from "./pages/FacebookFeed";
+import FacebookFeedDownload from "./pages/FacebookFeedDownload";
 // ✅ Import Facebook Pixel
 import { initFacebookPixel } from "./utils/facebookPixel";
 
@@ -98,7 +99,8 @@ function App() {
             <Route path="/return-policy" element={<RefundPolicy />} />
             <Route path="/terms" element={<TermsAndConditions />} />
             <Route path="/shipping-policy" element={<ShippingPolicy />} />
-
+            <Route path="/facebook-feed" element={<FacebookFeed />} />
+            <Route path="/facebook-feed-download" element={<FacebookFeedDownload />} />
             {/* Cart & Checkout */}
             <Route path="/cart" element={<CartPage />} />
             <Route path="/checkoutStep1" element={<CheckoutStep1 />} />
