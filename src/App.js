@@ -1,11 +1,10 @@
 // src/App.js
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import CartContext from "./context/CartContext";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 
 // Import pages
-
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import HomePage from "./pages/HomePage";
@@ -23,8 +22,19 @@ import TermsAndConditions from "./pages/TermsAndConditions";
 import RefundPolicy from "./pages/RefundPolicy";
 import ShippingPolicy from "./pages/ShippingPolicy";
 
-// ✅ Import our Facebook Pixel utility
+// ✅ Import Facebook Pixel
 import { initFacebookPixel } from "./utils/facebookPixel";
+
+// ✅ ScrollToTop Component
+function ScrollToTop() {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0); // Instant scroll to top
+  }, [pathname]);
+
+  return null;
+}
 
 function App() {
   const [cartItems, setCartItems] = useState(() => {
@@ -56,9 +66,9 @@ function App() {
     localStorage.removeItem("cart");
   };
 
-  // ✅ Initialize Facebook Pixel once on App load
+  // ✅ Initialize Facebook Pixel once
   useEffect(() => {
-    initFacebookPixel(); // PageView will fire on all pages
+    initFacebookPixel();
   }, []);
 
   return (
@@ -73,8 +83,8 @@ function App() {
         }}
       >
         <Router>
+          <ScrollToTop /> {/* ✅ Always scroll to top on route change */}
           <Routes>
-            
             <Route path="/" element={<HomePage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
