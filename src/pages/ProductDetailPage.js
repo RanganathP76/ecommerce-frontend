@@ -614,9 +614,13 @@ const slides = [
 {Array.isArray(product.description) && product.description.length > 0 ? (
   <DescriptionSections parts={product.description} />
 ) : (
-  <p className="product-description">
-    {product.description || "No description available."}
-  </p>
+  <p
+  className="product-description"
+  dangerouslySetInnerHTML={{
+    __html: (product.description || "").replace(/\n/g, "<br/><br/>")
+  }}
+></p>
+
 )}
 
 
@@ -849,7 +853,13 @@ const DescriptionSections = ({ parts }) => {
 
             {/* ✅ Keep content mounted but hide via CSS to prevent flicker */}
             <div className={`desc-content ${isExpanded ? "show" : "hide"}`}>
-              {part.text && <p className="desc-text">{part.text}</p>}
+              {part.text && <p
+  className="desc-text"
+  dangerouslySetInnerHTML={{
+    __html: (part.text || "").replace(/\n/g, "<br/><br/>")
+  }}
+></p>
+}
 
               {part.image && (
                 <img
