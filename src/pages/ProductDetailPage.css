@@ -1403,3 +1403,31 @@
   margin-top: 4px;
   display: block;
 }
+
+/* 🔥 TOP TO BOTTOM POPUP */
+.popup-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.35);
+  backdrop-filter: blur(2px);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start; /* 👈 NOW popup appears at TOP */
+  z-index: 9999;
+}
+
+.popup-content {
+  width: 100%;
+  max-height: 85vh;
+  background: #fff;
+  border-radius: 0 0 16px 16px; /* 👈 Rounded bottom now */
+  padding: 18px;
+  overflow-y: auto;
+  animation: slideDown 0.35s ease forwards; /* 👈 changed animation */
+}
+
+/* 🔥 ANIMATION: From top to bottom */
+@keyframes slideDown {
+  from { transform: translateY(-100%); } /* Start above screen */
+  to { transform: translateY(0); }        /* Slide down */
+}
