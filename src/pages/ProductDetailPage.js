@@ -27,6 +27,8 @@ const ProductDetailPage = () => {
   const [showPopup, setShowPopup] = useState(false);
   const [uploadingFiles, setUploadingFiles] = useState({});
   const [estimatedDelivery, setEstimatedDelivery] = useState("");
+const [highlightField, setHighlightField] = useState(null);
+const [firstEmptyField, setFirstEmptyField] = useState(null);
 
 
   // Fetch product details
@@ -573,7 +575,16 @@ const slides = [
     // ✅ If customizable, show only "Customize" button
     <button
       className="customize-btn"
-      onClick={() => setShowPopup(true)}
+      onClick={() => {
+  setShowPopup(true);
+
+  // Focus after popup opens
+  setTimeout(() => {
+    const firstField = document.querySelector(".popup-input input[type='text']");
+    if (firstField) firstField.focus();
+  }, 300);
+}}
+
     >
       ✨ Customize
     </button>
@@ -747,7 +758,11 @@ const slides = [
   <div className="popup-section">
     <h4>Customization</h4>
     {product.customizationFields.map((field, idx) => (
-      <div key={`${field.label}-${idx}`} className="popup-input">
+      <div
+  key={`${field.label}-${idx}`}
+  id={`field-${field.label}-${idx}`}
+  className={`popup-input ${highlightField === `${field.label}-${idx}` ? "highlight-required" : ""}`}
+>
         <label>{field.label}</label>
 
         {field.type === "file" ? (
@@ -759,6 +774,7 @@ const slides = [
                   handleFileUpload(`${field.label}-${idx}`, e.target.files[0])
                 }
               />
+              
             ) : (
               <div className="file-info-line">
                 <img
@@ -779,6 +795,7 @@ const slides = [
               </div>
             )}
           </div>
+          
         ) : (
           <input
             type="text"
@@ -788,6 +805,10 @@ const slides = [
             }
           />
         )}
+        {highlightField === `${field.label}-${idx}` && (
+  <small className="error-hint">Please fill this</small>
+)}
+
       </div>
     ))}
   </div>
@@ -802,13 +823,38 @@ const slides = [
       <button
         className="popup-continue"
         onClick={() => {
-          if (validateSelections()) {
-            setShowPopup(false);
-            buyNow();
-          } else {
-            alert("Please complete all required selections before continuing.");
-          }
-        }}
+  const missing = [];
+
+  // Check customization fields
+  if (product.isCustomizable) {
+    product.customizationFields.forEach((field, idx) => {
+      const key = `${field.label}-${idx}`;
+      if (!customInputs[key]) {
+        missing.push(key);
+      }
+    });
+  }
+
+  // If missing fields
+  if (missing.length > 0) {
+    const first = missing[0];
+    setHighlightField(first);
+
+    // Auto scroll to the field
+    const el = document.getElementById(`field-${first}`);
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "center" });
+      el.querySelector("input")?.focus();
+    }
+    return; // Stop continue
+  }
+
+  // No errors → proceed
+  setHighlightField(null);
+  setShowPopup(false);
+  buyNow();
+}}
+
       >
         Continue
       </button>
