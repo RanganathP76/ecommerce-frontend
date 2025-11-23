@@ -122,3 +122,70 @@
 .track-footer .footer-icons a:hover {
   color: white;
 }
+
+.order-stepper {
+  display: flex;
+  flex-direction: column;
+  margin: 20px 0;
+}
+
+.step-item {
+  display: flex;
+  align-items: center;
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.step-circle {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #ccc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  z-index: 1;
+}
+
+.step-circle.completed {
+  background: green;
+  color: white;
+}
+
+.step-circle.current {
+  background: orange;
+  color: white;
+}
+
+.step-label {
+  margin-left: 15px;
+  font-weight: 500;
+}
+
+.step-line {
+  position: absolute;
+  left: 14px;
+  top: 30px;
+  width: 2px;
+  height: 20px;
+  background: green;
+  z-index: 0;
+}
+
+.order-cancelled {
+  text-align: center;
+  color: red;
+  font-size: 24px;
+  font-weight: bold;
+  margin: 30px 0;
+}
+
+.order-summary ul {
+  list-style: none;
+  padding: 0;
+}
+
+.order-summary li {
+  margin-bottom: 5px;
+}

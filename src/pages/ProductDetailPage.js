@@ -529,7 +529,7 @@ const slides = [
 
 
 <div className="extra-product-info">
-  <p className="delivery-info">🚚 Free Delivery</p>
+  <p className="delivery-info"> COD Availabel</p>
   {estimatedDelivery && (
     <p className="estimated-delivery">
       📦 Estimated Delivery: <strong>{estimatedDelivery}</strong>
