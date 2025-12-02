@@ -1431,3 +1431,10 @@
   from { transform: translateY(-100%); } /* Start above screen */
   to { transform: translateY(0); }        /* Slide down */
 }
+
+
+.advance-info {
+  color: #2d7a46;
+  font-weight: 600;
+  margin-top: 5px;
+}

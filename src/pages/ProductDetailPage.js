@@ -119,6 +119,32 @@ if (savedEndTime) {
 }, []);
 
 
+
+const [paymentOptions, setPaymentOptions] = useState(null);
+
+useEffect(() => {
+  axiosInstance.get("/payment-config/get")
+    .then(res => setPaymentOptions(res.data))
+    .catch(console.error);
+}, []);
+
+
+const productPrice = product?.price ? Number(product.price) : 0;
+
+const getAdvance = () => {
+  if (paymentOptions?.partialPayment?.enabled) {
+    const { partialType, partialValue } = paymentOptions.partialPayment;
+    return partialType === "percent"
+      ? Math.round((productPrice * partialValue) / 100)
+      : Math.round(partialValue);
+  }
+  return 0;
+};
+
+const advance = getAdvance();
+const due = productPrice - advance;
+
+
   // Utility: Get estimated delivery range (e.g., 3–7 days)
 const getEstimatedDelivery = () => {
   const today = new Date();
@@ -529,13 +555,22 @@ const slides = [
 
 
 <div className="extra-product-info">
-  <p className="delivery-info"> COD Availabel</p>
+  {/* --- Show Pay X Now + Y At Delivery --- */}
+  {paymentOptions?.partialPayment?.enabled && (
+    <p className="advance-info">
+      💳 Pay only <strong>₹{advance}</strong> now & <strong>₹{due}</strong> at delivery
+    </p>
+  )}
+
   {estimatedDelivery && (
     <p className="estimated-delivery">
       📦 Estimated Delivery: <strong>{estimatedDelivery}</strong>
     </p>
   )}
+
+  
 </div>
+
 
 {/* Specifications */}
           {product.specifications?.length > 0 && (

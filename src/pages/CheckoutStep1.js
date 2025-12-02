@@ -12,6 +12,7 @@ const CheckoutStep1 = () => {
     phone: "",
     address: "",
     city: "",
+    state: "",
     postalCode: "",
     country: "India",
   });
@@ -179,6 +180,7 @@ const CheckoutStep1 = () => {
       !shippingInfo.phone ||
       !shippingInfo.address ||
       !shippingInfo.city ||
+      !shippingInfo.state ||
       !shippingInfo.postalCode ||
       !selectedShipping
     ) {
@@ -208,6 +210,7 @@ const CheckoutStep1 = () => {
     !shippingInfo.phone ||
     !shippingInfo.address ||
     !shippingInfo.city ||
+    !shippingInfo.state ||
     !shippingInfo.postalCode ||
     !selectedShipping
   ) {
@@ -334,19 +337,75 @@ const CheckoutStep1 = () => {
       {/* Shipping Info */}
       <div className="shipping-info">
         <h3>Shipping Info</h3>
-        {["name", "email", "phone", "address", "city", "postalCode"].map(
-          (field) => (
-            <input
-              key={field}
-              type="text"
-              placeholder={field}
-              value={shippingInfo[field]}
-              onChange={(e) =>
-                setShippingInfo({ ...shippingInfo, [field]: e.target.value })
-              }
-            />
-          )
-        )}
+        {/* Name */}
+<input
+  type="text"
+  placeholder="name"
+  value={shippingInfo.name}
+  onChange={(e) =>
+    setShippingInfo({ ...shippingInfo, name: e.target.value })
+  }
+/>
+
+{/* Email */}
+<input
+  type="text"
+  placeholder="email"
+  value={shippingInfo.email}
+  onChange={(e) =>
+    setShippingInfo({ ...shippingInfo, email: e.target.value })
+  }
+/>
+
+{/* Phone */}
+<input
+  type="text"
+  placeholder="phone"
+  value={shippingInfo.phone}
+  onChange={(e) =>
+    setShippingInfo({ ...shippingInfo, phone: e.target.value })
+  }
+/>
+
+{/* DOUBLE-SIZE ADDRESS FIELD */}
+<textarea
+  placeholder="address"
+  className="big-address"
+  value={shippingInfo.address}
+  onChange={(e) =>
+    setShippingInfo({ ...shippingInfo, address: e.target.value })
+  }
+/>
+
+{/* City */}
+<input
+  type="text"
+  placeholder="city"
+  value={shippingInfo.city}
+  onChange={(e) =>
+    setShippingInfo({ ...shippingInfo, city: e.target.value })
+  }
+/>
+
+{/* State */}
+<input
+  type="text"
+  placeholder="state"
+  value={shippingInfo.state}
+  onChange={(e) =>
+    setShippingInfo({ ...shippingInfo, state: e.target.value })
+  }
+/>
+
+{/* Pincode */}
+<input
+  type="text"
+  placeholder="postalCode"
+  value={shippingInfo.postalCode}
+  onChange={(e) =>
+    setShippingInfo({ ...shippingInfo, postalCode: e.target.value })
+  }
+/>
       </div>
 
       {/* Shipping Rates */}
