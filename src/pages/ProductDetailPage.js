@@ -555,21 +555,23 @@ const slides = [
 
 
 <div className="extra-product-info">
-  {/* --- Show Pay X Now + Y At Delivery --- */}
+
+  {/* --- Payment Option Message --- */}
   {paymentOptions?.partialPayment?.enabled && (
-    <p className="advance-info">
-      💳 Pay only <strong>₹{advance}</strong> now & <strong>₹{due}</strong> at delivery
+    <p className="payment-option-info">
+      Free delivery
     </p>
   )}
 
+  {/* Estimated Delivery */}
   {estimatedDelivery && (
     <p className="estimated-delivery">
       📦 Estimated Delivery: <strong>{estimatedDelivery}</strong>
     </p>
   )}
 
-  
 </div>
+
 
 
 {/* Specifications */}
