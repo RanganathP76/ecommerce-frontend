@@ -123,52 +123,59 @@ const CheckoutStep1 = () => {
   };
 
   // --- Create Order ---
-  const createOrder = async (
-    method,
-    status,
-    paymentId = "",
-    extraPaymentData = {}
-  ) => {
-    const orderItems = cartItems.map((item) => ({
-      product: item._id,
-      name: item.title,
-      image: item.image || "",
-      price: parseFloat(item.price),
-      quantity: item.quantity ? Number(item.quantity) : 1,
-      customization: item.customization || [],
-      specifications: item.specifications || [],
-    }));
+  // --- Updated Create Order Logic ---
+const createOrder = async (
+  method,
+  status,
+  paymentId = "",
+  extraPaymentData = {}
+) => {
+  const orderItems = cartItems.map((item) => ({
+    product: item._id,
+    name: item.title,
+    image: item.image || "",
+    price: Math.round(parseFloat(item.price)), // Round individual item price
+    quantity: item.quantity ? Number(item.quantity) : 1,
+    customization: item.customization || [],
+    specifications: item.specifications || [],
+  }));
 
-    const orderData = {
-      shippingInfo,
-      paymentInfo: { method, status, id: paymentId },
-      razorpay_order_id: extraPaymentData.razorpay_order_id || "",
-      razorpay_payment_id: paymentId || "",
-      razorpay_signature: extraPaymentData.razorpay_signature || "",
-      amountPaid: payableNow,
-      amountDue: total - payableNow,
-      orderItems,
-      itemsPrice,
-      discount,
-      shippingPrice,
-      totalPrice: total,
-      orderStatus: "Processing",
-    };
+  // Ensure all values sent to DB are rounded integers
+  const roundedItemsPrice = Math.round(itemsPrice);
+  const roundedDiscount = Math.round(discount);
+  const roundedShipping = Math.round(shippingPrice);
+  const roundedTotal = Math.round(total);
+  const roundedPayableNow = Math.round(payableNow);
 
-    try {
-      const res = await axiosInstance.post("/orders", orderData, {
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
-      });
-
-      clearCart();
-      window.location.href = `/order-confirmation/${res.data._id}`;
-    } catch (err) {
-      console.error("Order creation failed:", err);
-      alert(err.response?.data?.message || "Order creation failed.");
-      setProcessing(false);
-      clickedOnceRef.current = false;
-    }
+  const orderData = {
+    shippingInfo,
+    paymentInfo: { method, status, id: paymentId },
+    razorpay_order_id: extraPaymentData.razorpay_order_id || "",
+    razorpay_payment_id: paymentId || "",
+    razorpay_signature: extraPaymentData.razorpay_signature || "",
+    amountPaid: roundedPayableNow, // Matches actual payment
+    amountDue: roundedTotal - roundedPayableNow, // Clean subtraction
+    orderItems,
+    itemsPrice: roundedItemsPrice,
+    discount: roundedDiscount,
+    shippingPrice: roundedShipping,
+    totalPrice: roundedTotal,
+    orderStatus: "Processing",
   };
+
+  try {
+    const res = await axiosInstance.post("/orders", orderData, {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    });
+    clearCart();
+    window.location.href = `/order-confirmation/${res.data._id}`;
+  } catch (err) {
+    console.error("Order creation failed:", err);
+    alert(err.response?.data?.message || "Order creation failed.");
+    setProcessing(false);
+    clickedOnceRef.current = false;
+  }
+};
 
   // --- COD Checkout ---
   const handleCOD = () => {
