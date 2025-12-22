@@ -236,19 +236,24 @@ const CheckoutStep1 = () => {
     await new Promise((resolve) => (script.onload = resolve));
   }
 
-  try {
-    const res = await axiosInstance.post(
-      "/payment/create-order",
-      {
-        amount: payableNow,
-        shippingInfo,
-        itemsPrice,
-        discount,
-        shippingPrice,
-        totalPrice: total,
-      },
-      { headers: token ? { Authorization: `Bearer ${token}` } : {} }
-    );
+  // --- Inside handlePrepaid function ---
+
+try {
+  const res = await axiosInstance.post(
+    "/payment/create-order",
+    {
+      // Wrap payableNow in Math.round to ensure it's a clean integer
+      amount: Math.round(payableNow), 
+      shippingInfo,
+      itemsPrice: Math.round(itemsPrice),
+      discount: Math.round(discount),
+      shippingPrice: Math.round(shippingPrice),
+      totalPrice: Math.round(total),
+    },
+    { headers: token ? { Authorization: `Bearer ${token}` } : {} }
+  );
+
+  // ... rest of your code
 
     const { razorpayOrder } = res.data;
 
@@ -546,27 +551,24 @@ const CheckoutStep1 = () => {
     </div>
 
     <div className="hero-section">
-      {/* LABEL: Changes based on selection */}
-      <p className="hero-label">
-        {selectedPayment === "COD" ? "Amount Payable at Delivery" : "Amount Payable Now"}
-      </p>
+  <p className="hero-label">
+    {selectedPayment === "COD" ? "Amount Payable at Delivery" : "Amount Payable Now"}
+  </p>
 
-      {/* AMOUNT: Shows Total for COD, PayableNow for others */}
-      <h2 className="hero-amount-display">
-        ₹{selectedPayment === "COD" ? Math.round(total) : Math.round(payableNow)}
-      </h2>
-      
-      {/* ICONS: Hide online icons if COD is selected */}
-      {selectedPayment !== "COD" ? (
-        <div className="summary-payment-icons">
-          <img src="/payment-icons/upi.png" alt="UPI" />
-          <img src="/payment-icons/card.png" alt="Cards" />
-          <img src="/payment-icons/paytm.png" alt="Paytm" />
-        </div>
-      ) : (
-        <div className="cod-badge-mini">Cash / QR on Delivery</div>
-      )}
+  {/* SHOW FULL TOTAL FOR COD, BUT ONLY ADVANCE/PREPAID FOR ONLINE */}
+  <h2 className="hero-amount-display">
+    ₹{selectedPayment === "COD" ? Math.round(total) : Math.round(payableNow)}
+  </h2>
+  
+  {selectedPayment !== "COD" ? (
+    <div className="summary-payment-icons">
+      <img src="/payment-icons/upi.png" alt="UPI" />
+      <img src="/payment-icons/card.png" alt="Cards" />
     </div>
+  ) : (
+    <div className="cod-badge-mini">Cash / QR on Delivery</div>
+  )}
+</div>
 
     {/* Subtle Breakdown */}
     <div className="price-breakdown-mini">
