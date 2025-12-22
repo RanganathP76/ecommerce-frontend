@@ -519,3 +519,277 @@
   border: 1px solid #ccc;
   margin-bottom: 10px;
 }
+
+/* The Container */
+.summary-box-v2 {
+  background: #ffffff;
+  padding: 30px 15px;
+  border-radius: 16px;
+  text-align: center;
+  border: 1px solid #f0f0f0;
+}
+
+/* Total: Make it so small it's almost unreadable */
+.total-stealth-mode {
+  font-size: 0.5rem; /* Tiny */
+  color: #e0e0e0;    /* Very light grey (hard to see on white) */
+  margin-bottom: 5px;
+  letter-spacing: -0.5px;
+}
+
+/* Payable Header */
+.payable-header {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 0;
+}
+
+/* THE HERO PRICE: Big, Bold, and Green */
+.hero-payable-amount {
+  font-size: 3.5rem; /* Huge impact */
+  font-weight: 900;
+  color: #2e7d32;    /* Deep green */
+  margin: 5px 0;
+  line-height: 1;
+}
+
+/* Ghost Balance: "Invisible" text that is still in the DOM */
+.ghost-balance {
+  font-size: 0.55rem;
+  color: #f5f5f5;    /* Almost matches background */
+  margin-top: 10px;
+  font-weight: 300;
+  transition: opacity 0.3s;
+}
+
+/* Optional: Only show the ghost text if they hover over it */
+.ghost-balance:hover {
+  color: #cccccc; 
+}
+
+/* Tiny breakdown at the bottom */
+.tiny-details-row {
+  margin-top: 15px;
+  font-size: 0.65rem;
+  color: #d1d1d1;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+/* Make the button even more prominent below this */
+.pay-order-btn {
+  width: 100%;
+  padding: 18px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  background-color: #2e7d32;
+  border-radius: 12px;
+  margin-top: 20px;
+}
+
+/* Container for the Payment Cards */
+.payment-method {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.payment-card {
+  display: block;
+  position: relative;
+  padding: 15px;
+  border: 2px solid #eee;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.payment-card.active {
+  border-color: #556B2F; /* Your brand green */
+  background-color: #f9fff0;
+}
+
+/* Hide the actual radio circle */
+.payment-card input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.card-title {
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.save-badge {
+  background: #e8f5e9;
+  color: #2e7d32;
+  font-size: 0.75rem;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-weight: bold;
+}
+
+/* Icons Strip Styling */
+.payment-icons-strip {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.payment-icons-strip img {
+  height: 18px; /* Small and sleek */
+  object-fit: contain;
+  filter: grayscale(20%);
+}
+
+/* The Big Price inside the Selection */
+.hero-price-display {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.hero-label {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.hero-amount {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #2e7d32;
+}
+
+/* Ghost text - present but barely visible */
+.ghost-subtext {
+  font-size: 0.65rem;
+  color: #d1d1d1; /* Very light grey */
+  margin-top: 4px;
+}
+
+.summary-card {
+  background: #ffffff;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+  border: 1px solid #f0f0f0;
+  margin-top: 25px;
+}
+
+.summary-header {
+  background: #fcfcfc;
+  padding: 12px 20px;
+  border-bottom: 1px solid #f5f5f5;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.summary-header h4 {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.secure-badge {
+  font-size: 0.7rem;
+  color: #556B2F;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.summary-body {
+  padding: 20px;
+  position: relative;
+}
+
+/* The "Hidden" Total */
+.stealth-total {
+  text-align: right;
+  font-size: 0.6rem;
+  color: #eee; /* Almost invisible */
+  font-weight: 400;
+}
+
+/* The Hero Focus */
+.hero-section {
+  text-align: center;
+  padding: 10px 0 20px 0;
+}
+
+.hero-label {
+  font-size: 0.9rem;
+  color: #444;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.hero-amount-display {
+  font-size: 3rem;
+  font-weight: 900;
+  color: #2e7d32;
+  margin: 0;
+  letter-spacing: -1px;
+}
+
+.summary-payment-icons {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.summary-payment-icons img {
+  height: 14px;
+  opacity: 0.6;
+}
+
+/* Mini Breakdown */
+.price-breakdown-mini {
+  border-top: 1px dashed #eee;
+  padding-top: 15px;
+}
+
+.mini-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: #bbb; /* Light color to keep focus on Hero amount */
+  margin-bottom: 4px;
+}
+
+.mini-row.discount {
+  color: #a5d6a7; /* Subtle green for discount */
+}
+
+/* The Ghost Balance Footer */
+.summary-footer-ghost {
+  background: #fafafa;
+  padding: 10px;
+  text-align: center;
+}
+
+.summary-footer-ghost p {
+  margin: 0;
+  font-size: 0.65rem;
+  color: #f0f0f0; /* Matches background - "Hidden" */
+  font-style: italic;
+}
+
+.summary-card:hover .summary-footer-ghost p {
+  color: #ccc; /* Becomes visible only on hover */
+  transition: 0.3s;
+}

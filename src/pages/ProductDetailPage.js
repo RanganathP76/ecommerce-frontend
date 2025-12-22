@@ -535,21 +535,26 @@ const slides = [
           <h2>{product.title}</h2>
 
           {/* 💰 Price + Compare + Offer Timer (All in One Line, Mobile-Friendly) */}
-<div className="price-offer-line">
-  <div className="price-section">
-    <span className="current-price">₹{product.price}</span>
-    {product.comparePrice && product.comparePrice > product.price && (
-      <span className="compare-price">₹{product.comparePrice}</span>
-    )}
-  </div>
-
-  <div className="offer-pill">
-    {timeLeft.days > 0 ? (
-      <p>🔥Hurry {timeLeft.days}d {timeLeft.hours}h left</p>
-    ) : (
-      <p>🔥Hurry {timeLeft.hours}h {timeLeft.minutes}m left</p>
-    )}
-  </div>
+<div className="price-section">
+  {paymentOptions?.partialPayment?.enabled ? (
+    <div className="partial-price-container">
+      {/* Primary Display: Advance Amount */}
+      <span className="current-price">₹{advance}</span>
+      
+      {/* Breakdown Subtext */}
+      <div className="payment-split-hint">
+        <p className="pay-now">Pay ₹{advance} now to book</p>
+        <p className="pay-later">₹{due} will be due at delivery</p>
+      </div>
+    </div>
+  ) : (
+    <>
+      <span className="current-price">₹{product.price}</span>
+      {product.comparePrice && product.comparePrice > product.price && (
+        <span className="compare-price">₹{product.comparePrice}</span>
+      )}
+    </>
+  )}
 </div>
 
 

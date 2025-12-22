@@ -1455,3 +1455,35 @@
   border-radius: 6px;
   font-size: 14px;
 }
+
+.partial-price-container {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.payment-split-hint {
+  line-height: 1.2;
+  margin-top: 2px;
+}
+
+.pay-now {
+  font-size: 0.9rem;
+  color: #27ae60; /* A soft green to indicate 'booking' */
+  font-weight: 500;
+  margin: 0;
+}
+
+.pay-later {
+  font-size: 0.8rem;
+  color: #666; /* Grayish for secondary info */
+  margin: 0;
+}
+
+/* Optional: Make the main price stand out more since it's a 'Booking Amount' */
+.current-price {
+  font-size: 1.6rem;
+  color: #a43c45;
+  font-weight: bold;
+  color: #000;
+}

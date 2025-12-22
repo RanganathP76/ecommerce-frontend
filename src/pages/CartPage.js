@@ -62,10 +62,7 @@ const CartPage = () => {
                     </button>
                   </div>
 
-                  <p>
-                    Price: ₹{item.price} x {item.quantity || 1}
-                  </p>
-
+                  
                   {/* ✅ Show selected specification */}
                   {item.specifications && item.specifications.length > 0 && (
                     <div className="specification-details">
@@ -99,7 +96,7 @@ const CartPage = () => {
             ))}
 
             <div className="cart-summary">
-              <h3>Total: ₹{getTotal()}</h3>
+              
               <button className="checkout-btn" onClick={handleCheckout}>
                 Proceed to Checkout
               </button>
