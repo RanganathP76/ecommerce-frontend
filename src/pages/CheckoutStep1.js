@@ -517,7 +517,7 @@ try {
       {/* Details */}
       <div className="payment-details">
         <span className="price">
-          Pay ₹{previewPartialNow} now,   ₹{previewPartialLater} later
+          Pay ₹{previewPartialNow} now, 
         </span>
         <small className="secure-text">Secure payment via Razorpay</small>
       </div>
