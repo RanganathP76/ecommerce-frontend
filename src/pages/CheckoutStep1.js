@@ -517,7 +517,7 @@ try {
       {/* Details */}
       <div className="payment-details">
         <span className="price">
-          Pay ₹{previewPartialNow} now, ₹{previewPartialLater} later
+          Pay ₹{previewPartialNow} now 
         </span>
         <small className="secure-text">Secure payment via Razorpay</small>
       </div>
@@ -569,8 +569,11 @@ try {
   
   {selectedPayment !== "COD" ? (
     <div className="summary-payment-icons">
-      <img src="/payment-icons/upi.png" alt="UPI" />
-      <img src="/payment-icons/card.png" alt="Cards" />
+      <img src="/payment-icons/gpay.png" alt="Google Pay" />
+        <img src="/payment-icons/phonepe.png" alt="PhonePe" />
+        <img src="/payment-icons/paytm.png" alt="Paytm" />
+        <img src="/payment-icons/card.png" alt="Card" />
+        <img src="/payment-icons/upi.png" alt="UPI" />
     </div>
   ) : (
     <div className="cod-badge-mini">Cash / QR on Delivery</div>
