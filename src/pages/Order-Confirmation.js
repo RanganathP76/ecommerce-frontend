@@ -17,7 +17,7 @@ const OrderConfirmation = () => {
     const fetchOrder = async () => {
       try {
         // ✅ Fetch order details
-        const res = await axiosInstance.get(`/orders/track/${id}`);
+        const res = await axiosInstance.get(`/orders/confirmation/${id}`);
         const orderData = res.data;
         setOrder(orderData);
 
@@ -76,7 +76,14 @@ const OrderConfirmation = () => {
       <div className="order-section">
         <h3>Payment Info</h3>
         <p><strong>Method:</strong> {order.paymentInfo?.method || 'N/A'}</p>
-        <p><strong>Status:</strong> {order.paymentInfo?.status || 'N/A'}</p>
+        
+        {/* Updated Status Logic */}
+        <p><strong>Status:</strong> {
+            (order.amountDue > 0 && order.amountPaid > 0) 
+            ? 'Partially Paid' 
+            : (order.paymentInfo?.status || 'N/A')
+        }</p>
+        
         <p><strong>Amount Paid:</strong> ₹{order.amountPaid}</p>
         <p><strong>Amount Due:</strong> ₹{order.amountDue}</p>
       </div>

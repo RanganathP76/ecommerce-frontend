@@ -544,7 +544,7 @@ const slides = [
       {/* Breakdown Subtext */}
       <div className="payment-split-hint">
         <p className="pay-now">Pay ₹{advance} now to book</p>
-        <p className="pay-later">₹{due} will be delivery COD</p>
+        <p className="pay-later">₹{due} will be on delivery COD</p>
       </div>
     </div>
   ) : (
