@@ -517,7 +517,7 @@ try {
       {/* Details */}
       <div className="payment-details">
         <span className="price">
-          Pay ₹{previewPartialNow} now, 
+          Pay ₹{previewPartialNow} now, pay ₹{previewPartialLater} later at delivery
         </span>
         <small className="secure-text">Secure payment via Razorpay</small>
       </div>
@@ -539,70 +539,78 @@ try {
         )}
       </div>
 
-     {/* Optimized Summary Box with COD Logic */}
-<div className="summary-card">
+    <div className="summary-card shadow-sm">
   <div className="summary-header">
-    <h4>
-      {selectedPayment === "COD" ? "Order Summary" : "Payment Breakdown"}
-    </h4>
+    <div className="header-title">
+      <h4>Order Summary</h4>
+      <span className="item-count">{cartItems.length} Items</span>
+    </div>
     <div className="secure-badge">
-      <img src="/payment-icons/shield-check.png" alt="" /> 
-      {selectedPayment === "COD" ? "Verified Order" : "Secure Checkout"}
+      
+      <span>100% Secure</span>
     </div>
   </div>
 
   <div className="summary-body">
-    {/* Stealth Total - Almost invisible if COD (because it matches hero), tiny if others */}
-    <div className="stealth-total">
-      Order Value: ₹{Math.round(total)}
-    </div>
+    {/* Financial Breakdown */}
+    <div className="price-lines">
+      <div className="price-row">
+        <span>Cart Subtotal</span>
+        <span>₹{Math.round(itemsPrice)}</span>
+      </div>
 
-    <div className="hero-section">
-  <p className="hero-label">
-    {selectedPayment === "COD" ? "Amount Payable at Delivery" : "Amount Payable Now"}
-  </p>
+      <div className="price-row">
+        <span>Shipping Charges</span>
+        <span className={shippingPrice === 0 ? "text-success" : ""}>
+          {shippingPrice === 0 ? "FREE" : `+ ₹${Math.round(shippingPrice)}`}
+        </span>
+      </div>
 
-  {/* SHOW FULL TOTAL FOR COD, BUT ONLY ADVANCE/PREPAID FOR ONLINE */}
-  <h2 className="hero-amount-display">
-    ₹{selectedPayment === "COD" ? Math.round(total) : Math.round(payableNow)}
-  </h2>
-  
-  {selectedPayment !== "COD" ? (
-    <div className="summary-payment-icons">
-      <img src="/payment-icons/gpay.png" alt="Google Pay" />
-        <img src="/payment-icons/phonepe.png" alt="PhonePe" />
-        <img src="/payment-icons/paytm.png" alt="Paytm" />
-        <img src="/payment-icons/card.png" alt="Card" />
-        <img src="/payment-icons/upi.png" alt="UPI" />
-    </div>
-  ) : (
-    <div className="cod-badge-mini">Cash / QR on Delivery</div>
-  )}
-</div>
-
-    {/* Subtle Breakdown */}
-    <div className="price-breakdown-mini">
-      {/* Show discount only if it exists */}
       {discount > 0 && (
-        <div className="mini-row discount">
-          <span>Prepaid Discount Applied</span>
-          <span>-₹{Math.round(discount)}</span>
+        <div className="price-row discount-applied">
+          <span className="d-flex align-items-center">
+            <i className="tag-icon">🏷️</i> Prepaid Discount
+          </span>
+          <span>- ₹{Math.round(discount)}</span>
         </div>
       )}
-      
-      {/* Hidden detail row */}
-      <div className="mini-row stealth-detail">
-       
+
+      <hr className="summary-divider" />
+
+      <div className="price-row total-order-row">
+        <strong>Grand Total</strong>
+        <strong>₹{Math.round(total)}</strong>
       </div>
     </div>
-  </div>
 
-  {/* Ghost Footer - Only shows for Partial Payment */}
-  {selectedPayment === "partialPayment" && (
-    <div className="summary-footer-ghost">
-      
+    {/* Dynamic "Payable Now" Action Box */}
+    <div className={`action-payment-box ${selectedPayment}`}>
+      <div className="hero-content">
+        <p className="hero-label">
+          {selectedPayment === "COD" 
+            ? "Amount to pay at delivery" 
+            : selectedPayment === "partialPayment" 
+            ? "Payable today" 
+            : "Total amount to pay"}
+        </p>
+        <h2 className="hero-amount">
+          ₹{Math.round(payableNow || (selectedPayment === "COD" ? total : 0))}
+        </h2>
+      </div>
+
+      {selectedPayment === "partialPayment" && (
+        <div className="balance-notice">
+          <p>Remaining <strong>₹{Math.round(total - payableNow)}</strong> will be collected via Cash/QR at delivery.</p>
+        </div>
+      )}
+
+      {selectedPayment === "fullPrepaid" && (
+        <div className="savings-celebration">
+          🎉 You saved <strong>₹{Math.round(discount)}</strong> by paying online!
+        </div>
+      )}
     </div>
-  )}
+  </div>
 </div>
 
       {/* Action Button */}

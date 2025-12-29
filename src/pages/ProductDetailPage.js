@@ -534,49 +534,48 @@ const slides = [
         <div className="product-info">
           <h2>{product.title}</h2>
 
-          {/* 💰 Price + Compare + Offer Timer (All in One Line, Mobile-Friendly) */}
-<div className="price-section">
-  {paymentOptions?.partialPayment?.enabled ? (
-    <div className="partial-price-container">
-      {/* Primary Display: Advance Amount */}
-      <span className="current-price">₹{advance}</span>
-      
-      {/* Breakdown Subtext */}
-      <div className="payment-split-hint">
-        <p className="pay-now">Pay ₹{advance} now to book</p>
-        <p className="pay-later">₹{due} will be on delivery COD</p>
-      </div>
-    </div>
-  ) : (
-    <>
-      <span className="current-price">₹{product.price}</span>
-      {product.comparePrice && product.comparePrice > product.price && (
-        <span className="compare-price">₹{product.comparePrice}</span>
-      )}
-    </>
-  )}
-</div>
+         <div className="price-section-container">
+  <div className="main-price-row">
+    {/* Always show the actual Total Price first */}
+    <span className="current-total-price">₹{product.price}</span>
+    
+    {product.comparePrice && product.comparePrice > product.price && (
+      <span className="compare-price">₹{product.comparePrice}</span>
+    )}
+    
+    {product.comparePrice && (
+      <span className="discount-tag">
+        {Math.round(((product.comparePrice - product.price) / product.comparePrice) * 100)}% OFF
+      </span>
+    )}
+  </div>
 
-
-
-<div className="extra-product-info">
-
-  {/* --- Payment Option Message --- */}
+  {/* Partial Payment Highlight Box */}
   {paymentOptions?.partialPayment?.enabled && (
-    <p className="payment-option-info">
-      Free delivery
-    </p>
+    <div className="partial-payment-badge-box">
+      <div className="badge-header">
+        <span className="flash-icon">⚡</span>
+        <span className="badge-text">Pay in Parts Available</span>
+      </div>
+      
+      <div className="partial-breakdown">
+        <div className="breakdown-item">
+          <span className="amount">₹{advance}</span>
+          <span className="label">Pay Now</span>
+        </div>
+        <div className="breakdown-divider">+</div>
+        <div className="breakdown-item">
+          <span className="amount">₹{due}</span>
+          <span className="label">at Delivery</span>
+        </div>
+      </div>
+      
+      <p className="partial-footer-text">
+        Secure your order today by paying just a small advance.
+      </p>
+    </div>
   )}
-
-  {/* Estimated Delivery */}
-  {estimatedDelivery && (
-    <p className="estimated-delivery">
-      📦 Estimated Delivery: <strong>{estimatedDelivery}</strong>
-    </p>
-  )}
-
 </div>
-
 
 
 

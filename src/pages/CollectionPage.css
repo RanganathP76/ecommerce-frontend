@@ -127,3 +127,85 @@
     text-align: left;
   }
 }
+
+.summary-card {
+  background: #fff;
+  border-radius: 16px;
+  border: 1px solid #eaeaea;
+  overflow: hidden;
+  margin-top: 2rem;
+}
+
+.summary-header {
+  padding: 1.25rem 1.5rem;
+  background: #fcfcfc;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.header-title h4 { margin: 0; font-size: 1.1rem; color: #333; }
+.item-count { font-size: 0.8rem; color: #888; }
+
+.price-lines { padding: 1.5rem; }
+
+.price-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+  font-size: 0.95rem;
+  color: #555;
+}
+
+.discount-applied {
+  color: #27ae60;
+  font-weight: 600;
+}
+
+.total-order-row {
+  font-size: 1.2rem;
+  color: #000;
+  padding-top: 0.5rem;
+}
+
+.action-payment-box {
+  padding: 1.5rem;
+  text-align: center;
+  border-top: 1px solid #f0f0f0;
+}
+
+/* Color coding per payment type */
+.action-payment-box.fullPrepaid { background: #f0fff4; border-top: 1px solid #c6f6d5; }
+.action-payment-box.partialPayment { background: #fffaf0; border-top: 1px solid #feebc8; }
+.action-payment-box.COD { background: #f7fafc; border-top: 1px solid #edf2f7; }
+
+.hero-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #718096;
+  margin-bottom: 0.25rem;
+}
+
+.hero-amount {
+  font-size: 2.25rem;
+  font-weight: 800;
+  color: #1a202c;
+  margin: 0;
+}
+
+.balance-notice {
+  margin-top: 1rem;
+  padding: 0.75rem;
+  background: rgba(255,255,255,0.6);
+  border-radius: 8px;
+  font-size: 0.85rem;
+  color: #744210;
+}
+
+.savings-celebration {
+  margin-top: 1rem;
+  font-size: 0.85rem;
+  color: #22543d;
+}

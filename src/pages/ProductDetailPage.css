@@ -1487,3 +1487,98 @@
   font-weight: bold;
   color: #000;
 }
+
+.price-section-container {
+  margin: 1.5rem 0;
+}
+
+.main-price-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 15px;
+}
+
+.current-total-price {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #1a1a1a;
+}
+
+.compare-price {
+  font-size: 1.2rem;
+  text-decoration: line-through;
+  color: #888;
+}
+
+.discount-tag {
+  background: #e6f4ea;
+  color: #1e7e34;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+/* Partial Payment Box */
+.partial-payment-badge-box {
+  background: #fdf8f0; /* Soft warm glow */
+  border: 1px solid #fae1b6;
+  border-radius: 12px;
+  padding: 16px;
+  max-width: 100%;
+}
+
+.badge-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 12px;
+  font-weight: 700;
+  color: #c05621;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+}
+
+.partial-breakdown {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  background: white;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px dashed #fae1b6;
+}
+
+.breakdown-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.breakdown-item .amount {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: #2d3748;
+}
+
+.breakdown-item .label {
+  font-size: 0.75rem;
+  color: #718096;
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+
+.breakdown-divider {
+  font-weight: 300;
+  color: #cbd5e0;
+  font-size: 1.5rem;
+}
+
+.partial-footer-text {
+  font-size: 0.8rem;
+  color: #718096;
+  margin-top: 10px;
+  margin-bottom: 0;
+  text-align: center;
+}
