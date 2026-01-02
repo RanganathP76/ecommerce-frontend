@@ -534,47 +534,39 @@ const slides = [
         <div className="product-info">
           <h2>{product.title}</h2>
 
-         <div className="price-section-container">
-  <div className="main-price-row">
-    {/* Always show the actual Total Price first */}
+         <div className="price-section-container enhanced">
+  <div className="price-main-row">
     <span className="current-total-price">₹{product.price}</span>
     
     {product.comparePrice && product.comparePrice > product.price && (
-      <span className="compare-price">₹{product.comparePrice}</span>
-    )}
-    
-    {product.comparePrice && (
-      <span className="discount-tag">
-        {Math.round(((product.comparePrice - product.price) / product.comparePrice) * 100)}% OFF
-      </span>
+      <>
+        <span className="compare-price">₹{product.comparePrice}</span>
+        <span className="discount-badge">
+          SAVE {Math.round(((product.comparePrice - product.price) / product.comparePrice) * 100)}%
+        </span>
+      </>
     )}
   </div>
 
-  {/* Partial Payment Highlight Box */}
-  {paymentOptions?.partialPayment?.enabled && (
-    <div className="partial-payment-badge-box">
-      <div className="badge-header">
-        <span className="flash-icon">⚡</span>
-        <span className="badge-text">Pay in Parts Available</span>
-      </div>
-      
-      <div className="partial-breakdown">
-        <div className="breakdown-item">
-          <span className="amount">₹{advance}</span>
-          <span className="label">Pay Now</span>
-        </div>
-        <div className="breakdown-divider">+</div>
-        <div className="breakdown-item">
-          <span className="amount">₹{due}</span>
-          <span className="label">at Delivery</span>
-        </div>
-      </div>
-      
-      <p className="partial-footer-text">
-        Secure your order today by paying just a small advance.
-      </p>
+  <div className="price-conversion-triggers">
+    <p className="tax-info">Inclusive of all taxes & Free Shipping</p>
+    
+    {/* Dynamic Delivery Highlight */}
+    <div className="delivery-highlight">
+      <FaShippingFast className="delivery-icon" />
+      <span>Delivered by <strong className="delivery-date">{estimatedDelivery.split('–')[1] || "Soon"}</strong></span>
     </div>
-  )}
+
+   {/* Urgency Timer integrated near the price */}
+    {timeLeft.hours < 24 && (
+      <div className="urgency-banner">
+        <span className="pulse-dot"></span>
+        <span className="urgency-text">
+          Limited Time Offer: Ends in <strong>{timeLeft.hours}h {timeLeft.minutes}m {timeLeft.seconds}s</strong>
+        </span>
+      </div>
+    )}
+  </div>
 </div>
 
 
