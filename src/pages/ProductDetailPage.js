@@ -534,41 +534,36 @@ const slides = [
         <div className="product-info">
           <h2>{product.title}</h2>
 
-         <div className="price-section-container enhanced">
+        <div className="price-section-container enhanced">
   <div className="price-main-row">
-    <span className="current-total-price">₹{product.price}</span>
-    
+    <span className="current-price">₹{product.price}</span>
     {product.comparePrice && product.comparePrice > product.price && (
       <>
-        <span className="compare-price">₹{product.comparePrice}</span>
-        <span className="discount-badge">
-          SAVE {Math.round(((product.comparePrice - product.price) / product.comparePrice) * 100)}%
+        <span className="original-price">₹{product.comparePrice}</span>
+        <span className="discount-pill">
+          Save {Math.round(((product.comparePrice - product.price) / product.comparePrice) * 100)}%
         </span>
       </>
     )}
   </div>
 
-  <div className="price-conversion-triggers">
-    <p className="tax-info">Inclusive of all taxes & Free Shipping</p>
+  {/* Trust & Conversion Boosters */}
+  <div className="price-footer-meta">
+    <p className="inclusive-taxes">Inclusive of all taxes</p>
     
-    {/* Dynamic Delivery Highlight */}
-    <div className="delivery-highlight">
-      <FaShippingFast className="delivery-icon" />
-      <span>Delivered by <strong className="delivery-date">{estimatedDelivery.split('–')[1] || "Soon"}</strong></span>
-    </div>
-
-   {/* Urgency Timer integrated near the price */}
-    {timeLeft.hours < 24 && (
-      <div className="urgency-banner">
-        <span className="pulse-dot"></span>
-        <span className="urgency-text">
-          Limited Time Offer: Ends in <strong>{timeLeft.hours}h {timeLeft.minutes}m {timeLeft.seconds}s</strong>
-        </span>
+    {timeLeft.days === 0 && timeLeft.hours < 24 && (
+      <div className="urgency-timer-inline">
+        <span className="fire-icon">🔥</span> 
+        Offer ends in: <strong>{timeLeft.hours}h {timeLeft.minutes}m {timeLeft.seconds}s</strong>
       </div>
     )}
+
+    <div className="delivery-estimate-pill">
+      <FaShippingFast className="truck-icon" />
+      <span>FREE Delivery by <strong>{estimatedDelivery.split('–')[1]}</strong></span>
+    </div>
   </div>
 </div>
-
 
 
 
