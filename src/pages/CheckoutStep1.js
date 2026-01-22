@@ -440,6 +440,44 @@ try {
       <div className="payment-method">
         <h3>Payment Method</h3>
 
+         {paymentOptions?.partialPayment?.enabled && (
+          <label>
+            <input
+              type="radio"
+              name="payment"
+              checked={selectedPayment === "partialPayment"}
+              onChange={() => setSelectedPayment("partialPayment")}
+            />
+
+          <div className="payment-option-content">
+      {/* Header */}
+      <div className="payment-title-row">
+        <div className="payment-title">
+          <strong>Advance payment (UPI / Card)</strong>
+        </div>
+        </div> 
+
+      {/* Payment Icons */}
+      <div className="payment-icons">
+        <img src="/payment-icons/gpay.png" alt="Google Pay" />
+        <img src="/payment-icons/phonepe.png" alt="PhonePe" />
+        <img src="/payment-icons/paytm.png" alt="Paytm" />
+        <img src="/payment-icons/card.png" alt="Card" />
+        <img src="/payment-icons/upi.png" alt="UPI" />
+      </div>
+
+     <div className="payment-details">
+  <span className="price">
+    Advance now: ₹{previewPartialNow} 
+    <br />
+    Pay on delivery: ₹{previewPartialLater}
+  </span>
+  <small className="secure-text">🔒 Secure Razorpay checkout</small>
+</div>
+    </div>
+          </label>
+        )}
+
        {paymentOptions?.fullPrepaid?.enabled && (
   <label
     className={`payment-option prepaid-option ${
@@ -457,7 +495,7 @@ try {
       {/* Header */}
       <div className="payment-title-row">
         <div className="payment-title">
-          <strong>Pay Online (UPI / Card)</strong>
+          <strong>Full Payment (UPI / Card)</strong>
         </div>
 
         {previewFullPrepaidSave > 0 && (
@@ -488,42 +526,7 @@ try {
 )}
 
 
-        {paymentOptions?.partialPayment?.enabled && (
-          <label>
-            <input
-              type="radio"
-              name="payment"
-              checked={selectedPayment === "partialPayment"}
-              onChange={() => setSelectedPayment("partialPayment")}
-            />
-
-          <div className="payment-option-content">
-      {/* Header */}
-      <div className="payment-title-row">
-        <div className="payment-title">
-          <strong>Partial payment(UPI / Card)</strong>
-        </div>
-        </div> 
-
-      {/* Payment Icons */}
-      <div className="payment-icons">
-        <img src="/payment-icons/gpay.png" alt="Google Pay" />
-        <img src="/payment-icons/phonepe.png" alt="PhonePe" />
-        <img src="/payment-icons/paytm.png" alt="Paytm" />
-        <img src="/payment-icons/card.png" alt="Card" />
-        <img src="/payment-icons/upi.png" alt="UPI" />
-      </div>
-
-      {/* Details */}
-      <div className="payment-details">
-        <span className="price">
-          Pay ₹{previewPartialNow} now, pay ₹{previewPartialLater} later at delivery
-        </span>
-        <small className="secure-text">Secure payment via Razorpay</small>
-      </div>
-    </div>
-          </label>
-        )}
+       
 
         {paymentOptions?.cod?.enabled && (
           <label>
