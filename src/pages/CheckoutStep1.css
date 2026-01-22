@@ -21,16 +21,16 @@
 
 /* Headings */
 .checkout-container h2 {
-  font-size: 2rem;
-  margin-bottom: 1.8rem;
-  font-weight: 700;
-  color: #222;
+  font-size: 1.1rem;
+  margin-bottom: 1.2rem;
+  font-weight: 800;
+  color: #100f0f;
   text-align: center;
   letter-spacing: 0.5px;
 }
 
 .checkout-container h3 {
-  font-size: 1.3rem;
+  font-size: 0.8rem;
   margin: 1.2rem 0 0.8rem;
   font-weight: 600;
   color: #3a3a3a;
@@ -793,3 +793,31 @@
   color: #ccc; /* Becomes visible only on hover */
   transition: 0.3s;
 }
+/* Checkout Header */
+.checkout-header {
+  width: 100%;
+  background: #45338a; /* brand color */
+  padding: 16px 0;
+}
+
+.checkout-header-inner {
+  display: flex;
+  justify-content: center;   /* CENTER horizontally */
+  align-items: center;
+}
+
+.brand-name {
+  font-size: 26px;
+  font-weight: 900;
+  color: #fff;
+  letter-spacing: 0.6px;
+}
+
+/* Mobile friendly */
+@media (max-width: 768px) {
+  .brand-name {
+    font-size: 26px;
+  }
+}
+
+ 

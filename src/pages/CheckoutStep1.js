@@ -301,6 +301,13 @@ try {
 
   return (
     <div className="checkout-container">
+      {/* Simple Checkout Header */}
+<div className="checkout-header">
+  <div className="checkout-header-inner">
+    <span className="brand-name">Cuztory</span>
+  </div>
+</div>
+
       <h2>Checkout</h2>
 
       {/* Cart Items */}
@@ -495,7 +502,7 @@ try {
       {/* Header */}
       <div className="payment-title-row">
         <div className="payment-title">
-          <strong>Full Payment (UPI / Card)</strong>
+          <strong>Full payment (UPI / Card)</strong>
         </div>
 
         {previewFullPrepaidSave > 0 && (
@@ -517,7 +524,7 @@ try {
       {/* Details */}
       <div className="payment-details">
         <span className="price">
-          Pay ₹{previewFullPrepaidTotal}
+          Pay Full: ₹{previewFullPrepaidTotal}
         </span>
         <small className="secure-text">Secure payment via Razorpay</small>
       </div>
