@@ -616,7 +616,6 @@ try {
 
       {selectedPayment === "fullPrepaid" && (
         <div className="savings-celebration">
-          🎉 You saved <strong>₹{Math.round(discount)}</strong> by paying online!
         </div>
       )}
     </div>
