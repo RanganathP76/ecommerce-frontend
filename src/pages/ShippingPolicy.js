@@ -7,7 +7,7 @@ const ShippingPolicy = () => {
       <div className="container">
         <h1>Shipping Policy</h1>
         <p>
-          At <strong>YourStoreName</strong>, we strive to deliver your orders quickly
+          At <strong>Cuztory</strong>, we strive to deliver your orders quickly
           and efficiently. Please read our shipping policy carefully to
           understand how we process and ship your purchases.
         </p>
