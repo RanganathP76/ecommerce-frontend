@@ -59,8 +59,8 @@ const ShippingPolicy = () => {
         <p>
           If you have any questions about our shipping policy or your order,
           please contact us at{" "}
-          <a href="mailto:support@yourstorename.com">
-            support@yourstorename.com
+          <a href="mailto:dignifydeals@gmail.com">
+            support@cuztory.in
           </a>
           .
         </p>

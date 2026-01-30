@@ -30,7 +30,7 @@ const PrivacyPolicy = () => {
       <h2>Contact Us</h2>
       <p>
         If you have any privacy-related concerns, please contact us at 
-        <a href="mailto:support@yourstore.com"> support@yourstore.com</a>.
+        <a href="mailto:dignifydeals@gmail.com"> support@cuztory.in</a>.
       </p>
     </div>
   );

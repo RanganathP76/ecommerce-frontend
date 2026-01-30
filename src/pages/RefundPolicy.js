@@ -64,7 +64,7 @@ const RefundPolicy = () => {
       <h2>Contact Us</h2>
       <p>
         For return or replacement requests, email us at:{" "}
-        <a href="mailto:dignifydeals@gmail.com">support@yourstore.com</a>
+        <a href="mailto:dignifydeals@gmail.com">support@cuztory.in</a>
       </p>
     </div>
   );
