@@ -673,9 +673,8 @@ const slides = [
     <p>No reviews yet</p>
   ) : (
     <>
-      {product.reviews
-        .slice(0, expandedReviews.showAll ? product.reviews.length : 5)
-        .map((rev, idx) => (
+      {product.reviews.map((rev, idx) => (
+
           <div key={idx} className="review-card">
             <div className="review-header">
               <strong>{rev.name}</strong>
