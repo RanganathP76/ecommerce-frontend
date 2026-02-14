@@ -558,8 +558,21 @@ const slides = [
       </div>
     )}
 
+    
+      {paymentOptions?.partialPayment?.enabled && advance > 0 && (
+  <div className="advance-highlight-box">
+    <div className="advance-main">
+      Pay only ₹{advance} Now
+    </div>
+
+    <div className="advance-sub">
+      COD ₹{due} at delivery
+    </div>
+  </div>
+)}
+
     <div className="delivery-estimate-pill">
-      <FaShippingFast className="truck-icon" />
+     <FaShippingFast className="truck-icon" />
       <span>FREE Delivery by <strong>{estimatedDelivery.split('–')[1]}</strong></span>
     </div>
   </div>
