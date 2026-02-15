@@ -536,16 +536,25 @@ const slides = [
 
         <div className="price-section-container enhanced">
   <div className="price-main-row">
-    <span className="current-price">₹{product.price}</span>
-    {product.comparePrice && product.comparePrice > product.price && (
-      <>
-        <span className="original-price">₹{product.comparePrice}</span>
-        <span className="discount-pill">
-          Save {Math.round(((product.comparePrice - product.price) / product.comparePrice) * 100)}%
-        </span>
-      </>
-    )}
-  </div>
+  {paymentOptions?.partialPayment?.enabled && advance > 0 ? (
+    <>
+      {/* Main Advance Price */}
+      <span className="current-price highlight-advance">
+        ₹{advance}
+      </span>
+
+      {/* COD amount below */}
+      <div className="cod-line">
+        COD ₹{due}
+      </div>
+    </>
+  ) : (
+    <span className="current-price">
+      ₹{product.price}
+    </span>
+  )}
+</div>
+
 
   {/* Trust & Conversion Boosters */}
   <div className="price-footer-meta">
@@ -559,18 +568,7 @@ const slides = [
     )}
 
     
-      {paymentOptions?.partialPayment?.enabled && advance > 0 && (
-  <div className="advance-highlight-box">
-    <div className="advance-main">
-      Pay only ₹{advance} Now
-    </div>
-
-    <div className="advance-sub">
-      COD ₹{due} at delivery
-    </div>
-  </div>
-)}
-
+     
     <div className="delivery-estimate-pill">
      <FaShippingFast className="truck-icon" />
       <span>FREE Delivery by <strong>{estimatedDelivery.split('–')[1]}</strong></span>

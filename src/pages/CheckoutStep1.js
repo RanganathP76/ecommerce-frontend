@@ -460,7 +460,7 @@ try {
       {/* Header */}
       <div className="payment-title-row">
         <div className="payment-title">
-          <strong>Advance payment (UPI / Card)</strong>
+          <strong>Online payment (UPI / Card)</strong>
         </div>
         </div> 
 
@@ -475,9 +475,8 @@ try {
 
      <div className="payment-details">
   <span className="price">
-    Advance now: ₹{previewPartialNow} 
-    <br />
-    Pay on delivery: ₹{previewPartialLater}
+    pay now: ₹{previewPartialNow} 
+    
   </span>
   <small className="secure-text">🔒 Secure Razorpay checkout</small>
 </div>
@@ -549,78 +548,21 @@ try {
         )}
       </div>
 
-    <div className="summary-card shadow-sm">
-  <div className="summary-header">
-    <div className="header-title">
-      <h4>Order Summary</h4>
-      <span className="item-count">{cartItems.length} Items</span>
-    </div>
-    <div className="secure-badge">
-      
-      <span>100% Secure</span>
-    </div>
-  </div>
-
-  <div className="summary-body">
-    {/* Financial Breakdown */}
-    <div className="price-lines">
-      <div className="price-row">
-        <span>Cart Subtotal</span>
-        <span>₹{Math.round(itemsPrice)}</span>
-      </div>
-
-      <div className="price-row">
-        <span>Shipping Charges</span>
-        <span className={shippingPrice === 0 ? "text-success" : ""}>
-          {shippingPrice === 0 ? "FREE" : `+ ₹${Math.round(shippingPrice)}`}
-        </span>
-      </div>
-
-      {discount > 0 && (
-        <div className="price-row discount-applied">
-          <span className="d-flex align-items-center">
-            <i className="tag-icon">🏷️</i> Prepaid Discount
-          </span>
-          <span>- ₹{Math.round(discount)}</span>
-        </div>
-      )}
-
-      <hr className="summary-divider" />
-
-      <div className="price-row total-order-row">
-        <strong>Grand Total</strong>
-        <strong>₹{Math.round(total)}</strong>
-      </div>
-    </div>
-
-    {/* Dynamic "Payable Now" Action Box */}
-    <div className={`action-payment-box ${selectedPayment}`}>
-      <div className="hero-content">
-        <p className="hero-label">
-          {selectedPayment === "COD" 
-            ? "Amount to pay at delivery" 
-            : selectedPayment === "partialPayment" 
-            ? "Payable today" 
-            : "Total amount to pay"}
-        </p>
-        <h2 className="hero-amount">
-          ₹{Math.round(payableNow || (selectedPayment === "COD" ? total : 0))}
-        </h2>
-      </div>
-
-      {selectedPayment === "partialPayment" && (
-        <div className="balance-notice">
-          <p>Remaining <strong>₹{Math.round(total - payableNow)}</strong> will be collected via Cash/QR at delivery.</p>
-        </div>
-      )}
-
-      {selectedPayment === "fullPrepaid" && (
-        <div className="savings-celebration">
-        </div>
-      )}
-    </div>
-  </div>
+    <div className="simple-payable-box">
+  <h3>Payable Now</h3>
+  <h1>
+    ₹{Math.round(
+      selectedPayment === "COD"
+        ? total
+        : selectedPayment === "partialPayment"
+        ? payableNow
+        : selectedPayment === "fullPrepaid"
+        ? total
+        : 0
+    )}
+  </h1>
 </div>
+
 
       {/* Action Button */}
       {selectedPayment === "COD" ? (

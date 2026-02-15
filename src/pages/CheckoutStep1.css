@@ -820,4 +820,23 @@
   }
 }
 
- 
+ .simple-payable-box {
+  background: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  text-align: center;
+  margin-top: 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+}
+
+.simple-payable-box h3 {
+  font-size: 16px;
+  color: #666;
+  margin-bottom: 8px;
+}
+
+.simple-payable-box h1 {
+  font-size: 32px;
+  font-weight: 700;
+  margin: 0;
+}
