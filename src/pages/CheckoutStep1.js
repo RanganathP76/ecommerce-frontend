@@ -124,58 +124,7 @@ const CheckoutStep1 = () => {
 
   // --- Create Order ---
   // --- Updated Create Order Logic ---
-const createOrder = async (
-  method,
-  status,
-  paymentId = "",
-  extraPaymentData = {}
-) => {
-  const orderItems = cartItems.map((item) => ({
-    product: item._id,
-    name: item.title,
-    image: item.image || "",
-    price: Math.round(parseFloat(item.price)), // Round individual item price
-    quantity: item.quantity ? Number(item.quantity) : 1,
-    customization: item.customization || [],
-    specifications: item.specifications || [],
-  }));
 
-  // Ensure all values sent to DB are rounded integers
-  const roundedItemsPrice = Math.round(itemsPrice);
-  const roundedDiscount = Math.round(discount);
-  const roundedShipping = Math.round(shippingPrice);
-  const roundedTotal = Math.round(total);
-  const roundedPayableNow = Math.round(payableNow);
-
-  const orderData = {
-    shippingInfo,
-    paymentInfo: { method, status, id: paymentId },
-    razorpay_order_id: extraPaymentData.razorpay_order_id || "",
-    razorpay_payment_id: paymentId || "",
-    razorpay_signature: extraPaymentData.razorpay_signature || "",
-    amountPaid: roundedPayableNow, // Matches actual payment
-    amountDue: roundedTotal - roundedPayableNow, // Clean subtraction
-    orderItems,
-    itemsPrice: roundedItemsPrice,
-    discount: roundedDiscount,
-    shippingPrice: roundedShipping,
-    totalPrice: roundedTotal,
-    orderStatus: "Processing",
-  };
-
-  try {
-    const res = await axiosInstance.post("/orders", orderData, {
-      headers: token ? { Authorization: `Bearer ${token}` } : {},
-    });
-    clearCart();
-    window.location.href = `/order-confirmation/${res.data._id}`;
-  } catch (err) {
-    console.error("Order creation failed:", err);
-    alert(err.response?.data?.message || "Order creation failed.");
-    setProcessing(false);
-    clickedOnceRef.current = false;
-  }
-};
 
   // --- COD Checkout ---
   const handleCOD = () => {
@@ -204,7 +153,42 @@ const createOrder = async (
       return;
     }
 
-    createOrder("COD", "Pending");
+    const orderItems = cartItems.map((item) => ({
+  product: item._id,
+  name: item.title,
+  image: item.image || "",
+  price: Math.round(parseFloat(item.price)),
+  quantity: item.quantity ? Number(item.quantity) : 1,
+  customization: item.customization || [],
+  specifications: item.specifications || [],
+}));
+
+axiosInstance
+  .post(
+    "/orders/create",
+    {
+      orderItems,
+      shippingInfo,
+      itemsPrice: Math.round(itemsPrice),
+      discount: Math.round(discount),
+      shippingPrice: Math.round(shippingPrice),
+      totalPrice: Math.round(total),
+      amountPaid: 0,
+      amountDue: Math.round(total),
+      paymentMethod: "COD",
+    },
+    { headers: token ? { Authorization: `Bearer ${token}` } : {} }
+  )
+  .then((res) => {
+    clearCart();   // ✅ CLEAR HERE
+    window.location.href = `/order-confirmation/${res.data.order._id}`;
+  })
+  .catch((err) => {
+    console.error(err);
+    alert("Order creation failed.");
+    setProcessing(false);
+    clickedOnceRef.current = false;
+  });
   };
 
   // --- Prepaid Checkout ---
@@ -246,56 +230,66 @@ const createOrder = async (
   // --- Inside handlePrepaid function ---
 
 try {
+  const orderItems = cartItems.map((item) => ({
+    product: item._id,
+    name: item.title,
+    image: item.image || "",
+    price: Math.round(parseFloat(item.price)),
+    quantity: item.quantity ? Number(item.quantity) : 1,
+    customization: item.customization || [],
+    specifications: item.specifications || [],
+  }));
+
+  // 🔥 CREATE ORDER FIRST (ABANDONED)
   const res = await axiosInstance.post(
-    "/payment/create-order",
+    "/orders/create",
     {
-      // Wrap payableNow in Math.round to ensure it's a clean integer
-      amount: Math.round(payableNow), 
+      orderItems,
       shippingInfo,
       itemsPrice: Math.round(itemsPrice),
       discount: Math.round(discount),
       shippingPrice: Math.round(shippingPrice),
       totalPrice: Math.round(total),
+      amountPaid: Math.round(payableNow),
+      amountDue: Math.round(total - payableNow),
+      paymentMethod: "RAZORPAY",
     },
     { headers: token ? { Authorization: `Bearer ${token}` } : {} }
   );
 
-  // ... rest of your code
+  const { razorpayOrder, orderId } = res.data;
 
-    const { razorpayOrder } = res.data;
+  const rzp = new window.Razorpay({
+    key: RAZORPAY_KEY,
+    amount: razorpayOrder.amount,
+    currency: "INR",
+    name: "Cuztory",
+    description: "Order Payment",
+    order_id: razorpayOrder.id,
 
-    const rzp = new window.Razorpay({
-      key: RAZORPAY_KEY,
-      amount: razorpayOrder.amount,
-      currency: "INR",
-      name: "Cuztory",
-      description: "Order Payment",
-      order_id: razorpayOrder.id,
-      handler: (response) => {
-        createOrder("RAZORPAY", "Paid", response.razorpay_payment_id, {
-          razorpay_order_id: response.razorpay_order_id,
-          razorpay_signature: response.razorpay_signature,
-        });
+    handler: function () {
+       clearCart();   // ✅ CLEAR HERE
+      // 🚨 DO NOTHING HERE
+      // Webhook will update order
+      window.location.href = `/order-confirmation/${orderId}`;
+    },
+
+    modal: {
+      ondismiss: function () {
+        setProcessing(false);
+        clickedOnceRef.current = false;
+        alert("Payment cancelled. Order saved as abandoned.");
       },
-      prefill: { name: shippingInfo.name, contact: shippingInfo.phone },
-      theme: { color: "#556B2F" },
-      modal: {
-        ondismiss: function () {
-          // Reset processing state if user cancels the payment
-          setProcessing(false);
-          clickedOnceRef.current = false;
-          alert("Payment was cancelled.");
-        },
-      },
-    });
+    },
+  });
 
-    rzp.open();
-  } catch (err) {
-    console.error("Razorpay order creation failed:", err);
-    alert("Payment initiation failed.");
-    setProcessing(false);
-    clickedOnceRef.current = false;
-  }
+  rzp.open();
+} catch (err) {
+  console.error(err);
+  alert("Payment initiation failed.");
+  setProcessing(false);
+  clickedOnceRef.current = false;
+}
 };
 
 
