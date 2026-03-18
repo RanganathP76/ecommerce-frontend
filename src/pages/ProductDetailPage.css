@@ -1660,3 +1660,36 @@
   font-size: 14px;
   color: #484747;
 }
+
+
+.advance-highlight-box {
+  background: linear-gradient(135deg, #fff9e6 0%, #fff3cd 100%); /* Soft gold gradient */
+  border: 1px dashed #eec643; /* Dashed border implies a "deal" or "coupon" */
+  border-radius: 12px;
+  padding: 16px;
+  margin: 20px 0;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.advance-main {
+  color: #856404; /* Deep gold/brown for readability */
+  font-size: 1.2rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.advance-sub {
+  color: #666;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+/* Optional: Add a small "Fire" or "Flash" icon feel */
+.advance-main::before {
+  content: '⚡';
+}
