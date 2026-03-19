@@ -152,8 +152,8 @@ const getEstimatedDelivery = () => {
   const endDate = new Date(today);
 
   // e.g., deliver between 3–7 business days
-  startDate.setDate(today.getDate() + 5);
-  endDate.setDate(today.getDate() + 8);
+  startDate.setDate(today.getDate() + 3);
+  endDate.setDate(today.getDate() + 4);
 
   const formatDate = (date) =>
     date.toLocaleDateString("en-IN", {
