@@ -1693,3 +1693,33 @@
 .advance-main::before {
   content: '⚡';
 }
+
+:root {
+  color-scheme: light; /* This is the most important line */
+}
+
+/* Explicitly set the background for the whole page */
+html, body, .product-detail {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+}
+
+.advance-highlight-box {
+  background-color: #fff9e6 !important; /* Forces the light yellow */
+  border: 1px dashed #eec643 !important;
+  border-radius: 12px;
+  padding: 16px;
+  margin: 20px 0;
+  text-align: center;
+}
+
+.advance-main {
+  color: #856404 !important; /* Forces the brown/gold text */
+  font-size: 1.2rem;
+  font-weight: 800;
+}
+
+.advance-sub {
+  color: #666666 !important;
+  font-size: 0.9rem;
+}
