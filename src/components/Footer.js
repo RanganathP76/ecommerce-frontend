@@ -32,7 +32,7 @@ const Footer = () => {
         </div>
 
         <div className="social-icons">
-          <a href="https://www.instagram.com/cuztory.in?igsh=MXNyamx4NW5wc3dxcQ==" target="_blank" rel="noreferrer">
+          <a href="https://www.instagram.com/cuztory?igsh=MWFlaWMyZmNvMGdmcg==" target="_blank" rel="noreferrer">
             <FaInstagram />
           </a>
           <a href="https://www.facebook.com/profile.php?id=61574254927966" target="_blank" rel="noreferrer">
