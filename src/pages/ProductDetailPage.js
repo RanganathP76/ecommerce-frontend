@@ -164,6 +164,26 @@ const getEstimatedDelivery = () => {
   return `Between ${formatDate(startDate)} – ${formatDate(endDate)}`;
 };
 
+// ✅ Add a check for 'product' to prevent the "null" error
+const calculateTotalPrice = () => {
+  // If product is not loaded yet, return 0 or a placeholder
+  if (!product) return 0; 
+
+  let extra = 0;
+  if (product.specifications && Object.keys(selectedSpecs).length > 0) {
+    product.specifications.forEach(spec => {
+      const selectedValue = selectedSpecs[spec.key];
+      const specOption = spec.values.find(v => v.value === selectedValue);
+      if (specOption && specOption.extraPrice) {
+        extra += Number(specOption.extraPrice);
+      }
+    });
+  }
+  return Number(product.price) + extra;
+};
+
+const totalPrice = calculateTotalPrice();
+
 const handleThumbnailClick = (idx) => {
   setActiveIndex(idx);
 
@@ -205,6 +225,19 @@ const handleThumbnailClick = (idx) => {
   // Handle spec change
   const handleSpecChange = (key, value) => {
     setSelectedSpecs((prev) => ({ ...prev, [key]: value }));
+    // 2. Find the spec object to check for a linked image
+  const currentSpec = product.specifications.find(s => s.key === key);
+  const specOption = currentSpec?.values.find(v => v.value === value);
+
+  if (specOption?.linkedImage) {
+    // 3. Find which index this image is in the main slides array
+    const imageIndex = slides.indexOf(specOption.linkedImage);
+    
+    if (imageIndex !== -1) {
+      // 4. Use your existing thumbnail click logic to scroll the slider
+      handleThumbnailClick(imageIndex);
+    }
+  }
   };
 
   // Handle file upload
@@ -279,7 +312,7 @@ const removeFile = (key) => {
     return {
       _id: product._id,
       title: product.title,
-      price: product.price,
+      price: totalPrice,
       comparePrice: product.comparePrice || null,
       image: product.images[0],
       quantity: 1,
@@ -536,7 +569,7 @@ const slides = [
 
         <div className="price-section-container enhanced">
   <div className="price-main-row">
-    <span className="current-price">₹{product.price}</span>
+    <span className="current-price">₹{totalPrice}</span>
     {product.comparePrice && product.comparePrice > product.price && (
       <>
         <span className="original-price">₹{product.comparePrice}</span>
@@ -626,7 +659,17 @@ const slides = [
                             handleSpecChange(spec.key, option.value)
                           }
                         />
-                        <span className="spec-option-text">{option.value}</span>
+                       <span className="spec-option-text">
+  {/* Main Value (e.g., Full Sleeve) */}
+  <span className="spec-main-value">{option.value}</span>
+  
+  {/* Extra Price on new line */}
+  {option.extraPrice > 0 && (
+    <span className="extra-price-tag">
+      {`(+₹${option.extraPrice})`}
+    </span>
+  )}
+</span>
                       </label>
                     ))}
                   </div>
@@ -779,7 +822,14 @@ const slides = [
                         handleSpecChange(spec.key, option.value)
                       }
                     />
-                    <span>{option.value}</span>
+                    <span>{option.value}
+                      {/* 👈 ADD THIS LINE BELOW */}
+      {option.extraPrice > 0 && (
+        <small style={{ color: "#28a745", marginLeft: "4px" }}>
+          (+₹{option.extraPrice})
+        </small>
+      )}
+                    </span>
                   </label>
                 ))}
               </div>

@@ -1723,3 +1723,38 @@ html, body, .product-detail {
   color: #666666 !important;
   font-size: 0.9rem;
 }
+/* Container for the text inside the radio button label */
+.spec-option-text {
+  display: flex;
+  flex-direction: column; /* Stacks children vertically */
+  align-items: center;    /* Centers text horizontally */
+  text-align: center;
+  line-height: 1.2;       /* Keeps lines close together */
+}
+
+.spec-main-value {
+  font-weight: 500;
+}
+
+.extra-price-tag {
+  display: block;         /* Ensures it starts on a new line */
+  font-size: 0.75rem;     /* Slightly smaller than main text */
+  color: #28a745;         /* Green for extra cost */
+  white-space: nowrap;    /* 👈 CRITICAL: Prevents (+ and 50) from splitting */
+  margin-top: 2px;
+}
+
+/* Optional: If the button is selected, make the green text white for better contrast */
+.spec-option input:checked + .spec-option-text .extra-price-tag {
+  color: #3039b7;
+}
+
+/* Highlight the spec option when it's linked to an image */
+.spec-option input:checked + .spec-option-text {
+  border-color: #007bff;
+  background-color: #f0f7ff;
+}
+
+.image-slide-wrapper {
+  scroll-behavior: smooth; /* 👈 Essential for the "jump" to look good */
+}
