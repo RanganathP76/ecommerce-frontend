@@ -1758,3 +1758,62 @@ html, body, .product-detail {
 .image-slide-wrapper {
   scroll-behavior: smooth; /* 👈 Essential for the "jump" to look good */
 }
+
+/* ✅ Fix: Ensure content has enough space and visibility */
+.desc-content {
+  overflow: hidden;
+  transition: max-height 0.3s ease-out, opacity 0.3s ease;
+  max-height: 0;
+  opacity: 0;
+}
+
+.desc-content.show {
+  max-height: 2000px; /* Large enough to fit the video */
+  opacity: 1;
+  padding: 10px 0;
+}
+
+.desc-content.hide {
+  max-height: 0;
+  opacity: 0;
+  padding: 0;
+  pointer-events: none; /* Prevents interaction when hidden */
+}
+
+/* ✅ Ensure the description video scales correctly */
+.desc-video {
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin-top: 15px;
+  display: block; /* Removes any inline spacing issues */
+  background-color: #000; /* Shows a black box if the video is loading */
+}
+
+/* Ensure the content container can expand for both video and image */
+.desc-content.show {
+  max-height: none; /* Allows container to grow with multiple media items */
+  opacity: 1;
+  padding: 15px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 15px; /* Adds space between video, text, and image */
+}
+
+/* Specific styling for the description video */
+.desc-video {
+  width: 100%;
+  border-radius: 8px;
+  display: block;
+  background-color: #000;
+  margin-bottom: 10px;
+}
+
+/* Ensure the image also behaves well in the stack */
+.desc-image {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  object-fit: contain;
+}

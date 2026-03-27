@@ -983,6 +983,24 @@ const DescriptionSections = ({ parts }) => {
 
             {/* ✅ Keep content mounted but hide via CSS to prevent flicker */}
             <div className={`desc-content ${isExpanded ? "show" : "hide"}`}>
+
+             {part.video && (
+  <video
+    src={part.video}
+    controls
+    autoPlay
+    muted
+    loop
+    preload="metadata"
+    playsInline
+    crossOrigin="anonymous"
+    className="desc-video"
+    style={{ width: "100%", height: "auto", display: "block" }} // Ensures visibility
+  >
+    Your browser does not support the video tag.
+  </video>
+)}
+
               {part.text && <p
   className="desc-text"
   dangerouslySetInnerHTML={{
@@ -999,16 +1017,7 @@ const DescriptionSections = ({ parts }) => {
                 />
               )}
 
-              {part.video && (
-                <video
-                  src={part.video}
-                  controls
-                  preload="metadata"
-                  playsInline
-                  crossOrigin="anonymous"
-                  className="desc-video"
-                />
-              )}
+             
             </div>
           </div>
         );
