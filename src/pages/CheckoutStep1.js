@@ -28,6 +28,13 @@ const CheckoutStep1 = () => {
   const RAZORPAY_KEY = "rzp_live_HirbfaYGKt499v";
   const token = localStorage.getItem("token");
 
+  const handlePhoneChange = (e) => {
+  const value = e.target.value.replace(/\D/g, ""); // Remove non-numeric characters
+  if (value.length <= 10) {
+    setShippingInfo({ ...shippingInfo, phone: value });
+  }
+};
+
   // --- Price Calculations ---
   const itemsPrice = cartItems.reduce((acc, item) => {
     const price = parseFloat(item.price || 0);
@@ -147,6 +154,13 @@ const CheckoutStep1 = () => {
       return;
     }
 
+    if (shippingInfo.phone.length !== 10) {
+  alert("Please enter a valid 10-digit mobile number.");
+  setProcessing(false);
+  clickedOnceRef.current = false;
+  return;
+}
+
     if (!validateStock()) {
       alert("Some items are out of stock.");
       setProcessing(false);
@@ -228,6 +242,12 @@ axiosInstance
     await new Promise((resolve) => (script.onload = resolve));
   }
 
+  if (shippingInfo.phone.length !== 10) {
+  alert("Please enter a valid 10-digit mobile number.");
+  setProcessing(false);
+  clickedOnceRef.current = false;
+  return;
+}
   // --- Inside handlePrepaid function ---
 
 try {
@@ -372,14 +392,16 @@ try {
 />
 
 {/* Phone */}
-<input
-  type="text"
-  placeholder="phone"
-  value={shippingInfo.phone}
-  onChange={(e) =>
-    setShippingInfo({ ...shippingInfo, phone: e.target.value })
-  }
-/>
+<div className="phone-input-container">
+  <span className="phone-prefix">+91</span>
+  <input
+    type="tel" // Changed to tel for better mobile keyboard
+    placeholder="Enter 10 digit mobile number"
+    value={shippingInfo.phone}
+    onChange={handlePhoneChange}
+    className="phone-field"
+  />
+</div>
 
 {/* DOUBLE-SIZE ADDRESS FIELD */}
 <textarea

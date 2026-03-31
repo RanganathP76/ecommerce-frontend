@@ -840,3 +840,77 @@
   font-weight: 700;
   margin: 0;
 }
+
+.phone-input-container {
+  display: flex;
+  align-items: center;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background: #fff;
+  margin-bottom: 10px; /* Match your other inputs */
+}
+
+.phone-prefix {
+  padding: 0 10px;
+  background: #f0f0f0;
+  border-right: 1px solid #ccc;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  color: #555;
+  font-weight: bold;
+}
+
+.phone-field {
+  border: none !important; /* Remove individual border */
+  margin-bottom: 0 !important;
+  flex: 1;
+}
+
+.phone-field:focus {
+  outline: none;
+}
+
+/* The container for the +91 and the input */
+.phone-input-container {
+  display: flex;
+  align-items: stretch; /* Makes children the same height */
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background: #fff;
+  margin-bottom: 15px;
+  overflow: hidden; /* Keeps the rounded corners clean */
+  height: 45px; /* Set a fixed height to match your other fields */
+}
+
+/* The +91 box */
+.phone-prefix {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 12px;
+  background: #f8f9fa; /* Light grey background for the prefix */
+  border-right: 1px solid #ccc;
+  color: #333;
+  font-weight: 600;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+/* The actual input field */
+.phone-field {
+  flex: 1;
+  border: none !important; /* Remove the inner border that causes the "down" look */
+  outline: none !important;
+  padding: 0 12px !important;
+  margin: 0 !important;
+  font-size: 14px;
+  height: 100%; /* Take up full container height */
+  background: transparent;
+}
+
+/* Remove blue glow on focus if preferred */
+.phone-input-container:focus-within {
+  border-color: #007bff;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
