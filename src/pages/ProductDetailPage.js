@@ -596,10 +596,7 @@ const slides = [
     </div>
   </div>
 )}
-    <div className="delivery-estimate-pill">
-      <FaShippingFast className="truck-icon" />
-      <span>FREE Delivery by <strong>{estimatedDelivery.split('–')[1]}</strong></span>
-    </div>
+    
   </div>
 </div>
 
