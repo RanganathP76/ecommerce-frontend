@@ -90,7 +90,7 @@ export default function HomePage() {
     slideRef.current.startX = null;
   };
 
-if (loading) return <PageLoader text="Loading your store..." />;
+if (loading) return <PageLoader text="Loading store..." />;
 
 
   return (
