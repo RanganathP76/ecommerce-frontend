@@ -983,19 +983,14 @@ const DescriptionSections = ({ parts }) => {
 
              {part.video && (
   <video
-    src={part.video}
-    controls
-    autoPlay
-    muted
-    loop
-    preload="metadata"
-    playsInline
-    crossOrigin="anonymous"
-    className="desc-video"
-    style={{ width: "100%", height: "auto", display: "block" }} // Ensures visibility
-  >
-    Your browser does not support the video tag.
-  </video>
+  controls
+  playsInline
+  preload="metadata"
+  className="desc-video"
+>
+    <source src={part.video} type="video/mp4" />
+    Your browser does not support video.
+</video>
 )}
 
               {part.text && <p
