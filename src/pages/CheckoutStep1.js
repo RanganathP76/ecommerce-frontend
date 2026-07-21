@@ -3,6 +3,7 @@ import axiosInstance from "../axiosInstance";
 import CartContext from "../context/CartContext";
 import "./CheckoutStep1.css";
 import Footer from "../components/Footer";
+import PageLoader from "../components/PageLoader";
 
 const CheckoutStep1 = () => {
   const { cartItems, clearCart } = useContext(CartContext);
@@ -17,6 +18,7 @@ const CheckoutStep1 = () => {
     postalCode: "",
     country: "India",
   });
+  const [processingPayment, setProcessingPayment] = useState(false);
   const [shippingRates, setShippingRates] = useState([]);
   const [paymentOptions, setPaymentOptions] = useState(null);
   const [selectedShipping, setSelectedShipping] = useState(null);
@@ -288,12 +290,48 @@ try {
     description: "Order Payment",
     order_id: razorpayOrder.id,
 
-    handler: function () {
-       clearCart();   // ✅ CLEAR HERE
-      // 🚨 DO NOTHING HERE
-      // Webhook will update order
-      window.location.href = `/order-confirmation/${orderId}`;
-    },
+  handler: async function (response) {
+
+  setProcessingPayment(true);
+
+  clearCart();
+
+  try {
+
+    let retries = 15;
+
+    while (retries--) {
+
+      const result = await axiosInstance.get(
+        `/orders/by-razorpay/${response.razorpay_order_id}`
+      );
+console.log("Lookup Result:", result.data);
+      if (result.data.success) {
+
+        window.location.replace(
+          `/order-confirmation/${result.data.orderId}`
+        );
+
+        return;
+      }
+
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+    }
+
+    alert("Payment received. Your order is still being finalized.");
+
+    window.location.replace("/my-orders");
+
+  } catch (err) {
+
+    console.error(err);
+
+    window.location.replace("/my-orders");
+
+  }
+
+},
 
     modal: {
       ondismiss: function () {
@@ -313,8 +351,11 @@ try {
 }
 };
 
+if (processingPayment) {
+  return <PageLoader />;
+}
 
-  return (
+  return (  
     <div className="checkout-container">
       {/* Simple Checkout Header */}
 <div className="checkout-header">
