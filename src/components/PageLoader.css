@@ -1,221 +1,265 @@
-.page-loader{
-    position:fixed;
-    inset:0;
-    overflow:hidden;
-    background:#f7f8fc;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    z-index:99999;
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;800;900&display=swap');
+
+.page-loader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: linear-gradient(135deg, #f9fafc, #eef2ff);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  overflow: hidden;
+  font-family: 'Plus Jakarta Sans', sans-serif;
 }
 
-/* CLOTH PANELS */
-
-.cloth{
-    position:absolute;
-    top:0;
-    width:50%;
-    height:100%;
-    background:
-        linear-gradient(
-        120deg,
-        #f5f6ff 0%,
-        #eceefe 30%,
-        #ffffff 50%,
-        #eceefe 70%,
-        #f5f6ff 100%
-    );
-
-    background-size:300% 300%;
-    animation:
-        clothTexture 5s ease infinite,
-        openCloth 1.6s ease forwards;
+/* --- Dynamic Background Grid & Glow --- */
+.bg-grid {
+  position: absolute;
+  width: 200%;
+  height: 200%;
+  background-image: 
+    radial-gradient(rgba(61, 61, 139, 0.12) 1.5px, transparent 1.5px);
+  background-size: 32px 32px;
+  animation: gridMove 20s linear infinite;
+  opacity: 0.6;
 }
 
-.left{
-    left:0;
-    border-right:1px solid rgba(61,61,139,.12);
+.radial-glow {
+  position: absolute;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(0, 102, 255, 0.12) 0%, rgba(61, 61, 139, 0.04) 50%, transparent 70%);
+  border-radius: 50%;
+  animation: pulseGlow 4s ease-in-out infinite alternate;
 }
 
-.right{
-    right:0;
-    border-left:1px solid rgba(61,61,139,.12);
-    animation:
-        clothTexture 5s ease infinite,
-        openClothRight 1.6s ease forwards;
+/* --- Loader Central Stage --- */
+.loader-stage {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 2;
+  perspective: 1000px;
 }
 
-@keyframes clothTexture{
-    0%{
-        background-position:0 50%;
-    }
-    100%{
-        background-position:100% 50%;
-    }
+/* --- Floating Orbiting Threads --- */
+.thread-orbit {
+  position: absolute;
+  border-radius: 50%;
+  border: 1.5px dashed rgba(0, 102, 255, 0.35);
+  pointer-events: none;
 }
 
-@keyframes openCloth{
-    0%{
-        transform:translateX(0);
-    }
-    100%{
-        transform:translateX(-105%);
-    }
+.orbit-1 {
+  width: 210px;
+  height: 210px;
+  top: -25px;
+  animation: spinOrbit 8s linear infinite;
 }
 
-@keyframes openClothRight{
-    0%{
-        transform:translateX(0);
-    }
-    100%{
-        transform:translateX(105%);
-    }
+.orbit-2 {
+  width: 260px;
+  height: 260px;
+  top: -50px;
+  border-color: rgba(61, 61, 139, 0.2);
+  animation: spinOrbit 12s linear reverse infinite;
 }
 
-/* CENTER */
-
-.loader-center{
-    position:relative;
-    z-index:20;
-    text-align:center;
-    animation:fadeScale .9s ease;
+/* --- 3D Isometric Fabric Layers --- */
+.fabric-stack {
+  position: relative;
+  width: 140px;
+  height: 140px;
+  transform-style: preserve-3d;
+  transform: rotateX(25deg) rotateY(-15deg);
+  animation: floatStack 4s ease-in-out infinite alternate;
+  margin-bottom: 24px;
 }
 
-@keyframes fadeScale{
-
-    from{
-        opacity:0;
-        transform:scale(.8);
-    }
-
-    to{
-        opacity:1;
-        transform:scale(1);
-    }
-
+.layer {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 24px;
+  backdrop-filter: blur(8px);
+  transition: all 0.5s ease;
 }
 
-/* HANGER */
-
-.hanger{
-    width:90px;
-    margin:auto;
-    margin-bottom:25px;
-    animation:float 2.2s ease-in-out infinite;
+.layer-3 {
+  background: rgba(61, 61, 139, 0.1);
+  transform: translateZ(-30px) scale(0.85);
+  box-shadow: 0 15px 35px rgba(61, 61, 139, 0.1);
 }
 
-.hook{
-    width:20px;
-    height:20px;
-    border:4px solid #3d3d8b;
-    border-bottom:none;
-    border-radius:20px 20px 0 0;
-    margin:auto;
+.layer-2 {
+  background: rgba(0, 102, 255, 0.08);
+  border: 1px solid rgba(0, 102, 255, 0.2);
+  transform: translateZ(-15px) scale(0.92);
 }
 
-.hanger-body{
-    width:80px;
-    height:40px;
-    border-left:4px solid #3d3d8b;
-    border-right:4px solid #3d3d8b;
-    border-bottom:4px solid #3d3d8b;
-    transform:skewX(-35deg);
-    margin:auto;
+.layer-1 {
+  background: rgba(255, 255, 255, 0.85);
+  border: 2px solid rgba(61, 61, 139, 0.15);
+  box-shadow: 0 20px 40px rgba(61, 61, 139, 0.12),
+              inset 0 0 15px rgba(255, 255, 255, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
 }
 
-@keyframes float{
-
-0%,100%{
-transform:translateY(0);
+/* --- Laser Precision Beam --- */
+.laser-beam {
+  position: absolute;
+  top: -100%;
+  left: 0;
+  width: 100%;
+  height: 8px;
+  background: linear-gradient(90deg, transparent, #0066ff, #3d3d8b, transparent);
+  box-shadow: 0 0 12px #0066ff;
+  opacity: 0.8;
+  animation: scanLaser 2.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }
 
-50%{
-transform:translateY(-10px);
+/* --- Vector SVG Motion --- */
+.graphic-svg {
+  width: 75px;
+  height: 75px;
+  filter: drop-shadow(0 4px 8px rgba(61, 61, 139, 0.2));
 }
 
+.path-bg {
+  stroke: rgba(61, 61, 139, 0.15);
+  stroke-width: 3;
+  fill: rgba(61, 61, 139, 0.03);
 }
 
-/* BRAND */
-
-.brand{
-
-font-size:44px;
-
-font-weight:800;
-
-letter-spacing:8px;
-
-color:#3d3d8b;
-
-position:relative;
-
-display:inline-block;
-
-overflow:hidden;
-
-margin-bottom:10px;
-
+.path-animated {
+  stroke: url(#laserGrad);
+  stroke: #3d3d8b;
+  stroke-width: 3.5;
+  stroke-dasharray: 260;
+  stroke-dashoffset: 260;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  animation: drawOutline 2.5s cubic-bezier(0.65, 0, 0.35, 1) infinite;
 }
 
-/* shimmer */
-
-.brand::after{
-
-content:"";
-
-position:absolute;
-
-top:0;
-
-left:-100%;
-
-width:60%;
-
-height:100%;
-
-background:linear-gradient(
-90deg,
-transparent,
-rgba(255,255,255,.9),
-transparent
-);
-
-animation:shine 2s linear infinite;
-
+.core-dot {
+  animation: pulseDot 1.2s ease-in-out infinite alternate;
 }
 
-@keyframes shine{
-
-100%{
-
-left:160%;
-
+/* --- Typography & Progress Bar --- */
+.brand-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
+.brand-wrapper {
+  position: relative;
+  display: inline-block;
 }
 
-.loader-center p{
-
-font-size:15px;
-
-font-weight:500;
-
-color:#777;
-
-letter-spacing:2px;
-
-animation:pulse 1.5s infinite;
-
+.brand-name {
+  font-size: 1.8rem;
+  font-weight: 900;
+  letter-spacing: 0.4em;
+  color: #3d3d8b;
+  margin: 0;
+  text-indent: 0.4em;
 }
 
-@keyframes pulse{
-
-0%,100%{
-opacity:.6;
+.brand-glow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  font-size: 1.8rem;
+  font-weight: 900;
+  letter-spacing: 0.4em;
+  color: #0066ff;
+  text-indent: 0.4em;
+  filter: blur(8px);
+  opacity: 0.6;
+  animation: textGlow 2s ease-in-out infinite alternate;
 }
 
-50%{
-opacity:1;
+.meter-bar {
+  width: 140px;
+  height: 4px;
+  background: rgba(61, 61, 139, 0.1);
+  border-radius: 10px;
+  margin-top: 12px;
+  overflow: hidden;
+  position: relative;
 }
 
+.meter-fill {
+  width: 40%;
+  height: 100%;
+  background: linear-gradient(90deg, #0066ff, #3d3d8b);
+  border-radius: 10px;
+  position: absolute;
+  animation: meterSlide 1.8s ease-in-out infinite;
+}
+
+.loader-text {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #555570;
+  margin-top: 10px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* --- Keyframe Animations --- */
+@keyframes gridMove {
+  0% { transform: translate(0, 0); }
+  100% { transform: translate(-32px, -32px); }
+}
+
+@keyframes pulseGlow {
+  0% { transform: scale(0.9); opacity: 0.5; }
+  100% { transform: scale(1.2); opacity: 0.9; }
+}
+
+@keyframes floatStack {
+  0% { transform: rotateX(25deg) rotateY(-15deg) translateY(0px); }
+  100% { transform: rotateX(20deg) rotateY(-10deg) translateY(-12px); }
+}
+
+@keyframes spinOrbit {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes scanLaser {
+  0% { top: -20%; }
+  100% { top: 120%; }
+}
+
+@keyframes drawOutline {
+  0% { stroke-dashoffset: 260; }
+  50% { stroke-dashoffset: 0; }
+  100% { stroke-dashoffset: -260; }
+}
+
+@keyframes pulseDot {
+  0% { transform: scale(0.8); fill: #0066ff; }
+  100% { transform: scale(1.4); fill: #3d3d8b; }
+}
+
+@keyframes textGlow {
+  0% { opacity: 0.2; filter: blur(4px); }
+  100% { opacity: 0.8; filter: blur(10px); }
+}
+
+@keyframes meterSlide {
+  0% { left: -40%; }
+  50% { left: 100%; }
+  100% { left: -40%; }
 }
