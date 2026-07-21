@@ -8,7 +8,7 @@ const PageLoader = ({ text = "Crafting your experience..." }) => {
         {/* Glow backdrop behind the graphic */}
         <div className="aura-glow"></div>
 
-        {/* Dynamic Apparel Stitch & Weave Graphic */}
+        {/* Dynamic Apparel Stitch & Scanner Graphic */}
         <div className="apparel-graphic-wrapper">
           <svg
             className="apparel-svg"
@@ -21,9 +21,9 @@ const PageLoader = ({ text = "Crafting your experience..." }) => {
               cx="60"
               cy="60"
               r="52"
-              stroke="rgba(0, 102, 255, 0.15)"
-              strokeWidth="2"
-              strokeDasharray="6 6"
+              stroke="rgba(0, 102, 255, 0.1)"
+              strokeWidth="1.5"
+              strokeDasharray="4 4"
               className="ring-bg"
             />
 
@@ -33,7 +33,7 @@ const PageLoader = ({ text = "Crafting your experience..." }) => {
               cy="60"
               r="52"
               stroke="url(#gradient-accent)"
-              strokeWidth="2.5"
+              strokeWidth="2"
               strokeLinecap="round"
               className="ring-orbit"
             />
@@ -42,7 +42,7 @@ const PageLoader = ({ text = "Crafting your experience..." }) => {
             <path
               d="M60 28 C60 24, 65 22, 65 26 C65 30, 60 32, 60 35 L60 40 M32 50 L60 40 L88 50 C90 51, 88 54, 85 53 L35 53 C32 54, 30 51, 32 50 Z"
               stroke="#3d3d8b"
-              strokeWidth="2"
+              strokeWidth="1.5"
               strokeLinecap="round"
               strokeLinejoin="round"
               className="hanger-path"
@@ -52,20 +52,56 @@ const PageLoader = ({ text = "Crafting your experience..." }) => {
             <path
               d="M38 52 L26 62 L32 72 L40 66 L40 88 C40 90, 42 92, 44 92 L76 92 C78 92, 80 90, 80 88 L80 66 L88 72 L94 62 L82 52 C74 58, 46 58, 38 52 Z"
               stroke="url(#gradient-thread)"
-              strokeWidth="2.5"
+              strokeWidth="2"
               strokeLinecap="round"
               strokeLinejoin="round"
               className="jersey-stitch-path"
             />
 
-            {/* Central Brand Stitch Accent "C" */}
-            <path
-              d="M64 66 C57 65, 54 70, 54 75 C54 80, 57 85, 64 84"
+            {/* --- SCANNER GRAPHICS --- */}
+            {/* Scanner Line over the Hanger */}
+            <line
+              x1="45"
+              y1="35"
+              x2="75"
+              y2="35"
               stroke="#0066ff"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              className="cuztory-c-stitch"
+              strokeWidth="1.5"
+              className="hanger-scan-line"
             />
+
+            {/* Scanning Laser Sweep over T-shirt */}
+            <rect
+              x="36"
+              y="54"
+              width="48"
+              height="2"
+              fill="#0066ff"
+              className="tshirt-scan-laser"
+              style={{ filter: "drop-shadow(0 0 6px #0066ff)" }}
+            />
+
+            {/* --- INTEGRATED CZ T-SHIRT LOGO --- */}
+            <g className="cz-logo-group" style={{ filter: "drop-shadow(0 0 4px rgba(0, 102, 255, 0.8))" }}>
+              {/* Vector Path for C */}
+              <path
+                d="M55 67 C50 67, 47 70, 47 74 C47 78, 50 81, 55 81"
+                stroke="#0066ff"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="cz-path-c"
+              />
+              {/* Vector Path for Z */}
+              <path
+                d="M63 67 L73 67 L63 81 L73 81"
+                stroke="#0066ff"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="cz-path-z"
+              />
+            </g>
 
             {/* Gradients */}
             <defs>
@@ -82,9 +118,6 @@ const PageLoader = ({ text = "Crafting your experience..." }) => {
               </linearGradient>
             </defs>
           </svg>
-
-          {/* Floating precision needle spark */}
-          <div className="stitch-spark"></div>
         </div>
 
         {/* Brand Name with Shimmer Sweep */}

@@ -67,21 +67,30 @@
   animation: drawHanger 2.4s ease-in-out infinite alternate;
 }
 
-.cuztory-c-stitch {
+/* --- SCANNER ANIMATIONS --- */
+.hanger-scan-line {
+  stroke-dasharray: 30;
+  stroke-dashoffset: 30;
+  animation: scanHanger 1.2s ease-in-out infinite alternate;
+  opacity: 0;
+}
+
+.tshirt-scan-laser {
+  animation: scanTshirt 2.4s ease-in-out infinite;
+  opacity: 0;
+}
+
+/* --- CZ STITCHED LOGO ANIMATION --- */
+.cz-path-c {
   stroke-dasharray: 40;
   stroke-dashoffset: 40;
   animation: drawC 2.4s ease-in-out infinite alternate;
 }
 
-/* Floating Precision Spark */
-.stitch-spark {
-  position: absolute;
-  width: 6px;
-  height: 6px;
-  background: #0066ff;
-  border-radius: 50%;
-  box-shadow: 0 0 10px #0066ff, 0 0 18px #0066ff;
-  animation: sparkOrbit 2.4s ease-in-out infinite alternate;
+.cz-path-z {
+  stroke-dasharray: 60;
+  stroke-dashoffset: 60;
+  animation: drawZ 2.4s ease-in-out infinite alternate;
 }
 
 /* Brand Section */
@@ -105,7 +114,7 @@
   animation: textGradientShimmer 3s linear infinite;
   text-transform: uppercase;
   margin: 0;
-  padding-left: 0.35em; /* Optical alignment offset for tracking */
+  padding-left: 0.35em;
 }
 
 .shimmer-line {
@@ -152,15 +161,27 @@
   100% { stroke-dashoffset: 0; opacity: 1; }
 }
 
-@keyframes drawC {
-  0%, 40% { stroke-dashoffset: 40; opacity: 0; }
-  80%, 100% { stroke-dashoffset: 0; opacity: 1; }
+@keyframes scanHanger {
+  0%, 20% { stroke-dashoffset: 30; opacity: 0; }
+  50% { stroke-dashoffset: 0; opacity: 1; }
+  80%, 100% { stroke-dashoffset: -30; opacity: 0; }
 }
 
-@keyframes sparkOrbit {
-  0% { transform: translate(-30px, -20px) scale(0.5); opacity: 0; }
-  50% { opacity: 1; transform: translate(25px, -10px) scale(1.2); }
-  100% { transform: translate(0px, 30px) scale(0.8); opacity: 0.8; }
+@keyframes scanTshirt {
+  0%, 30% { transform: translateY(0); opacity: 0; }
+  50% { opacity: 1; }
+  70% { transform: translateY(30px); opacity: 1; }
+  80%, 100% { transform: translateY(30px); opacity: 0; }
+}
+
+@keyframes drawC {
+  0%, 30% { stroke-dashoffset: 40; opacity: 0; }
+  70%, 100% { stroke-dashoffset: 0; opacity: 1; }
+}
+
+@keyframes drawZ {
+  0%, 40% { stroke-dashoffset: 60; opacity: 0; }
+  80%, 100% { stroke-dashoffset: 0; opacity: 1; }
 }
 
 @keyframes textGradientShimmer {
