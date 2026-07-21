@@ -1,139 +1,100 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import "./PageLoader.css";
 
-const FABRIC_STAGES = [
-  "CRAFTING BESPOKE PIECES...",
-  "PRECISION TAILORING...",
-  "LIMITED EDITION SELECTION...",
-  "SETTING THE TREND..."
-];
-
-const PageLoader = () => {
-  const [stageIndex, setStageIndex] = useState(0);
-
-  // Cycle through brand tagline status messages
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setStageIndex((prev) => (prev + 1) % FABRIC_STAGES.length);
-    }, 1200);
-    return () => clearInterval(interval);
-  }, []);
-
+const PageLoader = ({ text = "Crafting your experience..." }) => {
   return (
-    <div className="page-loader" aria-label="Loading Cuztory Studio">
-      <div className="loader-stage">
-        
-        {/* Ambient Glowing Background Orb */}
-        <div className="light-aura"></div>
+    <div className="page-loader" aria-label="Loading page">
+      <div className="loader-container">
+        {/* Glow backdrop behind the graphic */}
+        <div className="aura-glow"></div>
 
-        {/* Dynamic Fashion Graphic Container */}
-        <div className="fashion-graphic">
-          
-          {/* Laser Scanner Line (Represents Custom Sizing & Precision) */}
-          <div className="laser-scanner"></div>
-
-          {/* Limited Edition Stamp Accent */}
-          <div className="limited-badge">
-            <span>LTD</span>
-            <div className="badge-dot"></div>
-          </div>
-
+        {/* Dynamic Apparel Stitch & Weave Graphic */}
+        <div className="apparel-graphic-wrapper">
           <svg
-            className="fashion-svg"
-            viewBox="0 0 140 140"
+            className="apparel-svg"
+            viewBox="0 0 120 120"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
           >
-            {/* Outer Geometric Frame */}
-            <rect
-              x="10"
-              y="10"
-              width="120"
-              height="120"
-              rx="24"
-              stroke="url(#frameGlow)"
+            {/* Background dashed outline ring */}
+            <circle
+              cx="60"
+              cy="60"
+              r="52"
+              stroke="rgba(0, 102, 255, 0.15)"
               strokeWidth="2"
-              className="atelier-frame"
+              strokeDasharray="6 6"
+              className="ring-bg"
             />
 
-            {/* Corner Precision Marks */}
-            <path d="M10 25 V10 H25" stroke="#0066ff" strokeWidth="2.5" strokeLinecap="round" />
-            <path d="M115 10 H130 V25" stroke="#0066ff" strokeWidth="2.5" strokeLinecap="round" />
-            <path d="M130 115 V130 H115" stroke="#3d3d8b" strokeWidth="2.5" strokeLinecap="round" />
-            <path d="M25 130 H10 V115" stroke="#3d3d8b" strokeWidth="2.5" strokeLinecap="round" />
+            {/* Rotating accent orbit */}
+            <circle
+              cx="60"
+              cy="60"
+              r="52"
+              stroke="url(#gradient-accent)"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              className="ring-orbit"
+            />
 
-            {/* Couture Mannequin / Form Lines */}
-            {/* Neck & Shoulders */}
+            {/* Glowing Hanger Silhouette */}
             <path
-              d="M62 32 H78 M70 32 V38 M50 48 L70 42 L90 48"
+              d="M60 28 C60 24, 65 22, 65 26 C65 30, 60 32, 60 35 L60 40 M32 50 L60 40 L88 50 C90 51, 88 54, 85 53 L35 53 C32 54, 30 51, 32 50 Z"
               stroke="#3d3d8b"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="hanger-path"
+            />
+
+            {/* Animated Thread-Formed Jersey Outline */}
+            <path
+              d="M38 52 L26 62 L32 72 L40 66 L40 88 C40 90, 42 92, 44 92 L76 92 C78 92, 80 90, 80 88 L80 66 L88 72 L94 62 L82 52 C74 58, 46 58, 38 52 Z"
+              stroke="url(#gradient-thread)"
               strokeWidth="2.5"
               strokeLinecap="round"
               strokeLinejoin="round"
-              className="mannequin-top"
+              className="jersey-stitch-path"
             />
 
-            {/* Avant-Garde Draped Corset / Torso Lines */}
+            {/* Central Brand Stitch Accent "C" */}
             <path
-              d="M50 48 L56 75 L62 102 M90 48 L84 75 L78 102"
-              stroke="url(#bodyGlow)"
+              d="M64 66 C57 65, 54 70, 54 75 C54 80, 57 85, 64 84"
+              stroke="#0066ff"
               strokeWidth="2.5"
               strokeLinecap="round"
-              className="mannequin-body"
+              className="cuztory-c-stitch"
             />
 
-            {/* Floating Custom Tailoring Curves */}
-            <path
-              d="M42 60 C58 52, 82 68, 98 60"
-              stroke="#0066ff"
-              strokeWidth="2"
-              strokeDasharray="4 4"
-              className="measure-tape-1"
-            />
-            <path
-              d="M46 80 C62 72, 78 88, 94 80"
-              stroke="#0066ff"
-              strokeWidth="2"
-              strokeDasharray="4 4"
-              className="measure-tape-2"
-            />
-
-            {/* Central Precision Accent */}
-            <circle cx="70" cy="72" r="3" fill="#0066ff" className="center-pulse" />
-
-            {/* SVG Gradients */}
+            {/* Gradients */}
             <defs>
-              <linearGradient id="frameGlow" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#0066ff" stopOpacity="0.8" />
-                <stop offset="50%" stopColor="#3d3d8b" stopOpacity="0.2" />
-                <stop offset="100%" stopColor="#3d3d8b" stopOpacity="0.8" />
-              </linearGradient>
-
-              <linearGradient id="bodyGlow" x1="0%" y1="0%" x2="0%" y2="100%">
+              <linearGradient id="gradient-thread" x1="0%" y1="0%" x2="100%" y2="100%">
                 <stop offset="0%" stopColor="#3d3d8b" />
                 <stop offset="50%" stopColor="#0066ff" />
                 <stop offset="100%" stopColor="#3d3d8b" />
               </linearGradient>
+
+              <linearGradient id="gradient-accent" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="#0066ff" stopOpacity="0" />
+                <stop offset="50%" stopColor="#0066ff" stopOpacity="1" />
+                <stop offset="100%" stopColor="#3d3d8b" stopOpacity="0" />
+              </linearGradient>
             </defs>
           </svg>
+
+          {/* Floating precision needle spark */}
+          <div className="stitch-spark"></div>
         </div>
 
-        {/* Branding & Status */}
-        <div className="brand-header">
-          <span className="brand-tagline">NEW GEN ATELIER</span>
-          <h1 className="brand-title">CUZTORY</h1>
-          <div className="brand-indicator-bar">
-            <div className="indicator-progress"></div>
-          </div>
+        {/* Brand Name with Shimmer Sweep */}
+        <div className="brand-section">
+          <h1 className="brand-name">CUZTORY</h1>
+          <div className="shimmer-line"></div>
         </div>
 
-        {/* Animated Dynamic Text */}
-        <div className="status-text-wrapper">
-          <p className="status-text" key={stageIndex}>
-            {FABRIC_STAGES[stageIndex]}
-          </p>
-        </div>
-
+        {/* Dynamic Status Text */}
+        <p className="loader-text">{text}</p>
       </div>
     </div>
   );
