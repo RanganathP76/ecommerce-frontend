@@ -59,21 +59,29 @@ const TrackOrderPublic = () => {
   const [error, setError] = useState('');
 
   const handleTrack = async (id = orderId) => {
-    if (!id.trim()) {
-      setError("Please enter a valid Order ID");
+  if (!id.trim()) {
+    setError("Please enter a valid Order ID");
+    return;
+  }
+
+  try {
+    const res = await axiosInstance.get(`/orders/track/${id}`);
+
+    // Redirect to Shiprocket live tracking if available
+    if (res.data?.fullTrackingHistory?.track_url) {
+      window.location.replace(res.data.fullTrackingHistory.track_url);
       return;
     }
 
-    try {
-      const res = await axiosInstance.get(`/orders/track/${id}`);
-      setOrder(res.data);
-      setError('');
-    } catch (err) {
-      console.error(err);
-      setOrder(null);
-      setError("Order not found or server error.");
-    }
-  };
+    // Otherwise show your existing tracking page
+    setOrder(res.data);
+    setError("");
+  } catch (err) {
+    console.error(err);
+    setOrder(null);
+    setError("Order not found or server error.");
+  }
+};
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -119,14 +127,55 @@ const TrackOrderPublic = () => {
               <p>{order.shippingInfo?.name} — {order.shippingInfo?.phone}</p>
               <p>{order.shippingInfo?.address}, {order.shippingInfo?.city}, {order.shippingInfo?.postalCode}, {order.shippingInfo?.country}</p>
 
-              <h4>Items ({order.orderItems.length})</h4>
-              <ul>
-                {order.orderItems.map((item, idx) => (
-                  <li key={idx}>
-                    {item.name} x {item.quantity} — ₹{item.price * item.quantity}
-                  </li>
-                ))}
-              </ul>
+             <h4>Items ({order.orderItems.length})</h4>
+
+<div className="track-order-items">
+  {order.orderItems.map((item, idx) => (
+    <div key={idx} className="track-order-item">
+      <img
+        src={item.image}
+        alt={item.name}
+        className="track-order-image"
+      />
+
+      <div className="track-order-details">
+        <h5>{item.name}</h5>
+
+        <p>
+          Qty: <strong>{item.quantity}</strong>
+        </p>
+
+        <p>
+          Price: <strong>₹{item.price}</strong>
+        </p>
+
+        <p>
+          Total: <strong>₹{item.price * item.quantity}</strong>
+        </p>
+
+        {item.specifications?.length > 0 && (
+          <div className="track-specs">
+            {item.specifications.map((spec, i) => (
+              <span key={i}>
+                <strong>{spec.key}:</strong> {spec.value}
+              </span>
+            ))}
+          </div>
+        )}
+
+        {item.customization?.length > 0 && (
+          <div className="track-customization">
+            {item.customization.map((custom, i) => (
+              <span key={i}>
+                <strong>{custom.label}:</strong> {custom.value}
+              </span>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  ))}
+</div>
 
               <h4>Payment Summary</h4>
               <p><strong>Total Price:</strong> ₹{order.totalPrice}</p>

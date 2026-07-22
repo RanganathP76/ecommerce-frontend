@@ -53,3 +53,45 @@
   margin-left: 10px;
   color: #333;
 }
+
+.order-summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    gap: 20px;
+}
+
+.order-summary-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex: 1;
+}
+
+.order-summary-image {
+    width: 90px;
+    height: 90px;
+    object-fit: cover;
+    border-radius: 10px;
+    border: 1px solid #e5e5e5;
+    background: #fff;
+    flex-shrink: 0;
+}
+
+.order-summary-info {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.more-items {
+    color: #777;
+    font-size: 14px;
+}
+
+.expand-icon {
+    font-size: 18px;
+    color: #666;
+    font-weight: bold;
+}

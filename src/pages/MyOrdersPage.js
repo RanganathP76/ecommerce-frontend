@@ -52,14 +52,34 @@ const MyOrdersPage = () => {
           orders.map((order) => (
             <div key={order._id} className="order-summary-box">
               <div
-                className="order-summary"
-                onClick={() => toggleExpand(order._id)}
-              >
-                <div><strong>Order ID:</strong> {order._id}</div>
-                <div><strong>Status:</strong> {order.orderStatus}</div>
-                <div><strong>Total:</strong> ₹{order.totalPrice.toFixed(1)}</div>
-                <div><strong>Created:</strong> {new Date(order.createdAt).toLocaleString()}</div>
-              </div>
+  className="order-summary"
+  onClick={() => toggleExpand(order._id)}
+>
+  <div className="order-summary-left">
+    <img
+      src={order.orderItems?.[0]?.image || "/placeholder.png"}
+      alt={order.orderItems?.[0]?.name}
+      className="order-summary-image"
+    />
+
+    <div className="order-summary-info">
+      <div><strong>Order ID:</strong> {order._id}</div>
+      <div><strong>Status:</strong> {order.orderStatus}</div>
+      <div><strong>Total:</strong> ₹{order.totalPrice.toFixed(1)}</div>
+      <div><strong>Created:</strong> {new Date(order.createdAt).toLocaleString()}</div>
+
+      {order.orderItems.length > 1 && (
+        <div className="more-items">
+          +{order.orderItems.length - 1} more item(s)
+        </div>
+      )}
+    </div>
+  </div>
+
+  <div className="expand-icon">
+    {expandedOrderId === order._id ? "▲" : "▼"}
+  </div>
+</div>
 
               {expandedOrderId === order._id && (
                 <div className="order-details">
