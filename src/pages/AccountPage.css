@@ -3,369 +3,256 @@
 =================================================== */
 
 .cuz-account-page{
-
     min-height:100vh;
     background:
     radial-gradient(circle at top right,rgba(0,102,255,.08),transparent 35%),
     radial-gradient(circle at bottom left,rgba(61,61,139,.08),transparent 35%),
     #f7f8fc;
-
 }
 
 /* Wrapper */
-
 .cuz-account-wrapper{
-
     max-width:760px;
     margin:auto;
-    padding:120px 20px 70px;
-
+    padding:20px 20px 70px;
 }
 
 /* Title */
-
 .cuz-account-title{
-
     font-size:42px;
     font-weight:700;
     text-align:center;
     color:#202020;
     margin-bottom:35px;
     letter-spacing:.5px;
-
 }
 
 /* Card */
-
 .cuz-account-card{
-
     position:relative;
-
     background:rgba(255,255,255,.88);
-
     backdrop-filter:blur(18px);
-
     border-radius:28px;
-
     padding:38px;
-
+    padding-right: 110px; /* Safe space for desktop avatar */
     overflow:hidden;
-
-    box-shadow:
-    0 20px 50px rgba(0,0,0,.08);
-
+    box-shadow: 0 20px 50px rgba(0,0,0,.08);
     border:1px solid rgba(255,255,255,.4);
-
 }
 
 /* Glow */
-
 .cuz-account-card::before{
-
     content:"";
-
     position:absolute;
-
     width:260px;
     height:260px;
-
     top:-120px;
     right:-120px;
-
     border-radius:50%;
-
     background:
     radial-gradient(circle,
     rgba(0,102,255,.28),
     transparent 70%);
-
 }
 
 /* Avatar */
-
 .cuz-account-card::after{
-
     content:attr(data-avatar);
-
     position:absolute;
-
     top:28px;
     right:28px;
-
     width:72px;
     height:72px;
-
     border-radius:50%;
-
     display:flex;
     justify-content:center;
     align-items:center;
-
     background:
     linear-gradient(135deg,#0066ff,#3d3d8b);
-
     color:#fff;
-
     font-size:28px;
     font-weight:700;
-
     box-shadow:
     0 15px 30px rgba(0,102,255,.3);
-
+    z-index: 2;
 }
 
 /* Heading */
-
 .cuz-account-heading{
-
     font-size:30px;
-
     font-weight:700;
-
     color:#111;
-
 }
 
 /* Subtitle */
-
 .cuz-account-subtitle{
-
     margin-top:8px;
-
     color:#666;
-
     margin-bottom:35px;
-
 }
 
 /* Details */
-
 .cuz-account-details{
-
     display:flex;
-
     flex-direction:column;
-
     gap:22px;
-
 }
 
 /* Row */
-
 .cuz-account-item{
-
     display:flex;
-
     justify-content:space-between;
-
     align-items:center;
-
+    gap: 12px; /* ✅ Added gap between label and value */
     border-bottom:1px solid #ececec;
-
     padding-bottom:14px;
-
 }
 
 .cuz-account-item span{
-
     color:#777;
-
     font-size:15px;
-
+    flex-shrink: 0; /* ✅ Keeps "Name" and "Email" labels fixed width */
 }
 
 .cuz-account-item strong{
-
     color:#111;
-
     font-size:17px;
-
+    text-align: right;
+    word-break: break-all; /* ✅ FIXED: Wraps long email addresses cleanly */
 }
 
 /* Buttons */
-
 .cuz-account-actions{
-
     display:grid;
-
     grid-template-columns:repeat(3,1fr);
-
     gap:18px;
-
     margin-top:35px;
-
 }
 
 .cuz-account-actions button{
-
     height:70px;
-
     border:none;
-
     border-radius:18px;
-
     background:white;
-
     cursor:pointer;
-
     transition:.35s;
-
     display:flex;
-
     flex-direction:column;
-
     justify-content:center;
-
     align-items:center;
-
     gap:6px;
-
     font-size:26px;
-
     box-shadow:
     0 10px 25px rgba(0,0,0,.06);
-
 }
 
 .cuz-account-actions button span{
-
     font-size:15px;
-
     color:#222;
-
     font-weight:600;
-
 }
 
 .cuz-account-actions button:hover{
-
     transform:translateY(-8px);
-
     background:
     linear-gradient(135deg,#0066ff,#3d3d8b);
-
     box-shadow:
     0 18px 40px rgba(0,102,255,.3);
-
     color:white;
-
 }
 
 .cuz-account-actions button:hover span{
-
     color:white;
-
 }
 
 /* Logout */
-
 .cuz-logout-btn{
-
     background:#fff3f3 !important;
-
 }
 
 .cuz-logout-btn:hover{
-
     background:
     linear-gradient(135deg,#ff4a4a,#d60000) !important;
-
 }
 
 /* Login Card */
-
 .cuz-login-card{
-
     background:white;
-
     border-radius:24px;
-
     padding:45px;
-
     text-align:center;
-
     box-shadow:
     0 15px 35px rgba(0,0,0,.08);
-
 }
 
 .cuz-login-card h2{
-
     margin-bottom:15px;
-
 }
 
 .cuz-login-card p{
-
     color:#666;
-
     margin-bottom:25px;
-
 }
 
 .cuz-login-card button{
-
     border:none;
-
     background:
     linear-gradient(135deg,#0066ff,#3d3d8b);
-
     color:white;
-
     padding:14px 34px;
-
     border-radius:12px;
-
     cursor:pointer;
-
     font-size:15px;
-
     transition:.3s;
-
 }
 
 .cuz-login-card button:hover{
-
     transform:translateY(-4px);
-
 }
 
-/* Mobile */
-
+/* Mobile & Small Screen Fixes */
 @media(max-width:768px){
 
 .cuz-account-title{
-
     font-size:32px;
-
 }
 
 .cuz-account-card{
-
-    padding:25px;
-
+    padding: 25px;
+    padding-right: 85px;
 }
 
 .cuz-account-card::after{
+    width:52px;
+    height:52px;
+    font-size:20px;
+    top:20px;
+    right:20px;
+}
 
-    width:58px;
+/* ✅ FIXED: Stack details vertically on mobile screens so email never collides */
+.cuz-account-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+}
 
-    height:58px;
+.cuz-account-item strong {
+    text-align: left;
+    font-size: 15px;
+}
 
-    font-size:22px;
+.cuz-account-heading{
+    font-size:24px;
+}
 
+.cuz-account-subtitle{
+    font-size:14px;
+    margin-bottom:24px;
 }
 
 .cuz-account-actions{
-
     grid-template-columns:1fr;
-
 }
 
-}
-
-.cuz-account-wrapper{
-    max-width:760px;
-    margin:auto;
-    padding:20px 20px 70px;
 }
