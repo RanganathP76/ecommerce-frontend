@@ -1,4 +1,21 @@
-@import url('https://fonts.googleapis.com/css2?family=Pacifico&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Saira+Stencil+One&display=swap');
+
+.logo {
+  font-family: 'Saira Stencil One', cursive;
+  font-size: 1.8rem;
+  color: #ffffff;
+  text-decoration: none;
+  text-transform: none; /* Keeps 'Cuztory' exact casing */
+  letter-spacing: -1px; /* Closed, packed feel */
+  text-shadow: 0 0 10px rgba(37, 99, 235, 0.6);
+  transition: all 0.2s ease;
+  display: inline-block;
+}
+
+.logo:hover {
+  transform: scale(1.04);
+  text-shadow: 0 0 15px rgba(255, 255, 255, 0.8);
+}
 
 :root {
   --primary-dark: rgba(92, 98, 145, 0.538); /* subtle overlay tone */
@@ -45,20 +62,7 @@
   align-items: center;
 }
 
-/* Logo Style */
-.logo {
-  font-family: 'Pacifico', cursive;
-  font-size: 2.4rem;
-  color: var(--highlight-color);
-  text-decoration: none;
-  letter-spacing: 2px;
-  transition: transform 0.3s ease, color 0.3s ease;
-}
 
-.logo:hover {
-  transform: scale(1.05);
-  color: #fff;
-}
 
 /* Icons */
 .icon-link {
