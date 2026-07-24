@@ -27,7 +27,7 @@ setShowLoader(true);
 
 setTimeout(() => {
   navigate("/");
-}, 1000);
+}, 2000);
     } catch (err) {
       console.error(err);
       setError(err.response?.data?.message || 'Invalid email or password');
@@ -56,7 +56,7 @@ setTimeout(() => {
 if (showLoader) {
   return (
     <PageLoader
-      message={loaderText}
+      text={loaderText}
     />
   );
 }
