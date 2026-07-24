@@ -1,97 +1,443 @@
+/* ==========================================================================
+   MY ORDERS PAGE - FULLY SCOPED & ALIGNED STYLES
+   ========================================================================== */
 
-
-.my-orders-container h2 {
-  text-align: center;
-  margin-bottom: 20px;
-}
-
-.order-summary-box {
-  background: #f9f9f9;
-  border-radius: 12px;
-  box-shadow: 0 0 8px rgba(0,0,0,0.1);
-  margin-bottom: 20px;
-  overflow: hidden;
-  transition: all 0.3s ease;
-}
-
-.order-summary {
-  padding: 15px 20px;
-  background: #5c6291;
-  color: white;
-  cursor: pointer;
+.mop-page-wrapper {
+  min-height: 100vh;
+  background-color: #f8fafc;
   display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
+  flex-direction: column;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  color: #0f172a;
+}
+
+.mop-container {
+  flex: 1;
+  max-width: 800px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 24px 16px 60px 16px;
+  box-sizing: border-box;
+}
+
+.mop-header {
+  display: flex;
   justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #e2e8f0;
 }
 
-.order-details {
-  padding: 20px;
-  background: white;
-  border-top: 1px solid #ddd;
-  font-size: 15px;
+.mop-title {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0;
 }
 
-.order-item {
+.mop-count-badge {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #475569;
+  background: #e2e8f0;
+  padding: 4px 12px;
+  border-radius: 999px;
+}
+
+/* ==========================================================================
+   Order Card List Item
+   ========================================================================== */
+
+.mop-orders-list {
   display: flex;
-  gap: 15px;
-  margin-top: 10px;
-  padding: 10px;
-  background: #f4f4f4;
-  border-radius: 8px;
+  flex-direction: column;
+  gap: 16px;
 }
 
-.order-item img {
-  width: 70px;
-  height: 70px;
+.mop-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+  transition: all 0.2s ease;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.mop-card:hover {
+  border-color: #2563eb;
+  box-shadow: 0 8px 16px rgba(37, 99, 235, 0.1);
+}
+
+.mop-card-body {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+}
+
+.mop-hero-thumb {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.mop-thumb-img {
+  width: 72px;
+  height: 72px;
   object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  background-color: #f8fafc;
+}
+
+.mop-extra-badge {
+  position: absolute;
+  bottom: -4px;
+  right: -4px;
+  background: #2563eb;
+  color: #ffffff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 10px;
+  border: 2px solid #ffffff;
+}
+
+.mop-summary-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+}
+
+.mop-order-id-full {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #0f172a;
+  word-break: break-all;
+  font-family: monospace;
+}
+
+.mop-order-date {
+  font-size: 0.8rem;
+  color: #64748b;
+}
+
+.mop-order-price {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+/* PERFECTLY CENTER-ALIGNED VIEW DETAILS BUTTON */
+.mop-card-footer {
+  width: 100%;
+  padding: 10px 0;
+  background: #f8fafc;
+  border-top: 1px solid #f1f5f9;
+  text-align: center;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #2563eb;
+  transition: all 0.2s ease;
+}
+
+.mop-card:hover .mop-card-footer {
+  background: #2563eb;
+  color: #ffffff;
+}
+
+/* ==========================================================================
+   Full Details Screen Breakdown
+   ========================================================================== */
+
+.mop-full-screen-details {
+  animation: mopFadeIn 0.2s ease-out;
+}
+
+@keyframes mopFadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.mop-details-topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.mop-back-btn {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #334155;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.mop-back-btn:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+.mop-details-header {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.mop-subtitle {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 700;
+  color: #64748b;
+  margin: 0 0 4px 0;
+}
+
+.mop-full-id {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 8px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.mop-full-id span {
+  font-family: monospace;
+  word-break: break-all;
+}
+
+.mop-copy-btn {
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 3px 8px;
   border-radius: 6px;
+  cursor: pointer;
+  color: #475569;
 }
 
-.customization p {
-  font-size: 13px;
-  margin-left: 10px;
-  color: #333;
+.mop-date-stamp {
+  font-size: 0.8rem;
+  color: #64748b;
+  margin: 0;
 }
 
-.order-summary {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    cursor: pointer;
-    gap: 20px;
+/* ==========================================================================
+   Items Block Container (Appears directly after Header)
+   ========================================================================== */
+
+.mop-items-container {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
 }
 
-.order-summary-left {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    flex: 1;
+.mop-items-title {
+  font-size: 1rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0 0 16px 0;
 }
 
-.order-summary-image {
-    width: 90px;
-    height: 90px;
-    object-fit: cover;
-    border-radius: 10px;
-    border: 1px solid #e5e5e5;
-    background: #fff;
-    flex-shrink: 0;
+.mop-items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
-.order-summary-info {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
+.mop-item-card {
+  display: flex;
+  gap: 12px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #f1f5f9;
 }
 
-.more-items {
-    color: #777;
-    font-size: 14px;
+.mop-item-card:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
 }
 
-.expand-icon {
-    font-size: 18px;
-    color: #666;
-    font-weight: bold;
+.mop-item-img {
+  width: 68px;
+  height: 68px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+  flex-shrink: 0;
+}
+
+.mop-item-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.mop-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 2px;
+}
+
+.mop-item-name {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: #0f172a;
+  margin: 0;
+}
+
+.mop-item-price {
+  font-weight: 800;
+  color: #2563eb;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+.mop-item-qty {
+  font-size: 0.8rem;
+  color: #64748b;
+  margin-bottom: 6px;
+}
+
+.mop-options-box {
+  background: #f8fafc;
+  padding: 8px;
+  border-radius: 6px;
+  margin-top: 6px;
+  border: 1px solid #f1f5f9;
+}
+
+.mop-options-title {
+  font-size: 0.725rem;
+  font-weight: 700;
+  color: #64748b;
+  margin-bottom: 4px;
+}
+
+.mop-chips-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.mop-chip {
+  font-size: 0.75rem;
+  color: #334155;
+  word-break: break-word;
+}
+
+.mop-attachment-link {
+  color: #2563eb;
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+/* ==========================================================================
+   Shipping, Payment & Financial Details Grid
+   ========================================================================== */
+
+.mop-details-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.mop-info-card {
+  background: #ffffff;
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+}
+
+.mop-info-card h4 {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #64748b;
+  margin: 0 0 12px 0;
+}
+
+.mop-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
+  font-size: 0.85rem;
+  gap: 12px;
+}
+
+.mop-row-label { color: #64748b; flex-shrink: 0; }
+.mop-row-val { font-weight: 600; color: #1e293b; text-align: right; word-break: break-word; }
+
+.mop-row--total {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px dashed #e2e8f0;
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.mop-due-alert { color: #dc2626; }
+
+/* Status Badges & Utilities */
+.mop-badge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 20px;
+  text-transform: uppercase;
+}
+
+.mop-badge--delivered { background-color: #dcfce7; color: #15803d; }
+.mop-badge--processing { background-color: #fef3c7; color: #b45309; }
+.mop-badge--cancelled { background-color: #fee2e2; color: #b91c1c; }
+.mop-badge--default { background-color: #f1f5f9; color: #475569; }
+
+.mop-empty-card,
+.mop-auth-card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 36px 16px;
+  text-align: center;
+  border: 1px dashed #cbd5e1;
+}
+
+.mop-btn-primary {
+  display: inline-block;
+  background: #2563eb;
+  color: #ffffff !important;
+  font-weight: 600;
+  padding: 8px 20px;
+  border-radius: 8px;
+  text-decoration: none;
+}
+
+.mop-skeleton-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.mop-skeleton-card {
+  height: 90px;
+  background: #e2e8f0;
+  border-radius: 12px;
+  opacity: 0.6;
 }
