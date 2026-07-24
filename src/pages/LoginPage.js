@@ -4,22 +4,30 @@ import { useNavigate } from 'react-router-dom';
 import { GoogleLogin } from '@react-oauth/google';
 import axiosInstance from '../axiosInstance';
 import './LoginPage.css';
+import PageLoader from "../components/PageLoader"; // adjust path if needed
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
+  const [showLoader, setShowLoader] = useState(false);
+const [loaderText, setLoaderText] = useState("");
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setError('');
     try {
       const res = await axiosInstance.post('/auth/login', { email, password });
-      localStorage.setItem('token', res.data.token);
-      localStorage.setItem('user', JSON.stringify(res.data.user));
-      alert('Login successful!');
-      navigate('/');
+     localStorage.setItem('token', res.data.token);
+localStorage.setItem('user', JSON.stringify(res.data.user));
+
+setLoaderText("Login Successful\nWelcome to Cuztory");
+setShowLoader(true);
+
+setTimeout(() => {
+  navigate("/");
+}, 1000);
     } catch (err) {
       console.error(err);
       setError(err.response?.data?.message || 'Invalid email or password');
@@ -32,17 +40,31 @@ const LoginPage = () => {
         tokenId: credentialResponse.credential,
       });
       localStorage.setItem('token', res.data.token);
-      localStorage.setItem('user', JSON.stringify(res.data.user));
-      alert('Login successful!');
-      navigate('/');
+localStorage.setItem('user', JSON.stringify(res.data.user));
+
+setLoaderText("Login Successful\nWelcome to Cuztory");
+setShowLoader(true);
+
+setTimeout(() => {
+  navigate("/");
+}, 1000);
     } catch (err) {
       console.error(err);
       setError(err.response?.data?.message || 'Google login failed');
     }
   };
-
+if (showLoader) {
   return (
+    <PageLoader
+      message={loaderText}
+    />
+  );
+}
+  return (
+
+    
     <div className="auth-container">
+      
       <h2>Login</h2>
       <form onSubmit={handleLogin} className="auth-form">
         <input type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} required />
