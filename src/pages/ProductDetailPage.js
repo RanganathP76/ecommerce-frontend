@@ -581,59 +581,30 @@ const slides = [
   </div>
 
   {/* Trust & Conversion Boosters */}
-  <div className="price-footer-meta">
-    <p className="inclusive-taxes">Inclusive of all taxes</p>
+ <div className="price-footer-meta">
+  <p className="inclusive-taxes">Inclusive of all taxes</p>
 
+  {paymentOptions?.partialPayment?.enabled && advance > 0 && (
+    <div className="advance-highlight-box">
+      <div className="advance-main">
+        Pay only ₹{advance} Now
+      </div>
 
-{paymentOptions?.partialPayment?.enabled && advance > 0 && (
-  <div className="advance-highlight-box">
-    <div className="advance-main">
-      Pay only ₹{advance} Now
+      <div className="advance-sub">
+        ₹{due} After delivery
+      </div>
     </div>
+  )}
 
-    <div className="advance-sub">
-      ₹{due} After delivery
-    </div>
-  </div>
-)}
-    
+  {/* Estimated Delivery */}
+  <div className="delivery-estimate-pill">
+    <FaShippingFast className="truck-icon" />
+    <span>
+      Estimated Delivery by{" "}
+      <strong>{estimatedDelivery.split("–")[1]}</strong>
+    </span>
   </div>
 </div>
-
-
-
-    {/* Buttons */}
-  <div className="action-buttons">
-  {isAnyFileUploading ? (
-    <p style={{ color: "#007bff" }}>Uploading file(s)...</p>
-  ) : product.isCustomizable ? (
-    // ✅ If customizable, show only "Customize" button
-    <button
-      className="customize-btn"
-      onClick={() => {
-  setShowPopup(true);
-
-  // Focus after popup opens
-  setTimeout(() => {
-    const firstField = document.querySelector(".popup-input input[type='text']");
-    if (firstField) firstField.focus();
-  }, 300);
-}}
-
-    >
-      ✨ Customize and Buy Now
-    </button>
-  ) : (
-    // ✅ Otherwise show normal Buy Now / Add to Cart
-    <>
-      <button className="buy-now" onClick={buyNow}>
-        Buy Now
-      </button>
-      <button className="add-to-cart" onClick={addToCart}>
-        Add to Cart
-      </button>
-    </>
-  )}
 </div>
 
 {/* Specifications */}
@@ -674,6 +645,44 @@ const slides = [
               ))}
             </div>
           )}
+
+    {/* Buttons */}
+  <div className="action-buttons">
+  {isAnyFileUploading ? (
+    <p style={{ color: "#007bff" }}>Uploading file(s)...</p>
+  ) : product.isCustomizable ? (
+    // ✅ If customizable, show only "Customize" button
+    <button
+      className="customize-btn"
+      onClick={() => {
+  setShowPopup(true);
+
+  // Focus after popup opens
+  setTimeout(() => {
+    const firstField = document.querySelector(".popup-input input[type='text']");
+    if (firstField) firstField.focus();
+  }, 300);
+}}
+
+
+
+    >
+      ✨ Customize and Buy Now
+    </button>
+  ) : (
+    // ✅ Otherwise show normal Buy Now / Add to Cart
+    <>
+      <button className="buy-now" onClick={buyNow}>
+        Buy Now
+      </button>
+      <button className="add-to-cart" onClick={addToCart}>
+        Add to Cart
+      </button>
+    </>
+  )}
+</div>
+
+
  
  
  {/* ✅ TRUST BADGES SECTION */}
