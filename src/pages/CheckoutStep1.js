@@ -337,7 +337,7 @@ console.log("Lookup Result:", result.data);
       ondismiss: function () {
         setProcessing(false);
         clickedOnceRef.current = false;
-        alert("Payment cancelled. Order saved as abandoned.");
+        alert("Payment cancelled, Please try again.");
       },
     },
   });
