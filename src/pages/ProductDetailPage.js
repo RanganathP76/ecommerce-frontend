@@ -28,9 +28,28 @@ const ProductDetailPage = () => {
   const [estimatedDelivery, setEstimatedDelivery] = useState("");
   const [highlightField, setHighlightField] = useState(null);
 
-  // 🔄 VIEW SWITCHER STATE (Like selectedOrder in MyOrdersPage)
-  // When true, hides main product page and opens full customization step
+  // 🔄 VIEW SWITCHER STATE
   const [showCustomizationStep, setShowCustomizationStep] = useState(false);
+
+  // 📱 HANDLE MOBILE HARDWARE / GESTURE BACK BUTTON
+  useEffect(() => {
+    const handlePopState = (e) => {
+      // If customization screen is open and user hits physical back button
+      if (showCustomizationStep) {
+        setShowCustomizationStep(false);
+      }
+    };
+
+    if (showCustomizationStep) {
+      // Push dummy entry into history stack so browser back button triggers popstate
+      window.history.pushState({ step: "customization" }, "");
+      window.addEventListener("popstate", handlePopState);
+    }
+
+    return () => {
+      window.removeEventListener("popstate", handlePopState);
+    };
+  }, [showCustomizationStep]);
 
   // Fetch product details
   useEffect(() => {
@@ -266,25 +285,6 @@ const ProductDetailPage = () => {
     }));
   };
 
-  const validateSelections = () => {
-    if (product?.isCustomizable) {
-      const allFilled = product.customizationFields.every((field, idx) => {
-        const key = `${field.label}-${idx}`;
-        return !!customInputs[key];
-      });
-      if (!allFilled) return false;
-    }
-
-    if (product?.specifications?.length > 0) {
-      const allSpecsChosen = product.specifications.every(
-        (spec) => !!selectedSpecs[spec.key]
-      );
-      if (!allSpecsChosen) return false;
-    }
-
-    return true;
-  };
-
   const generateCartItem = () => {
     return {
       _id: product._id,
@@ -322,6 +322,15 @@ const ProductDetailPage = () => {
       window.scrollTo({ top: 0, behavior: "smooth" });
     } else {
       buyNowDirect();
+    }
+  };
+
+  // Trigger manual back button on top bar
+  const handleBackButtonClick = () => {
+    if (window.history.state?.step === "customization") {
+      window.history.back(); // Triggers popstate listener
+    } else {
+      setShowCustomizationStep(false);
     }
   };
 
@@ -412,9 +421,7 @@ const ProductDetailPage = () => {
       </Helmet>
 
       {/* ===================================================================
-          VIEW SWITCHER: 
-          If showCustomizationStep is true -> render Customization Page View
-          Otherwise -> render standard Product Detail Page
+          VIEW SWITCHER
          =================================================================== */}
       {showCustomizationStep ? (
         /* SCREEN 2: CUSTOMIZATION & SPECIFICATION PAGE VIEW */
@@ -422,9 +429,9 @@ const ProductDetailPage = () => {
           <div className="step-header-bar">
             <button
               className="step-back-btn"
-              onClick={() => setShowCustomizationStep(false)}
+              onClick={handleBackButtonClick}
             >
-              ← Back to Product
+              ←
             </button>
             <span className="step-title-badge">Product Customization</span>
           </div>
