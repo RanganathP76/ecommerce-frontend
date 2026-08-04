@@ -24,12 +24,13 @@ const ProductDetailPage = () => {
   const [loading, setLoading] = useState(true);
   const [activeIndex, setActiveIndex] = useState(0); // For image slider
   const [expandedReviews, setExpandedReviews] = useState({}); // Track expanded reviews
-  const [showPopup, setShowPopup] = useState(false);
   const [uploadingFiles, setUploadingFiles] = useState({});
   const [estimatedDelivery, setEstimatedDelivery] = useState("");
-const [highlightField, setHighlightField] = useState(null);
-const [firstEmptyField, setFirstEmptyField] = useState(null);
+  const [highlightField, setHighlightField] = useState(null);
 
+  // 🔄 VIEW SWITCHER STATE (Like selectedOrder in MyOrdersPage)
+  // When true, hides main product page and opens full customization step
+  const [showCustomizationStep, setShowCustomizationStep] = useState(false);
 
   // Fetch product details
   useEffect(() => {
@@ -48,7 +49,6 @@ const [firstEmptyField, setFirstEmptyField] = useState(null);
 
         setEstimatedDelivery(getEstimatedDelivery());
 
-
         // Init customization fields
         if (data.isCustomizable && Array.isArray(data.customizationFields)) {
           const initState = {};
@@ -59,18 +59,17 @@ const [firstEmptyField, setFirstEmptyField] = useState(null);
           setCustomInputs(initState);
         }
 
-         // ✅ Auto-select first available spec option
-      if (Array.isArray(data.specifications) && data.specifications.length > 0) {
-        const autoSpecs = {};
-        data.specifications.forEach((spec) => {
-          const firstAvailable = (spec.values || []).find(v => v.stock > 0);
-          if (firstAvailable) {
-            autoSpecs[spec.key] = firstAvailable.value;
-          }
-        });
-        setSelectedSpecs(autoSpecs);
-      }
-
+        // ✅ Auto-select first available spec option
+        if (Array.isArray(data.specifications) && data.specifications.length > 0) {
+          const autoSpecs = {};
+          data.specifications.forEach((spec) => {
+            const firstAvailable = (spec.values || []).find((v) => v.stock > 0);
+            if (firstAvailable) {
+              autoSpecs[spec.key] = firstAvailable.value;
+            }
+          });
+          setSelectedSpecs(autoSpecs);
+        }
       } catch (error) {
         console.error("Failed to fetch product", error);
       } finally {
@@ -80,206 +79,186 @@ const [firstEmptyField, setFirstEmptyField] = useState(null);
     fetchProduct();
   }, [id]);
 
- // 🕒 Persistent Urgency Timer
-const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+  // 🕒 Persistent Urgency Timer
+  const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
 
-useEffect(() => {
-  // Check if an offer end time already exists
-  const savedEndTime = localStorage.getItem("offerEndTime");
-
- let offerEnd;
-if (savedEndTime) {
-  offerEnd = new Date(savedEndTime);
-} else {
-  offerEnd = new Date();
-  offerEnd.setDate(offerEnd.getDate() + 1);   // +1 day
-  offerEnd.setMinutes(offerEnd.getMinutes() + 25); // +25 minutes
-
-  localStorage.setItem("offerEndTime", offerEnd.toISOString());
-}
-
-  const timer = setInterval(() => {
-    const now = new Date().getTime();
-    const distance = offerEnd.getTime() - now;
-
-    if (distance <= 0) {
-      clearInterval(timer);
-      localStorage.removeItem("offerEndTime"); // Remove when finished
-      setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+  useEffect(() => {
+    const savedEndTime = localStorage.getItem("offerEndTime");
+    let offerEnd;
+    if (savedEndTime) {
+      offerEnd = new Date(savedEndTime);
     } else {
-      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-      const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-      setTimeLeft({ days, hours, minutes, seconds });
+      offerEnd = new Date();
+      offerEnd.setDate(offerEnd.getDate() + 1);
+      offerEnd.setMinutes(offerEnd.getMinutes() + 25);
+      localStorage.setItem("offerEndTime", offerEnd.toISOString());
     }
-  }, 1000);
 
-  return () => clearInterval(timer);
-}, []);
+    const timer = setInterval(() => {
+      const now = new Date().getTime();
+      const distance = offerEnd.getTime() - now;
 
-
-
-const [paymentOptions, setPaymentOptions] = useState(null);
-
-useEffect(() => {
-  axiosInstance.get("/payment-config/get")
-    .then(res => setPaymentOptions(res.data))
-    .catch(console.error);
-}, []);
-
-
-const productPrice = product?.price ? Number(product.price) : 0;
-
-const getAdvance = () => {
-  if (paymentOptions?.partialPayment?.enabled) {
-    const { partialType, partialValue } = paymentOptions.partialPayment;
-    return partialType === "percent"
-      ? Math.round((productPrice * partialValue) / 100)
-      : Math.round(partialValue);
-  }
-  return 0;
-};
-
-const advance = getAdvance();
-const due = productPrice - advance;
-
-
-  // Utility: Get estimated delivery range (e.g., 3–7 days)
-const getEstimatedDelivery = () => {
-  const today = new Date();
-  const startDate = new Date(today);
-  const endDate = new Date(today);
-
-  // e.g., deliver between 3–7 business days
-  startDate.setDate(today.getDate() + 3);
-  endDate.setDate(today.getDate() + 5);
-
-  const formatDate = (date) =>
-    date.toLocaleDateString("en-IN", {
-      day: "numeric",
-      month: "short",
-    });
-
-  return `By ${formatDate(startDate)} – ${formatDate(endDate)}`;
-};
-
-// ✅ Add a check for 'product' to prevent the "null" error
-const calculateTotalPrice = () => {
-  // If product is not loaded yet, return 0 or a placeholder
-  if (!product) return 0; 
-
-  let extra = 0;
-  if (product.specifications && Object.keys(selectedSpecs).length > 0) {
-    product.specifications.forEach(spec => {
-      const selectedValue = selectedSpecs[spec.key];
-      const specOption = spec.values.find(v => v.value === selectedValue);
-      if (specOption && specOption.extraPrice) {
-        extra += Number(specOption.extraPrice);
+      if (distance <= 0) {
+        clearInterval(timer);
+        localStorage.removeItem("offerEndTime");
+        setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+      } else {
+        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+        setTimeLeft({ days, hours, minutes, seconds });
       }
-    });
-  }
-  return Number(product.price) + extra;
-};
+    }, 1000);
 
-const totalPrice = calculateTotalPrice();
+    return () => clearInterval(timer);
+  }, []);
 
-const handleThumbnailClick = (idx) => {
-  setActiveIndex(idx);
+  const [paymentOptions, setPaymentOptions] = useState(null);
 
-  const mainSlider = document.querySelector(".image-slide-wrapper");
-  const thumbScroll = document.getElementById("thumbnailScroll");
-  const thumbnails = thumbScroll.querySelectorAll(".thumbnail");
+  useEffect(() => {
+    axiosInstance
+      .get("/payment-config/get")
+      .then((res) => setPaymentOptions(res.data))
+      .catch(console.error);
+  }, []);
 
-  // Scroll the main image slider
-  mainSlider.scrollTo({
-    left: idx * mainSlider.clientWidth,
-    behavior: "smooth",
-  });
+  const productPrice = product?.price ? Number(product.price) : 0;
 
-  // ✅ Smart auto-scroll preview behavior
-  const thumb = thumbnails[idx];
-  const thumbRect = thumb.getBoundingClientRect();
-  const containerRect = thumbScroll.getBoundingClientRect();
-
-  const buffer = 20; // small margin so it’s not flush
-  const visibleRight = containerRect.right - buffer;
-  const visibleLeft = containerRect.left + buffer;
-
-  if (thumbRect.right > visibleRight) {
-    // move scroll slightly so user sees next items
-    thumbScroll.scrollBy({
-      left: thumbRect.right - visibleRight + 40,
-      behavior: "smooth",
-    });
-  } else if (thumbRect.left < visibleLeft) {
-    // scroll back if user clicks earlier thumbnail
-    thumbScroll.scrollBy({
-      left: thumbRect.left - visibleLeft - 40,
-      behavior: "smooth",
-    });
-  }
-};
-
-
-  // Handle spec change
-  const handleSpecChange = (key, value) => {
-    setSelectedSpecs((prev) => ({ ...prev, [key]: value }));
-    // 2. Find the spec object to check for a linked image
-  const currentSpec = product.specifications.find(s => s.key === key);
-  const specOption = currentSpec?.values.find(v => v.value === value);
-
-  if (specOption?.linkedImage) {
-    // 3. Find which index this image is in the main slides array
-    const imageIndex = slides.indexOf(specOption.linkedImage);
-    
-    if (imageIndex !== -1) {
-      // 4. Use your existing thumbnail click logic to scroll the slider
-      handleThumbnailClick(imageIndex);
+  const getAdvance = () => {
+    if (paymentOptions?.partialPayment?.enabled) {
+      const { partialType, partialValue } = paymentOptions.partialPayment;
+      return partialType === "percent"
+        ? Math.round((productPrice * partialValue) / 100)
+        : Math.round(partialValue);
     }
-  }
+    return 0;
   };
 
-  // Handle file upload
-  const handleFileUpload = async (key, file) => {
-  try {
-    // mark as uploading
-    setUploadingFiles((prev) => ({ ...prev, [key]: true }));
+  const advance = getAdvance();
+  const due = productPrice - advance;
 
-    const formData = new FormData();
-    formData.append("file", file);
+  const getEstimatedDelivery = () => {
+    const today = new Date();
+    const startDate = new Date(today);
+    const endDate = new Date(today);
 
-    const { data } = await axiosInstance.post("/upload/temp", formData, {
-      headers: { "Content-Type": "multipart/form-data" },
+    startDate.setDate(today.getDate() + 3);
+    endDate.setDate(today.getDate() + 5);
+
+    const formatDate = (date) =>
+      date.toLocaleDateString("en-IN", {
+        day: "numeric",
+        month: "short",
+      });
+
+    return `By ${formatDate(startDate)} – ${formatDate(endDate)}`;
+  };
+
+  const calculateTotalPrice = () => {
+    if (!product) return 0;
+
+    let extra = 0;
+    if (product.specifications && Object.keys(selectedSpecs).length > 0) {
+      product.specifications.forEach((spec) => {
+        const selectedValue = selectedSpecs[spec.key];
+        const specOption = spec.values.find((v) => v.value === selectedValue);
+        if (specOption && specOption.extraPrice) {
+          extra += Number(specOption.extraPrice);
+        }
+      });
+    }
+    return Number(product.price) + extra;
+  };
+
+  const totalPrice = calculateTotalPrice();
+
+  const handleThumbnailClick = (idx) => {
+    setActiveIndex(idx);
+
+    const mainSlider = document.querySelector(".image-slide-wrapper");
+    const thumbScroll = document.getElementById("thumbnailScroll");
+    if (!mainSlider || !thumbScroll) return;
+
+    const thumbnails = thumbScroll.querySelectorAll(".thumbnail");
+
+    mainSlider.scrollTo({
+      left: idx * mainSlider.clientWidth,
+      behavior: "smooth",
     });
 
+    const thumb = thumbnails[idx];
+    if (!thumb) return;
+
+    const thumbRect = thumb.getBoundingClientRect();
+    const containerRect = thumbScroll.getBoundingClientRect();
+
+    const buffer = 20;
+    const visibleRight = containerRect.right - buffer;
+    const visibleLeft = containerRect.left + buffer;
+
+    if (thumbRect.right > visibleRight) {
+      thumbScroll.scrollBy({
+        left: thumbRect.right - visibleRight + 40,
+        behavior: "smooth",
+      });
+    } else if (thumbRect.left < visibleLeft) {
+      thumbScroll.scrollBy({
+        left: thumbRect.left - visibleLeft - 40,
+        behavior: "smooth",
+      });
+    }
+  };
+
+  const handleSpecChange = (key, value) => {
+    setSelectedSpecs((prev) => ({ ...prev, [key]: value }));
+    const currentSpec = product.specifications.find((s) => s.key === key);
+    const specOption = currentSpec?.values.find((v) => v.value === value);
+
+    if (specOption?.linkedImage) {
+      const imageIndex = slides.indexOf(specOption.linkedImage);
+      if (imageIndex !== -1) {
+        handleThumbnailClick(imageIndex);
+      }
+    }
+  };
+
+  const handleFileUpload = async (key, file) => {
+    try {
+      setUploadingFiles((prev) => ({ ...prev, [key]: true }));
+
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const { data } = await axiosInstance.post("/upload/temp", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      setCustomInputs((prev) => ({
+        ...prev,
+        [key]: {
+          type: "file",
+          url: data.url,
+          public_id: data.public_id,
+        },
+      }));
+    } catch (err) {
+      console.error("File upload failed:", err);
+      alert("Image upload failed");
+    } finally {
+      setUploadingFiles((prev) => ({ ...prev, [key]: false }));
+    }
+  };
+
+  const isAnyFileUploading = Object.values(uploadingFiles).some(Boolean);
+
+  const removeFile = (key) => {
     setCustomInputs((prev) => ({
       ...prev,
-      [key]: {
-        type: "file",
-        url: data.url,
-        public_id: data.public_id,
-      },
+      [key]: null,
     }));
-  } catch (err) {
-    console.error("File upload failed:", err);
-    alert("Image upload failed");
-  } finally {
-    // mark as uploaded
-    setUploadingFiles((prev) => ({ ...prev, [key]: false }));
-  }
-};
-const isAnyFileUploading = Object.values(uploadingFiles).some(Boolean);
+  };
 
-const removeFile = (key) => {
-  setCustomInputs((prev) => ({
-    ...prev,
-    [key]: null,
-  }));
-};
-
-
-  // Handle text input
   const handleInputChange = (key, value) => {
     setCustomInputs((prev) => ({
       ...prev,
@@ -287,7 +266,6 @@ const removeFile = (key) => {
     }));
   };
 
-  // Validate customization + specs
   const validateSelections = () => {
     if (product?.isCustomizable) {
       const allFilled = product.customizationFields.every((field, idx) => {
@@ -307,7 +285,6 @@ const removeFile = (key) => {
     return true;
   };
 
-  // Generate cart item
   const generateCartItem = () => {
     return {
       _id: product._id,
@@ -338,82 +315,55 @@ const removeFile = (key) => {
     };
   };
 
-  // Add to cart
-const addToCart = () => {
-  // If product is not customizable but has specifications, show confirmation popup first
-  if (!product?.isCustomizable && product?.specifications?.length > 0) {
-    setShowPopup(true);
-    return;
-  }
+  // Switch view to customization step or go directly to cart
+  const handleProceedClick = () => {
+    if (product?.isCustomizable || product?.specifications?.length > 0) {
+      setShowCustomizationStep(true);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } else {
+      buyNowDirect();
+    }
+  };
 
-  if (!validateSelections()) {
-    setShowPopup(true); // open the popup instead of alert
-    return;
-  }
+  const buyNowDirect = () => {
+    const cartItem = generateCartItem();
+    trackEvent("AddToCart", {
+      content_name: cartItem.title,
+      content_ids: [cartItem._id],
+      value: cartItem.price,
+      currency: "INR",
+      quantity: 1,
+    });
+    localStorage.setItem("cart", JSON.stringify([cartItem]));
+    navigate("/cart");
+  };
 
-  const newItem = generateCartItem();
+  const handleFinalCheckout = () => {
+    const missing = [];
+    if (product.isCustomizable) {
+      product.customizationFields.forEach((field, idx) => {
+        const key = `${field.label}-${idx}`;
+        if (!customInputs[key]) {
+          missing.push(key);
+        }
+      });
+    }
 
-  // ✅ Track AddToCart event
-  trackEvent("AddToCart", {
-    content_name: newItem.title,
-    content_ids: [newItem._id],
-    value: newItem.price,
-    currency: "INR",
-    quantity: 1,
-  });
+    if (missing.length > 0) {
+      const first = missing[0];
+      setHighlightField(first);
+      const el = document.getElementById(`field-${first}`);
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "center" });
+        el.querySelector("input")?.focus();
+      }
+      return;
+    }
 
-  const cart = JSON.parse(localStorage.getItem("cart")) || [];
-  cart.push(newItem);
-  localStorage.setItem("cart", JSON.stringify(cart));
-  navigate("/cart");
-};
+    setHighlightField(null);
+    buyNowDirect();
+  };
 
-// Buy now
-const buyNow = () => {
-  // If product is not customizable but has specifications, show confirmation popup first
-  if (!product?.isCustomizable && product?.specifications?.length > 0) {
-    setShowPopup(true);
-    return;
-  }
-
-  if (!validateSelections()) {
-    setShowPopup(true); // open the popup instead of alert
-    return;
-  }
-
-  const cartItem = generateCartItem();
-
-  trackEvent("AddToCart", {
-    content_name: cartItem.title,
-    content_ids: [cartItem._id],
-    value: cartItem.price,
-    currency: "INR",
-    quantity: 1,
-  });
-
-  localStorage.setItem("cart", JSON.stringify([cartItem]));
-  navigate("/cart");
-};
-
-const proceedToCart = () => {
-  const cartItem = generateCartItem();
-
-  trackEvent("AddToCart", {
-    content_name: cartItem.title,
-    content_ids: [cartItem._id],
-    value: cartItem.price,
-    currency: "INR",
-    quantity: 1,
-  });
-
-  localStorage.setItem("cart", JSON.stringify([cartItem]));
-  setShowPopup(false);
-  navigate("/cart");
-};
-
-
-
-  // Submit review
   const submitReview = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -442,240 +392,65 @@ const proceedToCart = () => {
   };
 
   if (loading) return <PageLoader text="Fetching product details..." />;
-
   if (!product) return <p>Product not found</p>;
 
-  
-const slides = [
-  ...(product?.images || []),
-  ...(product?.videos || [])
-];
-
+  const slides = [...(product?.images || []), ...(product?.videos || [])];
 
   return (
     <div>
       <Header />
-<Helmet>
-  <title>{product?.title ? `${product.title} | Cuztory` : "Cuztory Product"}</title>
+      <Helmet>
+        <title>{product?.title ? `${product.title} | Cuztory` : "Cuztory Product"}</title>
+        <meta
+          name="description"
+          content={
+            typeof product?.description === "string"
+              ? `${product.description.substring(0, 150)}...`
+              : "Shop customized gifts from Cuztory."
+          }
+        />
+      </Helmet>
 
-  <meta
-    name="description"
-    content={
-      typeof product?.description === "string"
-        ? `${product.description.substring(0, 150)}...`
-        : "Shop customized gifts from Cuztory — Personalized lamps, keychains, and more."
-    }
-  />
+      {/* ===================================================================
+          VIEW SWITCHER: 
+          If showCustomizationStep is true -> render Customization Page View
+          Otherwise -> render standard Product Detail Page
+         =================================================================== */}
+      {showCustomizationStep ? (
+        /* SCREEN 2: CUSTOMIZATION & SPECIFICATION PAGE VIEW */
+        <div className="customization-step-wrapper">
+          <div className="step-header-bar">
+            <button
+              className="step-back-btn"
+              onClick={() => setShowCustomizationStep(false)}
+            >
+              ← Back to Product
+            </button>
+            <span className="step-title-badge">Product Customization</span>
+          </div>
 
-  <meta
-    name="keywords"
-    content={`${product?.title || ""}, custom gifts, personalized gifts, ${
-      product?.category || ""
-    }, Cuztory`}
-  />
-  <link rel="canonical" href={`https://cuztory.in/product/${product?._id}`} />
+          {/* Product Summary Header Box */}
+          <div className="step-product-summary">
+            <img
+              src={product.images[0]}
+              alt={product.title}
+              className="step-product-thumb"
+            />
+            <div className="step-product-meta">
+              <h3 className="step-product-title">{product.title}</h3>
+              <div className="step-product-price">
+                <span className="step-current-price">₹{totalPrice}</span>
+                {product.comparePrice && product.comparePrice > product.price && (
+                  <span className="step-original-price">₹{product.comparePrice}</span>
+                )}
+              </div>
+            </div>
+          </div>
 
-  {/* ✅ Open Graph (Facebook, WhatsApp) */}
-  <meta property="og:type" content="product" />
-  <meta property="og:title" content={`${product?.title || "Cuztory Product"} | Cuztory`} />
-  <meta
-    property="og:description"
-    content={
-      typeof product?.description === "string"
-        ? product.description.substring(0, 150)
-        : "Shop personalized products at Cuztory."
-    }
-  />
-  <meta property="og:image" content={product?.images?.[0]} />
-  <meta property="og:url" content={`https://cuztory.in/product/${product?._id}`} />
-
-  {/* ✅ Twitter Card */}
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content={`${product?.title || "Cuzto Product"} | Cuztory`} />
-  <meta
-    name="twitter:description"
-    content={
-      typeof product?.description === "string"
-        ? product.description.substring(0, 150)
-        : "Shop personalized products at Cuztory."
-    }
-  />
-  <meta name="twitter:image" content={product?.images?.[0]} />
-
-  {/* ✅ JSON-LD structured data for SEO */}
-  <script type="application/ld+json">
-    {JSON.stringify({
-      "@context": "https://schema.org/",
-      "@type": "Product",
-      name: product?.title,
-      image: product?.images,
-      description:
-        typeof product?.description === "string"
-          ? product.description
-          : "Personalized product from Cuztory.",
-      brand: { "@type": "Brand", name: "Cuztory" },
-      offers: {
-        "@type": "Offer",
-        url: `https://cuztory.in/product/${product?._id}`,
-        priceCurrency: "INR",
-        price: product?.price,
-        availability: "https://schema.org/InStock",
-      },
-    })}
-  </script>
-</Helmet>
-
-
-
-      <div className="product-detail">
-        {/* IMAGE SLIDER */}
-        <div className="product-image-slider-container">
-          <div
-  className="image-slide-wrapper"
-  onScroll={(e) => {
-    const scrollLeft = e.target.scrollLeft;
-    const width = e.target.clientWidth;
-    const currentIndex = Math.round(scrollLeft / width);
-    setActiveIndex(currentIndex);
-  }}
->
-  {slides.map((item, idx) =>
-    product.images?.includes(item) ? (
-      <img key={`img-${idx}`} src={item} alt={product.title} />
-    ) : (
-      <video key={`vid-${idx}`} src={item} controls className="product-video" />
-    )
-  )}
-</div>
-
-{/* Dots */}
-<div className="slider-dots">
-  {slides.map((_, idx) => (
-    <span
-      key={idx}
-      className={`dot ${activeIndex === idx ? "active" : ""}`}
-      onClick={() => {
-        const slider = document.querySelector(".image-slide-wrapper");
-        slider.scrollTo({
-          left: idx * slider.clientWidth,
-          behavior: "smooth",
-        });
-      }}
-    ></span>
-  ))}
-</div>
-</div>
-
-{/* ✅ Swipeable Thumbnail Gallery */}
-<div className="thumbnail-container">
-  <div className="thumbnail-scroll" id="thumbnailScroll">
-    {slides.map((item, idx) => (
-      <div
-        key={idx}
-        className={`thumbnail ${activeIndex === idx ? "active" : ""}`}
-        onClick={() => handleThumbnailClick(idx)}
-      >
-        {item.endsWith(".mp4") ? (
-          <video src={item} muted playsInline />
-        ) : (
-          <img src={item} alt={`thumb-${idx}`} loading="lazy" />
-        )}
-      </div>
-    ))}
-  </div>
-</div>
-
-
-
-
-
-        {/* PRODUCT INFO */}
-        <div className="product-info">
-          <h2>{product.title}</h2>
-
-        <div className="price-section-container enhanced">
-  <div className="price-main-row">
-    <span className="current-price">₹{totalPrice}</span>
-    {product.comparePrice && product.comparePrice > product.price && (
-      <>
-        <span className="original-price">₹{product.comparePrice}</span>
-        <span className="discount-pill">
-          Save {Math.round(((product.comparePrice - product.price) / product.comparePrice) * 100)}%
-        </span>
-      </>
-    )}
-  </div>
-
-  
-
-  {/* Trust & Conversion Boosters */}
- <div className="price-footer-meta">
-  <p className="inclusive-taxes">Inclusive of all taxes</p>
-
-  {paymentOptions?.partialPayment?.enabled && advance > 0 && (
-    <div className="advance-highlight-box">
-      <div className="advance-main">
-        Pay only ₹{advance} Now
-      </div>
-
-      <div className="advance-sub">
-        ₹{due} After delivery
-      </div>
-    </div>
-  )}
-
-  {/* Estimated Delivery */}
-  <div className="delivery-estimate-pill">
-  <FaShippingFast className="truck-icon" />
-  <span>
-    Estimated Delivery <strong>{estimatedDelivery}</strong>
-  </span>
-</div>
-</div>
-</div>
-
-
-
-    {/* Buttons */}
-  <div className="action-buttons">
-  {isAnyFileUploading ? (
-    <p style={{ color: "#007bff" }}>Uploading file(s)...</p>
-  ) : product.isCustomizable ? (
-    // ✅ If customizable, show only "Customize" button
-    <button
-      className="customize-btn"
-      onClick={() => {
-  setShowPopup(true);
-
-  // Focus after popup opens
-  setTimeout(() => {
-    const firstField = document.querySelector(".popup-input input[type='text']");
-    if (firstField) firstField.focus();
-  }, 300);
-}}
-
-
-
-    >
-      ✨ Customize and Buy Now
-    </button>
-  ) : (
-    // ✅ Otherwise show normal Buy Now / Add to Cart
-    <>
-      <button className="buy-now" onClick={buyNow}>
-        Buy Now
-      </button>
-      <button className="add-to-cart" onClick={addToCart}>
-        Add to Cart
-      </button>
-    </>
-  )}
-</div>
-
-{/* Specifications */}
+          {/* Specifications Selection Block */}
           {product.specifications?.length > 0 && (
-            <div className="specifications-block">
-              <h4>Select Specifications</h4>
+            <div className="step-section-box">
+              <h4 className="step-section-heading">1. Select Specifications</h4>
               {product.specifications.map((spec, idx) => (
                 <div key={idx} className="spec-group">
                   <p className="spec-label">{spec.key}:</p>
@@ -684,25 +459,20 @@ const slides = [
                       <label key={vIdx} className="spec-option">
                         <input
                           type="radio"
-                          name={spec.key}
+                          name={`step-${spec.key}`}
                           value={option.value}
                           checked={selectedSpecs[spec.key] === option.value}
                           disabled={option.stock <= 0}
-                          onChange={() =>
-                            handleSpecChange(spec.key, option.value)
-                          }
+                          onChange={() => handleSpecChange(spec.key, option.value)}
                         />
-                       <span className="spec-option-text">
-  {/* Main Value (e.g., Full Sleeve) */}
-  <span className="spec-main-value">{option.value}</span>
-  
-  {/* Extra Price on new line */}
-  {option.extraPrice > 0 && (
-    <span className="extra-price-tag">
-      {`(+₹${option.extraPrice})`}
-    </span>
-  )}
-</span>
+                        <span className="spec-option-text">
+                          <span className="spec-main-value">{option.value}</span>
+                          {option.extraPrice > 0 && (
+                            <span className="extra-price-tag">
+                              (+₹{option.extraPrice})
+                            </span>
+                          )}
+                        </span>
                       </label>
                     ))}
                   </div>
@@ -711,313 +481,377 @@ const slides = [
             </div>
           )}
 
+          {/* Customization Inputs Block */}
+          {product.isCustomizable && (
+            <div className="step-section-box">
+              <h4 className="step-section-heading">
+                {product.specifications?.length > 0
+                  ? "2. Fill Customization Details"
+                  : "1. Fill Customization Details"}
+              </h4>
 
- 
- 
- {/* ✅ TRUST BADGES SECTION */}
-<div className="trust-badges-section">
-  <div className="trust-badge">
-    <FaLock className="trust-icon" />
-    <p>Secure Payments</p>
-  </div>
-  <div className="trust-badge">
-    <FaShippingFast className="trust-icon" />
-    <p>Fast Shipping</p>
-  </div>
- 
-  <div className="trust-badge">
-    <FaHeadset className="trust-icon" />
-    <p>24/7 Support</p>
-  </div>
-</div>
-  
+              {product.customizationFields.map((field, idx) => (
+                <div
+                  key={`${field.label}-${idx}`}
+                  id={`field-${field.label}-${idx}`}
+                  className={`popup-input ${
+                    highlightField === `${field.label}-${idx}`
+                      ? "highlight-required"
+                      : ""
+                  }`}
+                >
+                  <label>{field.label}</label>
 
-                {/* Description */}
-         {/* ✅ Multi-Part Product Description with Expand-on-Click */}
-{/* ✅ Multi-Part Product Description with Expand-on-Click (No Hook Error) */}
-{Array.isArray(product.description) && product.description.length > 0 ? (
-  <DescriptionSections parts={product.description} />
-) : (
-  <p
-  className="product-description"
-  dangerouslySetInnerHTML={{
-    __html: (product.description || "").replace(/\n/g, "<br/><br/>")
-  }}
-></p>
+                  {field.type === "file" ? (
+                    <div className="file-upload-wrapper">
+                      {!customInputs[`${field.label}-${idx}`] ? (
+                        <input
+                          type="file"
+                          onChange={(e) =>
+                            handleFileUpload(
+                              `${field.label}-${idx}`,
+                              e.target.files[0]
+                            )
+                          }
+                        />
+                      ) : (
+                        <div className="file-info-line">
+                          <img
+                            src={customInputs[`${field.label}-${idx}`].url}
+                            alt="preview"
+                            className="tiny-preview"
+                          />
+                          <span className="file-name">
+                            {customInputs[`${field.label}-${idx}`].url
+                              .split("/")
+                              .pop()}
+                          </span>
+                          <button
+                            type="button"
+                            className="remove-file-btn"
+                            onClick={() => removeFile(`${field.label}-${idx}`)}
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <input
+                      type="text"
+                      placeholder={`Enter ${field.label}`}
+                      value={customInputs[`${field.label}-${idx}`] || ""}
+                      onChange={(e) =>
+                        handleInputChange(`${field.label}-${idx}`, e.target.value)
+                      }
+                    />
+                  )}
 
-)}
+                  {highlightField === `${field.label}-${idx}` && (
+                    <small className="error-hint">Please fill this field</small>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
 
+          {/* Final Proceed Action Box */}
+          <div className="step-action-bar">
+            {isAnyFileUploading ? (
+              <p style={{ color: "#007bff", textAlign: "center" }}>
+                Uploading file(s), please wait...
+              </p>
+            ) : (
+              <button className="step-proceed-btn" onClick={handleFinalCheckout}>
+                Confirm and proceed →
+              </button>
+            )}
+          </div>
+        </div>
+      ) : (
+        /* SCREEN 1: MAIN PRODUCT DETAIL PAGE VIEW */
+        <div className="product-detail">
+          {/* IMAGE SLIDER */}
+          <div className="product-image-slider-container">
+            <div
+              className="image-slide-wrapper"
+              onScroll={(e) => {
+                const scrollLeft = e.target.scrollLeft;
+                const width = e.target.clientWidth;
+                const currentIndex = Math.round(scrollLeft / width);
+                setActiveIndex(currentIndex);
+              }}
+            >
+              {slides.map((item, idx) =>
+                product.images?.includes(item) ? (
+                  <img key={`img-${idx}`} src={item} alt={product.title} />
+                ) : (
+                  <video
+                    key={`vid-${idx}`}
+                    src={item}
+                    controls
+                    className="product-video"
+                  />
+                )
+              )}
+            </div>
 
-          {/* ✅ REVIEWS SECTION — show 5 first, then show more */}
-<div className="existing-reviews">
-  <h2>Customer Reviews</h2>
+            {/* Dots */}
+            <div className="slider-dots">
+              {slides.map((_, idx) => (
+                <span
+                  key={idx}
+                  className={`dot ${activeIndex === idx ? "active" : ""}`}
+                  onClick={() => {
+                    const slider = document.querySelector(".image-slide-wrapper");
+                    slider.scrollTo({
+                      left: idx * slider.clientWidth,
+                      behavior: "smooth",
+                    });
+                  }}
+                ></span>
+              ))}
+            </div>
+          </div>
 
-  {(!product.reviews || product.reviews.length === 0) ? (
-    <p>No reviews yet</p>
-  ) : (
-    <>
-      {product.reviews.map((rev, idx) => (
+          {/* Swipeable Thumbnail Gallery */}
+          <div className="thumbnail-container">
+            <div className="thumbnail-scroll" id="thumbnailScroll">
+              {slides.map((item, idx) => (
+                <div
+                  key={idx}
+                  className={`thumbnail ${activeIndex === idx ? "active" : ""}`}
+                  onClick={() => handleThumbnailClick(idx)}
+                >
+                  {item.endsWith(".mp4") ? (
+                    <video src={item} muted playsInline />
+                  ) : (
+                    <img src={item} alt={`thumb-${idx}`} loading="lazy" />
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
 
-          <div key={idx} className="review-card">
-            <div className="review-header">
-              <strong>{rev.name}</strong>
-              <div className="review-rating">
-                {[...Array(5)].map((_, i) => (
-                  <FaStar key={i} color={i < rev.rating ? "gold" : "#ccc"} />
-                ))}
+          {/* PRODUCT INFO */}
+          <div className="product-info">
+            <h2>{product.title}</h2>
+
+            <div className="price-section-container enhanced">
+              <div className="price-main-row">
+                <span className="current-price">₹{totalPrice}</span>
+                {product.comparePrice && product.comparePrice > product.price && (
+                  <>
+                    <span className="original-price">₹{product.comparePrice}</span>
+                    <span className="discount-pill">
+                      Save{" "}
+                      {Math.round(
+                        ((product.comparePrice - product.price) /
+                          product.comparePrice) *
+                          100
+                      )}
+                      %
+                    </span>
+                  </>
+                )}
+              </div>
+
+              <div className="price-footer-meta">
+                <p className="inclusive-taxes">Inclusive of all taxes</p>
+
+                {paymentOptions?.partialPayment?.enabled && advance > 0 && (
+                  <div className="advance-highlight-box">
+                    <div className="advance-main">Pay only ₹{advance} Now</div>
+                    <div className="advance-sub">₹{due} After delivery</div>
+                  </div>
+                )}
+
+                <div className="delivery-estimate-pill">
+                  <FaShippingFast className="truck-icon" />
+                  <span>
+                    Estimated Delivery <strong>{estimatedDelivery}</strong>
+                  </span>
+                </div>
               </div>
             </div>
 
-            <p className="review-comment">
-              {rev.comment.length > 200
-                ? `${rev.comment.slice(0, 200)}...`
-                : rev.comment}
-            </p>
+            {/* Main Action Buttons */}
+            <div className="action-buttons">
+              {product.isCustomizable ? (
+                <button className="customize-btn" onClick={handleProceedClick}>
+                  ✨ Customize and Buy Now
+                </button>
+              ) : (
+                <>
+                  <button className="buy-now" onClick={handleProceedClick}>
+                    Buy Now
+                  </button>
+                </>
+              )}
+            </div>
 
-            {rev.images?.length > 0 && (
-              <div className="review-images">
-                {rev.images.map((img, imgIdx) => (
-                  <img
-                    key={imgIdx}
-                    src={img}
-                    alt="review"
-                    className="review-image"
-                  />
+            {/* Specifications Preview Block */}
+            {product.specifications?.length > 0 && (
+              <div className="specifications-block">
+                <h4>Select Specifications</h4>
+                {product.specifications.map((spec, idx) => (
+                  <div key={idx} className="spec-group">
+                    <p className="spec-label">{spec.key}:</p>
+                    <div className="spec-options">
+                      {spec.values.map((option, vIdx) => (
+                        <label key={vIdx} className="spec-option">
+                          <input
+                            type="radio"
+                            name={spec.key}
+                            value={option.value}
+                            checked={selectedSpecs[spec.key] === option.value}
+                            disabled={option.stock <= 0}
+                            onChange={() =>
+                              handleSpecChange(spec.key, option.value)
+                            }
+                          />
+                          <span className="spec-option-text">
+                            <span className="spec-main-value">{option.value}</span>
+                            {option.extraPrice > 0 && (
+                              <span className="extra-price-tag">
+                                (+₹{option.extraPrice})
+                              </span>
+                            )}
+                          </span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
                 ))}
               </div>
             )}
-          </div>
-        ))}
 
-      {/* Show More / Show Less Button */}
-      {product.reviews.length > 5 && (
-        <button
-          className="show-more-reviews-btn"
-          onClick={() =>
-            setExpandedReviews((prev) => ({
-              ...prev,
-              showAll: !prev.showAll,
-            }))
-          }
-        >
-          {expandedReviews.showAll ? "Show Less" : "Show More Reviews"}
-        </button>
-      )}
-    </>
-  )}
-</div>
-         
-         {/* Review Section */}
-          <div className="review-section">
-            <h3>Give a Review</h3>
-            <div className="rating-input">
-              {[1, 2, 3, 4, 5].map((star) => (
-                <FaStar
-                  key={star}
-                  color={star <= rating ? "gold" : "#ccc"}
-                  onClick={() => setRating(star)}
-                  style={{ cursor: "pointer" }}
-                />
-              ))}
-            </div>
-            <textarea
-              placeholder="Write your comment"
-              value={comment}
-              onChange={(e) => setComment(e.target.value)}
-            ></textarea>
-            <input type="file" onChange={(e) => setImage(e.target.files[0])} />
-            <button onClick={submitReview}>Submit Review</button>
-          </div>
-
-        </div>
-      </div>
-      <Footer />
-
-    {showPopup && (
-  <div className="popup-overlay">
-    <div className="popup-content">
-      <h3>
-        {product.isCustomizable
-          ? "Complete Your Selections"
-          : "Confirm Specifications"}
-      </h3>
-
-      {/* Specifications Block */}
-      {product.specifications?.length > 0 && (
-        <div className="popup-section">
-          <h4>Select Specifications</h4>
-          {product.specifications.map((spec, idx) => (
-            <div key={idx} className="popup-spec">
-              <p>{spec.key}:</p>
-              <div className="popup-options">
-                {spec.values.map((option, vIdx) => (
-                  <label key={vIdx} className="popup-option">
-                    <input
-                      type="radio"
-                      name={`popup-${spec.key}`}
-                      value={option.value}
-                      checked={selectedSpecs[spec.key] === option.value}
-                      disabled={option.stock <= 0}
-                      onChange={() => handleSpecChange(spec.key, option.value)}
-                    />
-                    <span>
-                      {option.value}
-                      {option.extraPrice > 0 && (
-                        <small style={{ color: "#28a745", marginLeft: "4px" }}>
-                          (+₹{option.extraPrice})
-                        </small>
-                      )}
-                    </span>
-                  </label>
-                ))}
+            {/* Trust Badges */}
+            <div className="trust-badges-section">
+              <div className="trust-badge">
+                <FaLock className="trust-icon" />
+                <p>Secure Payments</p>
+              </div>
+              <div className="trust-badge">
+                <FaShippingFast className="trust-icon" />
+                <p>Fast Shipping</p>
+              </div>
+              <div className="trust-badge">
+                <FaHeadset className="trust-icon" />
+                <p>24/7 Support</p>
               </div>
             </div>
-          ))}
-        </div>
-      )}
 
-      {/* Customization Block */}
-      {product.isCustomizable && (
-        <div className="popup-section">
-          <h4>Customization</h4>
-          {product.customizationFields.map((field, idx) => (
-            <div
-              key={`${field.label}-${idx}`}
-              id={`field-${field.label}-${idx}`}
-              className={`popup-input ${
-                highlightField === `${field.label}-${idx}`
-                  ? "highlight-required"
-                  : ""
-              }`}
-            >
-              <label>{field.label}</label>
+            {/* Description */}
+            {Array.isArray(product.description) && product.description.length > 0 ? (
+              <DescriptionSections parts={product.description} />
+            ) : (
+              <p
+                className="product-description"
+                dangerouslySetInnerHTML={{
+                  __html: (product.description || "").replace(/\n/g, "<br/><br/>"),
+                }}
+              ></p>
+            )}
 
-              {field.type === "file" ? (
-                <div className="file-upload-wrapper">
-                  {!customInputs[`${field.label}-${idx}`] ? (
-                    <input
-                      type="file"
-                      onChange={(e) =>
-                        handleFileUpload(
-                          `${field.label}-${idx}`,
-                          e.target.files[0]
-                        )
-                      }
-                    />
-                  ) : (
-                    <div className="file-info-line">
-                      <img
-                        src={customInputs[`${field.label}-${idx}`].url}
-                        alt="preview"
-                        className="tiny-preview"
-                      />
-                      <span className="file-name">
-                        {customInputs[`${field.label}-${idx}`].url
-                          .split("/")
-                          .pop()}
-                      </span>
-                      <button
-                        type="button"
-                        className="remove-file-btn"
-                        onClick={() => removeFile(`${field.label}-${idx}`)}
-                      >
-                        Remove
-                      </button>
-                    </div>
-                  )}
-                </div>
+            {/* Reviews Section */}
+            <div className="existing-reviews">
+              <h2>Customer Reviews</h2>
+              {!product.reviews || product.reviews.length === 0 ? (
+                <p>No reviews yet</p>
               ) : (
-                <input
-                  type="text"
-                  value={customInputs[`${field.label}-${idx}`] || ""}
-                  onChange={(e) =>
-                    handleInputChange(`${field.label}-${idx}`, e.target.value)
-                  }
-                />
-              )}
-              {highlightField === `${field.label}-${idx}` && (
-                <small className="error-hint">Please fill this</small>
+                <>
+                  {product.reviews.map((rev, idx) => (
+                    <div key={idx} className="review-card">
+                      <div className="review-header">
+                        <strong>{rev.name}</strong>
+                        <div className="review-rating">
+                          {[...Array(5)].map((_, i) => (
+                            <FaStar
+                              key={i}
+                              color={i < rev.rating ? "gold" : "#ccc"}
+                            />
+                          ))}
+                        </div>
+                      </div>
+
+                      <p className="review-comment">
+                        {rev.comment.length > 200
+                          ? `${rev.comment.slice(0, 200)}...`
+                          : rev.comment}
+                      </p>
+
+                      {rev.images?.length > 0 && (
+                        <div className="review-images">
+                          {rev.images.map((img, imgIdx) => (
+                            <img
+                              key={imgIdx}
+                              src={img}
+                              alt="review"
+                              className="review-image"
+                            />
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+
+                  {product.reviews.length > 5 && (
+                    <button
+                      className="show-more-reviews-btn"
+                      onClick={() =>
+                        setExpandedReviews((prev) => ({
+                          ...prev,
+                          showAll: !prev.showAll,
+                        }))
+                      }
+                    >
+                      {expandedReviews.showAll ? "Show Less" : "Show More Reviews"}
+                    </button>
+                  )}
+                </>
               )}
             </div>
-          ))}
+
+            {/* Submit Review */}
+            <div className="review-section">
+              <h3>Give a Review</h3>
+              <div className="rating-input">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <FaStar
+                    key={star}
+                    color={star <= rating ? "gold" : "#ccc"}
+                    onClick={() => setRating(star)}
+                    style={{ cursor: "pointer" }}
+                  />
+                ))}
+              </div>
+              <textarea
+                placeholder="Write your comment"
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
+              ></textarea>
+              <input
+                type="file"
+                onChange={(e) => setImage(e.target.files[0])}
+              />
+              <button onClick={submitReview}>Submit Review</button>
+            </div>
+          </div>
         </div>
       )}
 
-      {/* Modal Actions */}
-      <div className="popup-buttons">
-        {isAnyFileUploading ? (
-          <p style={{ color: "#007bff" }}>Uploading file(s), please wait...</p>
-        ) : (
-          <>
-            <button
-              className="popup-continue"
-              onClick={() => {
-                // If customizable, validate inputs first
-                if (product.isCustomizable) {
-                  const missing = [];
-                  product.customizationFields.forEach((field, idx) => {
-                    const key = `${field.label}-${idx}`;
-                    if (!customInputs[key]) {
-                      missing.push(key);
-                    }
-                  });
-
-                  if (missing.length > 0) {
-                    const first = missing[0];
-                    setHighlightField(first);
-                    const el = document.getElementById(`field-${first}`);
-                    if (el) {
-                      el.scrollIntoView({
-                        behavior: "smooth",
-                        block: "center",
-                      });
-                      el.querySelector("input")?.focus();
-                    }
-                    return;
-                  }
-                }
-
-                // If specifications validation check fails
-                if (
-                  product.specifications?.length > 0 &&
-                  !product.specifications.every(
-                    (spec) => !!selectedSpecs[spec.key]
-                  )
-                ) {
-                  alert("Please select all specifications.");
-                  return;
-                }
-
-                // Everything validated -> proceed to cart
-                setHighlightField(null);
-                proceedToCart();
-              }}
-            >
-              {product.isCustomizable ? "Continue" : "Confirm & Proceed"}
-            </button>
-            <button
-              className="popup-cancel"
-              onClick={() => setShowPopup(false)}
-            >
-              Cancel
-            </button>
-          </>
-        )}
-      </div>
-    </div>
-  </div>
-)}
-
+      <Footer />
     </div>
   );
 };
 
-// ✅ Subcomponent for Expandable Descriptions
+// Subcomponent for Expandable Descriptions
 const DescriptionSections = ({ parts }) => {
-  const [expandedIndex, setExpandedIndex] = useState(0); // First open by default
+  const [expandedIndex, setExpandedIndex] = useState(0);
 
   const handleToggle = (index) => {
-    setExpandedIndex(prev => (prev === index ? null : index));
+    setExpandedIndex((prev) => (prev === index ? null : index));
   };
 
   return (
@@ -1026,38 +860,31 @@ const DescriptionSections = ({ parts }) => {
         const isExpanded = expandedIndex === index;
         return (
           <div key={index} className="desc-wrapper">
-            <div
-              className="desc-header"
-              onClick={() => handleToggle(index)}
-            >
-              <h3 className="desc-headline">{part.headline || `Section ${index + 1}`}</h3>
+            <div className="desc-header" onClick={() => handleToggle(index)}>
+              <h3 className="desc-headline">
+                {part.headline || `Section ${index + 1}`}
+              </h3>
               <span className={`arrow ${isExpanded ? "up" : "down"}`}>
                 {isExpanded ? "▲" : "▼"}
               </span>
             </div>
 
-            {/* ✅ Keep content mounted but hide via CSS to prevent flicker */}
             <div className={`desc-content ${isExpanded ? "show" : "hide"}`}>
+              {part.video && (
+                <video controls playsInline preload="metadata" className="desc-video">
+                  <source src={part.video} type="video/mp4" />
+                  Your browser does not support video.
+                </video>
+              )}
 
-             {part.video && (
-  <video
-  controls
-  playsInline
-  preload="metadata"
-  className="desc-video"
->
-    <source src={part.video} type="video/mp4" />
-    Your browser does not support video.
-</video>
-)}
-
-              {part.text && <p
-  className="desc-text"
-  dangerouslySetInnerHTML={{
-    __html: (part.text || "").replace(/\n/g, "<br/><br/>")
-  }}
-></p>
-}
+              {part.text && (
+                <p
+                  className="desc-text"
+                  dangerouslySetInnerHTML={{
+                    __html: (part.text || "").replace(/\n/g, "<br/><br/>"),
+                  }}
+                ></p>
+              )}
 
               {part.image && (
                 <img
@@ -1066,8 +893,6 @@ const DescriptionSections = ({ parts }) => {
                   className="desc-image"
                 />
               )}
-
-             
             </div>
           </div>
         );
@@ -1075,6 +900,5 @@ const DescriptionSections = ({ parts }) => {
     </div>
   );
 };
-
 
 export default ProductDetailPage;
