@@ -153,7 +153,7 @@ const getEstimatedDelivery = () => {
 
   // e.g., deliver between 3–7 business days
   startDate.setDate(today.getDate() + 3);
-  endDate.setDate(today.getDate() + 4);
+  endDate.setDate(today.getDate() + 5);
 
   const formatDate = (date) =>
     date.toLocaleDateString("en-IN", {
@@ -161,7 +161,7 @@ const getEstimatedDelivery = () => {
       month: "short",
     });
 
-  return `Between ${formatDate(startDate)} – ${formatDate(endDate)}`;
+  return `By ${formatDate(startDate)} – ${formatDate(endDate)}`;
 };
 
 // ✅ Add a check for 'product' to prevent the "null" error
@@ -339,31 +339,43 @@ const removeFile = (key) => {
   };
 
   // Add to cart
-  const addToCart = () => {
-    if (!validateSelections()) {
-      setShowPopup(true); // open the popup instead of alert
+const addToCart = () => {
+  // If product is not customizable but has specifications, show confirmation popup first
+  if (!product?.isCustomizable && product?.specifications?.length > 0) {
+    setShowPopup(true);
     return;
-    }
+  }
 
-    const newItem = generateCartItem();
+  if (!validateSelections()) {
+    setShowPopup(true); // open the popup instead of alert
+    return;
+  }
 
-    // ✅ Track AddToCart event
-    trackEvent("AddToCart", {
-      content_name: newItem.title,
-      content_ids: [newItem._id],
-      value: newItem.price,
-      currency: "INR",
-      quantity: 1,
-    });
+  const newItem = generateCartItem();
 
-    const cart = JSON.parse(localStorage.getItem("cart")) || [];
-    cart.push(newItem);
-    localStorage.setItem("cart", JSON.stringify(cart));
-    navigate("/cart");
-  };
+  // ✅ Track AddToCart event
+  trackEvent("AddToCart", {
+    content_name: newItem.title,
+    content_ids: [newItem._id],
+    value: newItem.price,
+    currency: "INR",
+    quantity: 1,
+  });
 
-  // Buy now
-  const buyNow = () => {
+  const cart = JSON.parse(localStorage.getItem("cart")) || [];
+  cart.push(newItem);
+  localStorage.setItem("cart", JSON.stringify(cart));
+  navigate("/cart");
+};
+
+// Buy now
+const buyNow = () => {
+  // If product is not customizable but has specifications, show confirmation popup first
+  if (!product?.isCustomizable && product?.specifications?.length > 0) {
+    setShowPopup(true);
+    return;
+  }
+
   if (!validateSelections()) {
     setShowPopup(true); // open the popup instead of alert
     return;
@@ -383,7 +395,21 @@ const removeFile = (key) => {
   navigate("/cart");
 };
 
+const proceedToCart = () => {
+  const cartItem = generateCartItem();
 
+  trackEvent("AddToCart", {
+    content_name: cartItem.title,
+    content_ids: [cartItem._id],
+    value: cartItem.price,
+    currency: "INR",
+    quantity: 1,
+  });
+
+  localStorage.setItem("cart", JSON.stringify([cartItem]));
+  setShowPopup(false);
+  navigate("/cart");
+};
 
 
 
@@ -580,6 +606,8 @@ const slides = [
     )}
   </div>
 
+  
+
   {/* Trust & Conversion Boosters */}
  <div className="price-footer-meta">
   <p className="inclusive-taxes">Inclusive of all taxes</p>
@@ -598,13 +626,50 @@ const slides = [
 
   {/* Estimated Delivery */}
   <div className="delivery-estimate-pill">
-    <FaShippingFast className="truck-icon" />
-    <span>
-      Estimated Delivery by{" "}
-      <strong>{estimatedDelivery.split("–")[1]}</strong>
-    </span>
-  </div>
+  <FaShippingFast className="truck-icon" />
+  <span>
+    Estimated Delivery <strong>{estimatedDelivery}</strong>
+  </span>
 </div>
+</div>
+</div>
+
+
+
+    {/* Buttons */}
+  <div className="action-buttons">
+  {isAnyFileUploading ? (
+    <p style={{ color: "#007bff" }}>Uploading file(s)...</p>
+  ) : product.isCustomizable ? (
+    // ✅ If customizable, show only "Customize" button
+    <button
+      className="customize-btn"
+      onClick={() => {
+  setShowPopup(true);
+
+  // Focus after popup opens
+  setTimeout(() => {
+    const firstField = document.querySelector(".popup-input input[type='text']");
+    if (firstField) firstField.focus();
+  }, 300);
+}}
+
+
+
+    >
+      ✨ Customize and Buy Now
+    </button>
+  ) : (
+    // ✅ Otherwise show normal Buy Now / Add to Cart
+    <>
+      <button className="buy-now" onClick={buyNow}>
+        Buy Now
+      </button>
+      <button className="add-to-cart" onClick={addToCart}>
+        Add to Cart
+      </button>
+    </>
+  )}
 </div>
 
 {/* Specifications */}
@@ -645,42 +710,6 @@ const slides = [
               ))}
             </div>
           )}
-
-    {/* Buttons */}
-  <div className="action-buttons">
-  {isAnyFileUploading ? (
-    <p style={{ color: "#007bff" }}>Uploading file(s)...</p>
-  ) : product.isCustomizable ? (
-    // ✅ If customizable, show only "Customize" button
-    <button
-      className="customize-btn"
-      onClick={() => {
-  setShowPopup(true);
-
-  // Focus after popup opens
-  setTimeout(() => {
-    const firstField = document.querySelector(".popup-input input[type='text']");
-    if (firstField) firstField.focus();
-  }, 300);
-}}
-
-
-
-    >
-      ✨ Customize and Buy Now
-    </button>
-  ) : (
-    // ✅ Otherwise show normal Buy Now / Add to Cart
-    <>
-      <button className="buy-now" onClick={buyNow}>
-        Buy Now
-      </button>
-      <button className="add-to-cart" onClick={addToCart}>
-        Add to Cart
-      </button>
-    </>
-  )}
-</div>
 
 
  
@@ -807,11 +836,16 @@ const slides = [
     {showPopup && (
   <div className="popup-overlay">
     <div className="popup-content">
-      <h3>Complete Your Selections</h3>
+      <h3>
+        {product.isCustomizable
+          ? "Complete Your Selections"
+          : "Confirm Specifications"}
+      </h3>
 
+      {/* Specifications Block */}
       {product.specifications?.length > 0 && (
         <div className="popup-section">
-          <h4>Specifications</h4>
+          <h4>Select Specifications</h4>
           {product.specifications.map((spec, idx) => (
             <div key={idx} className="popup-spec">
               <p>{spec.key}:</p>
@@ -824,17 +858,15 @@ const slides = [
                       value={option.value}
                       checked={selectedSpecs[spec.key] === option.value}
                       disabled={option.stock <= 0}
-                      onChange={() =>
-                        handleSpecChange(spec.key, option.value)
-                      }
+                      onChange={() => handleSpecChange(spec.key, option.value)}
                     />
-                    <span>{option.value}
-                      {/* 👈 ADD THIS LINE BELOW */}
-      {option.extraPrice > 0 && (
-        <small style={{ color: "#28a745", marginLeft: "4px" }}>
-          (+₹{option.extraPrice})
-        </small>
-      )}
+                    <span>
+                      {option.value}
+                      {option.extraPrice > 0 && (
+                        <small style={{ color: "#28a745", marginLeft: "4px" }}>
+                          (+₹{option.extraPrice})
+                        </small>
+                      )}
                     </span>
                   </label>
                 ))}
@@ -844,117 +876,134 @@ const slides = [
         </div>
       )}
 
+      {/* Customization Block */}
       {product.isCustomizable && (
-  <div className="popup-section">
-    <h4>Customization</h4>
-    {product.customizationFields.map((field, idx) => (
-      <div
-  key={`${field.label}-${idx}`}
-  id={`field-${field.label}-${idx}`}
-  className={`popup-input ${highlightField === `${field.label}-${idx}` ? "highlight-required" : ""}`}
->
-        <label>{field.label}</label>
+        <div className="popup-section">
+          <h4>Customization</h4>
+          {product.customizationFields.map((field, idx) => (
+            <div
+              key={`${field.label}-${idx}`}
+              id={`field-${field.label}-${idx}`}
+              className={`popup-input ${
+                highlightField === `${field.label}-${idx}`
+                  ? "highlight-required"
+                  : ""
+              }`}
+            >
+              <label>{field.label}</label>
 
-        {field.type === "file" ? (
-          <div className="file-upload-wrapper">
-            {!customInputs[`${field.label}-${idx}`] ? (
-              <input
-                type="file"
-                onChange={(e) =>
-                  handleFileUpload(`${field.label}-${idx}`, e.target.files[0])
-                }
-              />
-              
-            ) : (
-              <div className="file-info-line">
-                <img
-                  src={customInputs[`${field.label}-${idx}`].url}
-                  alt="preview"
-                  className="tiny-preview"
+              {field.type === "file" ? (
+                <div className="file-upload-wrapper">
+                  {!customInputs[`${field.label}-${idx}`] ? (
+                    <input
+                      type="file"
+                      onChange={(e) =>
+                        handleFileUpload(
+                          `${field.label}-${idx}`,
+                          e.target.files[0]
+                        )
+                      }
+                    />
+                  ) : (
+                    <div className="file-info-line">
+                      <img
+                        src={customInputs[`${field.label}-${idx}`].url}
+                        alt="preview"
+                        className="tiny-preview"
+                      />
+                      <span className="file-name">
+                        {customInputs[`${field.label}-${idx}`].url
+                          .split("/")
+                          .pop()}
+                      </span>
+                      <button
+                        type="button"
+                        className="remove-file-btn"
+                        onClick={() => removeFile(`${field.label}-${idx}`)}
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <input
+                  type="text"
+                  value={customInputs[`${field.label}-${idx}`] || ""}
+                  onChange={(e) =>
+                    handleInputChange(`${field.label}-${idx}`, e.target.value)
+                  }
                 />
-                <span className="file-name">
-                  {customInputs[`${field.label}-${idx}`].url.split("/").pop()}
-                </span>
-                <button
-                  type="button"
-                  className="remove-file-btn"
-                  onClick={() => removeFile(`${field.label}-${idx}`)}
-                >
-                  Remove
-                </button>
-              </div>
-            )}
-          </div>
-          
-        ) : (
-          <input
-            type="text"
-            value={customInputs[`${field.label}-${idx}`] || ""}
-            onChange={(e) =>
-              handleInputChange(`${field.label}-${idx}`, e.target.value)
-            }
-          />
-        )}
-        {highlightField === `${field.label}-${idx}` && (
-  <small className="error-hint">Please fill this</small>
-)}
+              )}
+              {highlightField === `${field.label}-${idx}` && (
+                <small className="error-hint">Please fill this</small>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
 
-      </div>
-    ))}
-  </div>
-)}
-
-
+      {/* Modal Actions */}
       <div className="popup-buttons">
-  {isAnyFileUploading ? (
-    <p style={{ color: "#007bff" }}>Uploading file(s), please wait...</p>
-  ) : (
-    <>
-      <button
-        className="popup-continue"
-        onClick={() => {
-  const missing = [];
+        {isAnyFileUploading ? (
+          <p style={{ color: "#007bff" }}>Uploading file(s), please wait...</p>
+        ) : (
+          <>
+            <button
+              className="popup-continue"
+              onClick={() => {
+                // If customizable, validate inputs first
+                if (product.isCustomizable) {
+                  const missing = [];
+                  product.customizationFields.forEach((field, idx) => {
+                    const key = `${field.label}-${idx}`;
+                    if (!customInputs[key]) {
+                      missing.push(key);
+                    }
+                  });
 
-  // Check customization fields
-  if (product.isCustomizable) {
-    product.customizationFields.forEach((field, idx) => {
-      const key = `${field.label}-${idx}`;
-      if (!customInputs[key]) {
-        missing.push(key);
-      }
-    });
-  }
+                  if (missing.length > 0) {
+                    const first = missing[0];
+                    setHighlightField(first);
+                    const el = document.getElementById(`field-${first}`);
+                    if (el) {
+                      el.scrollIntoView({
+                        behavior: "smooth",
+                        block: "center",
+                      });
+                      el.querySelector("input")?.focus();
+                    }
+                    return;
+                  }
+                }
 
-  // If missing fields
-  if (missing.length > 0) {
-    const first = missing[0];
-    setHighlightField(first);
+                // If specifications validation check fails
+                if (
+                  product.specifications?.length > 0 &&
+                  !product.specifications.every(
+                    (spec) => !!selectedSpecs[spec.key]
+                  )
+                ) {
+                  alert("Please select all specifications.");
+                  return;
+                }
 
-    // Auto scroll to the field
-    const el = document.getElementById(`field-${first}`);
-    if (el) {
-      el.scrollIntoView({ behavior: "smooth", block: "center" });
-      el.querySelector("input")?.focus();
-    }
-    return; // Stop continue
-  }
-
-  // No errors → proceed
-  setHighlightField(null);
-  setShowPopup(false);
-  buyNow();
-}}
-
-      >
-        Continue
-      </button>
-      <button className="popup-cancel" onClick={() => setShowPopup(false)}>
-        Cancel
-      </button>
-    </>
-  )}
-</div>
-
+                // Everything validated -> proceed to cart
+                setHighlightField(null);
+                proceedToCart();
+              }}
+            >
+              {product.isCustomizable ? "Continue" : "Confirm & Proceed"}
+            </button>
+            <button
+              className="popup-cancel"
+              onClick={() => setShowPopup(false)}
+            >
+              Cancel
+            </button>
+          </>
+        )}
+      </div>
     </div>
   </div>
 )}
