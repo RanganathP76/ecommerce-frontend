@@ -24,7 +24,7 @@ const Footer = () => {
         </div>
         <div className="contact-item">
           <FaEnvelope className="contact-icon" />
-          <p>support@cuztory.in</p>
+          <p>cuztoryofficial@gmail.com</p>
         </div>
         <div className="contact-item">
           <FaPhoneAlt className="contact-icon" />

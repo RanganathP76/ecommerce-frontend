@@ -22,10 +22,10 @@ const ShippingPolicy = () => {
         <h2>Shipping Methods & Delivery Time</h2>
         <ul>
           <li>
-            <strong>Standard Shipping:</strong> 5-7 business days
+            <strong>Standard Shipping:</strong> 7-14 business days
           </li>
           <li>
-            <strong>Express Shipping:</strong> 2-4 business days
+            <strong>Express Shipping:</strong> 5-7 business days
           </li>
         </ul>
 
@@ -59,7 +59,7 @@ const ShippingPolicy = () => {
         <p>
           If you have any questions about our shipping policy or your order,
           please contact us at{" "}
-          <a href="mailto:dignifydeals@gmail.com">
+          <a href="mailto:cuztoryofficial@gmail.com">
             support@cuztory.in
           </a>
           .
