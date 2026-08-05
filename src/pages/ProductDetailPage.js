@@ -673,12 +673,7 @@ const ProductDetailPage = () => {
                   </div>
                 )}
 
-                <div className="delivery-estimate-pill">
-                  <FaShippingFast className="truck-icon" />
-                  <span>
-                    Estimated Delivery <strong>{estimatedDelivery}</strong>
-                  </span>
-                </div>
+                
               </div>
             </div>
 
