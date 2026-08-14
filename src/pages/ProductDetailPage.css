@@ -2050,3 +2050,632 @@ html, body, .product-detail {
   cursor: pointer;
 }
 
+/* ====================================================
+   💜 CUZTORY SIGNATURE BRAND THEME (PROFESSIONAL MATCH)
+   ==================================================== */
+
+.single-line-buttons {
+  display: flex !important;
+  flex-direction: row !important;
+  gap: 10px !important;
+  width: 100%;
+}
+
+/* Base button styles */
+.custom-add-cart-btn,
+.custom-buy-now-btn,
+.theme-stepper-box {
+  flex: 1;
+  min-height: 48px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  letter-spacing: 0.5px;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  box-sizing: border-box;
+}
+
+/* 1. Left Button: ADD TO CART (Clean Brand Outline) */
+.custom-add-cart-btn {
+  background: #ffffff;
+  color: #1e1145;
+  border: 1.5px solid #1e1145;
+  opacity: 1 !important;
+}
+
+.custom-add-cart-btn:hover {
+  background: #f7f5ff;
+  border-color: #3b1d79;
+  color: #3b1d79;
+}
+
+/* 2. Left Button Active: Stepper (- / +) */
+.theme-stepper-box {
+  background: #ffffff;
+  border: 1.5px solid #1e1145;
+  color: #1e1145;
+  padding: 0 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.stepper-btn {
+  background: linear-gradient(135deg, #3b1d79 0%, #1a103c 100%);
+  border: none;
+  color: #ffffff;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 12px;
+  transition: transform 0.15s ease, background 0.2s ease;
+}
+
+.stepper-btn:hover {
+  background: #4e279b;
+  transform: scale(1.05);
+}
+
+.stepper-qty-num {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1e1145;
+  text-transform: uppercase;
+}
+
+/* 3. Right Button: BUY NOW (Cuztory Midnight Gradient with Subtle Glow) */
+.custom-buy-now-btn {
+  background: linear-gradient(135deg, #2a155c 0%, #160d33 100%);
+  color: #ffffff;
+  border: 1px solid #3d2080;
+  box-shadow: 0 4px 14px rgba(26, 16, 60, 0.35);
+}
+
+.custom-buy-now-btn:hover {
+  background: linear-gradient(135deg, #371c77 0%, #1c1040 100%);
+  box-shadow: 0 6px 18px rgba(42, 21, 92, 0.45);
+}
+
+/* ====================================================
+   💜 FLOATING BOTTOM CART BAR (CUZTORY BRAND MATCH)
+   ==================================================== */
+.floating-cart-overlay {
+  position: fixed;
+  bottom: 18px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999999;
+  padding: 0 16px;
+  pointer-events: none;
+}
+
+.floating-cart-container {
+  pointer-events: auto;
+  width: 100%;
+  max-width: 520px;
+  /* Matching Header Mesh Gradient with subtle cyan accent border */
+  background: linear-gradient(135deg, #24134d 0%, #140b2b 100%);
+  color: #ffffff;
+  border: 1px solid rgba(0, 210, 255, 0.3); /* Neon Cyan border glow */
+  border-radius: 14px;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 10px 30px rgba(18, 9, 38, 0.7), 0 0 15px rgba(0, 210, 255, 0.15);
+  cursor: pointer;
+  animation: slideUpFloating 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.floating-cart-container:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 35px rgba(18, 9, 38, 0.8), 0 0 20px rgba(0, 210, 255, 0.25);
+}
+
+@keyframes slideUpFloating {
+  from {
+    opacity: 0;
+    transform: translateY(50px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Left: Demo Image & Info */
+.floating-cart-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: 58%;
+}
+
+.floating-img-wrapper {
+  position: relative;
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+}
+
+.floating-cart-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: #fff;
+}
+
+.floating-check-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  color: #ffffff;
+  background: #00d2ff; /* Neon Cyan check */
+  color: #140b2b;
+  border-radius: 50%;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.floating-cart-info {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.floating-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #ffffff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 150px;
+}
+
+.floating-specs {
+  font-size: 11px;
+  color: #c4b5fd;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 2px;
+}
+
+/* Right Section: Price & View Cart CTA */
+.floating-cart-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.floating-price-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.floating-qty-pill {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background: rgba(255, 255, 255, 0.12);
+  color: #e9d5ff;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 700;
+}
+
+.floating-cart-total {
+  font-size: 14px;
+  font-weight: 800;
+  color: #ffffff;
+  margin-top: 2px;
+}
+
+/* Crisp White CTA Button */
+.floating-cta-btn {
+  background: #ffffff;
+  color: #1a103c;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.floating-cta-btn:hover {
+  background: #f1ecff;
+  transform: scale(1.03);
+}
+
+.floating-close-btn {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 12px;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s;
+}
+
+.floating-close-btn:hover {
+  color: #ffffff;
+}
+
+/* Mobile Screen Tuning */
+@media (max-width: 480px) {
+  .floating-cart-overlay {
+    bottom: 12px;
+    padding: 0 10px;
+  }
+
+  .floating-cart-container {
+    padding: 8px 10px;
+    border-radius: 12px;
+  }
+
+  .floating-img-wrapper {
+    width: 36px;
+    height: 36px;
+  }
+
+  .floating-title {
+    max-width: 110px;
+    font-size: 12px;
+  }
+
+  .floating-specs {
+    font-size: 10px;
+  }
+
+  .floating-cart-total {
+    font-size: 13px;
+  }
+
+  .floating-cta-btn {
+    padding: 6px 9px;
+    font-size: 11px;
+  }
+}
+
+/* ====================================================
+   🌿 INSTAMART EMERALD GREEN FLOATING BOTTOM CART BAR
+   ==================================================== */
+.floating-cart-overlay {
+  position: fixed;
+  bottom: 18px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999999;
+  padding: 0 16px;
+  pointer-events: none;
+}
+
+.floating-cart-container {
+  pointer-events: auto;
+  width: 100%;
+  max-width: 520px;
+  background: #0f8a5f; /* Solid signature Instamart Green */
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 14px;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 10px 30px rgba(15, 138, 95, 0.45), 0 4px 12px rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+  animation: slideUpFloating 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.floating-cart-container:hover {
+  transform: translateY(-2px);
+  background: #0d7a53;
+  box-shadow: 0 12px 35px rgba(15, 138, 95, 0.55);
+}
+
+@keyframes slideUpFloating {
+  from {
+    opacity: 0;
+    transform: translateY(50px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Left: Demo Image & Info */
+.floating-cart-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: 58%;
+}
+
+.floating-img-wrapper {
+  position: relative;
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+}
+
+.floating-cart-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1.5px solid rgba(255, 255, 255, 0.8);
+  background: #ffffff;
+}
+
+.floating-check-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  color: #ffffff;
+  background: #0b6b4a;
+  border-radius: 50%;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.floating-cart-info {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.floating-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #ffffff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 150px;
+}
+
+.floating-specs {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.9);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 2px;
+}
+
+/* Right Section: Price & View Cart CTA */
+.floating-cart-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.floating-price-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.floating-qty-pill {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background: rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 700;
+}
+
+.floating-cart-total {
+  font-size: 14px;
+  font-weight: 800;
+  color: #ffffff;
+  margin-top: 2px;
+}
+
+/* Crisp White CTA Button */
+.floating-cta-btn {
+  background: #ffffff;
+  color: #0f8a5f; /* Green text on crisp white button */
+  border: none;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.floating-cta-btn:hover {
+  background: #f0fdf4;
+  transform: scale(1.03);
+}
+
+.floating-close-btn {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 12px;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s;
+}
+
+.floating-close-btn:hover {
+  color: #ffffff;
+}
+
+/* Mobile Screen Tuning */
+@media (max-width: 480px) {
+  .floating-cart-overlay {
+    bottom: 12px;
+    padding: 0 10px;
+  }
+
+  .floating-cart-container {
+    padding: 8px 10px;
+    border-radius: 12px;
+  }
+
+  .floating-img-wrapper {
+    width: 36px;
+    height: 36px;
+  }
+
+  .floating-title {
+    max-width: 110px;
+    font-size: 12px;
+  }
+
+  .floating-specs {
+    font-size: 10px;
+  }
+
+  .floating-cart-total {
+    font-size: 13px;
+  }
+
+  .floating-cta-btn {
+    padding: 6px 9px;
+    font-size: 11px;
+  }
+}
+
+/* Out of Stock & Disabled States */
+.option-out-of-stock {
+  opacity: 0.45;
+  cursor: not-allowed !important;
+  border-color: #e5e7eb !important;
+  background-color: #f9fafb !important;
+  text-decoration: line-through;
+}
+
+.spec-stock-tag.out {
+  font-size: 10px;
+  color: #ef4444;
+  margin-left: 4px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+/* Disabled Action Buttons */
+.disabled-action-btn,
+.disabled-action-btn:hover {
+  background: #e5e7eb !important;
+  color: #9ca3af !important;
+  border-color: #d1d5db !important;
+  cursor: not-allowed !important;
+  box-shadow: none !important;
+  transform: none !important;
+  opacity: 0.7;
+}
+
+/* ====================================================
+   🚫 OUT OF STOCK & DISABLED SPECIFICATION PILLS
+   ==================================================== */
+
+/* Disabled Variant Radio Pill */
+.spec-option input[type="radio"]:disabled + .spec-option-text {
+  background-color: #f3f4f6 !important;
+  color: #9ca3af !important;
+  border-color: #e5e7eb !important;
+  cursor: not-allowed !important;
+  position: relative;
+  overflow: hidden;
+  opacity: 0.6;
+}
+
+/* Strike-through diagonal line across out-of-stock options */
+.spec-option input[type="radio"]:disabled + .spec-option-text::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 100%;
+  height: 1.5px;
+  background: #ef4444;
+  transform: rotate(-15deg);
+  pointer-events: none;
+}
+
+/* ====================================================
+   🚫 OUT OF STOCK ACTION BUTTONS (ADD TO CART & BUY NOW)
+   ==================================================== */
+
+/* Disabled Add to Cart & Buy Now Buttons */
+.custom-add-cart-btn:disabled,
+.custom-buy-now-btn:disabled,
+.customize-btn:disabled {
+  background: #f3f4f6 !important;
+  color: #9ca3af !important;
+  border: 1.5px solid #d1d5db !important;
+  cursor: not-allowed !important;
+  box-shadow: none !important;
+  transform: none !important;
+  opacity: 0.75;
+  user-select: none;
+  filter: grayscale(100%);
+  position: relative;
+}
+
+/* Prevent hover transforms or glow when disabled */
+.custom-add-cart-btn:disabled:hover,
+.custom-buy-now-btn:disabled:hover,
+.customize-btn:disabled:hover {
+  background: #f3f4f6 !important;
+  color: #9ca3af !important;
+  border-color: #d1d5db !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* Disabled + button inside the stepper */
+.stepper-btn:disabled {
+  background: #9ca3af !important;
+  cursor: not-allowed !important;
+  transform: none !important;
+}

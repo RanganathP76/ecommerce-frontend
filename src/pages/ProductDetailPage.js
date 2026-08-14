@@ -1,6 +1,18 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { FaStar, FaLock, FaShippingFast, FaHeadset } from "react-icons/fa";
+import { 
+  FaStar, 
+  FaLock, 
+  FaShippingFast, 
+  FaHeadset, 
+  FaShoppingBag, 
+  FaBolt, 
+  FaArrowRight, 
+  FaTimes, 
+  FaPlus, 
+  FaMinus,
+  FaCheckCircle 
+} from "react-icons/fa";
 import axiosInstance from "../axiosInstance";
 import "./ProductDetailPage.css";
 import Header from "../components/Header";
@@ -22,26 +34,71 @@ const ProductDetailPage = () => {
   const [comment, setComment] = useState("");
   const [image, setImage] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [activeIndex, setActiveIndex] = useState(0); // For image slider
-  const [expandedReviews, setExpandedReviews] = useState({}); // Track expanded reviews
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [expandedReviews, setExpandedReviews] = useState({});
   const [uploadingFiles, setUploadingFiles] = useState({});
-  const [estimatedDelivery, setEstimatedDelivery] = useState("");
   const [highlightField, setHighlightField] = useState(null);
 
-  // 🔄 VIEW SWITCHER STATE
+  // 🛒 Cart Quantity & Floating Bar State
+  const [currentQtyInCart, setCurrentQtyInCart] = useState(0);
+  const [showFloatingCart, setShowFloatingCart] = useState(false);
+  const [cartCount, setCartCount] = useState(0);
+  const [cartTotal, setCartTotal] = useState(0);
+
+  // 🔄 VIEW SWITCHER STATE (Only for customizable products)
   const [showCustomizationStep, setShowCustomizationStep] = useState(false);
 
-  // 📱 HANDLE MOBILE HARDWARE / GESTURE BACK BUTTON
+  // Sync overall cart summary
+  const syncCartSummary = () => {
+    try {
+      const cart = JSON.parse(localStorage.getItem("cart")) || [];
+      const totalQty = cart.reduce((acc, item) => acc + (item.quantity || 1), 0);
+      const totalVal = cart.reduce((acc, item) => acc + (item.price || 0) * (item.quantity || 1), 0);
+      setCartCount(totalQty);
+      setCartTotal(totalVal);
+      if (totalQty === 0) setShowFloatingCart(false);
+    } catch (e) {
+      setCartCount(0);
+      setCartTotal(0);
+      setShowFloatingCart(false);
+    }
+  };
+
+  // Check specific item's quantity for chosen variant
+  const syncCurrentItemQty = (productId, specs) => {
+    try {
+      const cart = JSON.parse(localStorage.getItem("cart")) || [];
+      const formattedSpecs = Object.entries(specs).map(([key, value]) => ({ key, value }));
+      const found = cart.find(
+        (item) =>
+          item._id === productId &&
+          JSON.stringify(item.specifications || []) === JSON.stringify(formattedSpecs)
+      );
+      setCurrentQtyInCart(found ? found.quantity : 0);
+    } catch (e) {
+      setCurrentQtyInCart(0);
+    }
+  };
+
   useEffect(() => {
-    const handlePopState = (e) => {
-      // If customization screen is open and user hits physical back button
+    syncCartSummary();
+  }, []);
+
+  useEffect(() => {
+    if (product) {
+      syncCurrentItemQty(product._id, selectedSpecs);
+    }
+  }, [selectedSpecs, product]);
+
+  // 📱 Mobile back button listener
+  useEffect(() => {
+    const handlePopState = () => {
       if (showCustomizationStep) {
         setShowCustomizationStep(false);
       }
     };
 
     if (showCustomizationStep) {
-      // Push dummy entry into history stack so browser back button triggers popstate
       window.history.pushState({ step: "customization" }, "");
       window.addEventListener("popstate", handlePopState);
     }
@@ -58,7 +115,6 @@ const ProductDetailPage = () => {
         const { data } = await axiosInstance.get(`/products/${id}`);
         setProduct(data);
 
-        // ✅ Fire ViewContent event
         trackEvent("ViewContent", {
           content_name: data.title,
           content_ids: [data._id],
@@ -66,9 +122,6 @@ const ProductDetailPage = () => {
           currency: "INR",
         });
 
-        setEstimatedDelivery(getEstimatedDelivery());
-
-        // Init customization fields
         if (data.isCustomizable && Array.isArray(data.customizationFields)) {
           const initState = {};
           data.customizationFields.forEach((field, idx) => {
@@ -78,9 +131,8 @@ const ProductDetailPage = () => {
           setCustomInputs(initState);
         }
 
-        // ✅ Auto-select first available spec option
+        const autoSpecs = {};
         if (Array.isArray(data.specifications) && data.specifications.length > 0) {
-          const autoSpecs = {};
           data.specifications.forEach((spec) => {
             const firstAvailable = (spec.values || []).find((v) => v.stock > 0);
             if (firstAvailable) {
@@ -89,6 +141,7 @@ const ProductDetailPage = () => {
           });
           setSelectedSpecs(autoSpecs);
         }
+        syncCurrentItemQty(data._id, autoSpecs);
       } catch (error) {
         console.error("Failed to fetch product", error);
       } finally {
@@ -97,41 +150,6 @@ const ProductDetailPage = () => {
     };
     fetchProduct();
   }, [id]);
-
-  // 🕒 Persistent Urgency Timer
-  const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
-
-  useEffect(() => {
-    const savedEndTime = localStorage.getItem("offerEndTime");
-    let offerEnd;
-    if (savedEndTime) {
-      offerEnd = new Date(savedEndTime);
-    } else {
-      offerEnd = new Date();
-      offerEnd.setDate(offerEnd.getDate() + 1);
-      offerEnd.setMinutes(offerEnd.getMinutes() + 25);
-      localStorage.setItem("offerEndTime", offerEnd.toISOString());
-    }
-
-    const timer = setInterval(() => {
-      const now = new Date().getTime();
-      const distance = offerEnd.getTime() - now;
-
-      if (distance <= 0) {
-        clearInterval(timer);
-        localStorage.removeItem("offerEndTime");
-        setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
-      } else {
-        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-        setTimeLeft({ days, hours, minutes, seconds });
-      }
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, []);
 
   const [paymentOptions, setPaymentOptions] = useState(null);
 
@@ -157,23 +175,6 @@ const ProductDetailPage = () => {
   const advance = getAdvance();
   const due = productPrice - advance;
 
-  const getEstimatedDelivery = () => {
-    const today = new Date();
-    const startDate = new Date(today);
-    const endDate = new Date(today);
-
-    startDate.setDate(today.getDate() + 3);
-    endDate.setDate(today.getDate() + 5);
-
-    const formatDate = (date) =>
-      date.toLocaleDateString("en-IN", {
-        day: "numeric",
-        month: "short",
-      });
-
-    return `By ${formatDate(startDate)} – ${formatDate(endDate)}`;
-  };
-
   const calculateTotalPrice = () => {
     if (!product) return 0;
 
@@ -191,6 +192,44 @@ const ProductDetailPage = () => {
   };
 
   const totalPrice = calculateTotalPrice();
+
+  // 🔍 Check if all specifications are chosen and in stock
+  const isSelectionValidAndInStock = () => {
+    if (!product) return false;
+    if (Array.isArray(product.specifications) && product.specifications.length > 0) {
+      for (const spec of product.specifications) {
+        const chosenVal = selectedSpecs[spec.key];
+        if (!chosenVal) return false; // Spec not chosen
+        const matchedOption = spec.values?.find((v) => v.value === chosenVal);
+        if (!matchedOption || matchedOption.stock <= 0) return false; // Out of stock or invalid
+      }
+    }
+    return true;
+  };
+
+  // 🔄 Live Backend Stock Check on Click
+  const verifyLatestStockBeforeProceeding = async () => {
+    try {
+      const { data } = await axiosInstance.get(`/products/${id}`);
+      setProduct(data); // update product in state
+
+      if (Array.isArray(data.specifications) && data.specifications.length > 0) {
+        for (const spec of data.specifications) {
+          const chosenVal = selectedSpecs[spec.key];
+          const matchedOption = spec.values?.find((v) => v.value === chosenVal);
+          if (!matchedOption || matchedOption.stock <= 0) {
+            alert("Sorry, out of stock just now!");
+            return false;
+          }
+        }
+      }
+      return true;
+    } catch (err) {
+      console.error("Stock check failed:", err);
+      alert("Unable to verify stock. Please try again.");
+      return false;
+    }
+  };
 
   const handleThumbnailClick = (idx) => {
     setActiveIndex(idx);
@@ -285,14 +324,14 @@ const ProductDetailPage = () => {
     }));
   };
 
-  const generateCartItem = () => {
+  const generateCartItem = (qty = 1) => {
     return {
       _id: product._id,
       title: product.title,
       price: totalPrice,
       comparePrice: product.comparePrice || null,
       image: product.images[0],
-      quantity: 1,
+      quantity: qty,
       specifications:
         product.specifications?.length > 0
           ? Object.entries(selectedSpecs).map(([key, value]) => ({
@@ -315,27 +354,64 @@ const ProductDetailPage = () => {
     };
   };
 
-  // Switch view to customization step or go directly to cart
-  const handleProceedClick = () => {
-    if (product?.isCustomizable || product?.specifications?.length > 0) {
-      setShowCustomizationStep(true);
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    } else {
-      buyNowDirect();
+  // ➕ / ➖ Stepper Logic with Stock Re-verification
+  const handleUpdateQuantity = async (delta) => {
+    if (delta > 0) {
+      const inStock = await verifyLatestStockBeforeProceeding();
+      if (!inStock) return;
     }
+
+    let currentCart = [];
+    try {
+      currentCart = JSON.parse(localStorage.getItem("cart")) || [];
+    } catch (e) {
+      currentCart = [];
+    }
+
+    const currentFormattedSpecs = Object.entries(selectedSpecs).map(([key, value]) => ({ key, value }));
+
+    const existingIndex = currentCart.findIndex(
+      (item) =>
+        item._id === product._id &&
+        JSON.stringify(item.specifications || []) === JSON.stringify(currentFormattedSpecs)
+    );
+
+    const newQty = currentQtyInCart + delta;
+
+    if (newQty <= 0) {
+      if (existingIndex > -1) {
+        currentCart.splice(existingIndex, 1);
+      }
+      setCurrentQtyInCart(0);
+    } else {
+      if (existingIndex > -1) {
+        currentCart[existingIndex].quantity = newQty;
+      } else {
+        const newItem = generateCartItem(newQty);
+        currentCart.push(newItem);
+        trackEvent("AddToCart", {
+          content_name: newItem.title,
+          content_ids: [newItem._id],
+          value: newItem.price,
+          currency: "INR",
+          quantity: newQty,
+        });
+      }
+      setCurrentQtyInCart(newQty);
+      setShowFloatingCart(true);
+    }
+
+    localStorage.setItem("cart", JSON.stringify(currentCart));
+    syncCartSummary();
+    window.dispatchEvent(new Event("storage"));
   };
 
-  // Trigger manual back button on top bar
-  const handleBackButtonClick = () => {
-    if (window.history.state?.step === "customization") {
-      window.history.back(); // Triggers popstate listener
-    } else {
-      setShowCustomizationStep(false);
-    }
-  };
+  // ⚡ Direct Buy Now (Clears previous cart and adds only this fresh item to /cart)
+  const handleDirectBuyNow = async () => {
+    const inStock = await verifyLatestStockBeforeProceeding();
+    if (!inStock) return;
 
-  const buyNowDirect = () => {
-    const cartItem = generateCartItem();
+    const cartItem = generateCartItem(1);
     trackEvent("AddToCart", {
       content_name: cartItem.title,
       content_ids: [cartItem._id],
@@ -343,11 +419,30 @@ const ProductDetailPage = () => {
       currency: "INR",
       quantity: 1,
     });
+    
+    // Clear old cart and add fresh product
     localStorage.setItem("cart", JSON.stringify([cartItem]));
     navigate("/cart");
   };
 
-  const handleFinalCheckout = () => {
+  // Trigger customization view (Only for customizable items)
+  const handleCustomizeClick = async () => {
+    const inStock = await verifyLatestStockBeforeProceeding();
+    if (!inStock) return;
+
+    setShowCustomizationStep(true);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleBackButtonClick = () => {
+    if (window.history.state?.step === "customization") {
+      window.history.back();
+    } else {
+      setShowCustomizationStep(false);
+    }
+  };
+
+  const handleFinalCustomCheckout = () => {
     const missing = [];
     if (product.isCustomizable) {
       product.customizationFields.forEach((field, idx) => {
@@ -370,7 +465,7 @@ const ProductDetailPage = () => {
     }
 
     setHighlightField(null);
-    buyNowDirect();
+    handleDirectBuyNow();
   };
 
   const submitReview = async () => {
@@ -404,6 +499,7 @@ const ProductDetailPage = () => {
   if (!product) return <p>Product not found</p>;
 
   const slides = [...(product?.images || []), ...(product?.videos || [])];
+  const canProceed = isSelectionValidAndInStock();
 
   return (
     <div>
@@ -420,23 +516,17 @@ const ProductDetailPage = () => {
         />
       </Helmet>
 
-      {/* ===================================================================
-          VIEW SWITCHER
-         =================================================================== */}
+      {/* VIEW SWITCHER */}
       {showCustomizationStep ? (
-        /* SCREEN 2: CUSTOMIZATION & SPECIFICATION PAGE VIEW */
+        /* SCREEN 2: CUSTOMIZATION VIEW */
         <div className="customization-step-wrapper">
           <div className="step-header-bar">
-            <button
-              className="step-back-btn"
-              onClick={handleBackButtonClick}
-            >
+            <button className="step-back-btn" onClick={handleBackButtonClick}>
               ←
             </button>
             <span className="step-title-badge">Product Customization</span>
           </div>
 
-          {/* Product Summary Header Box */}
           <div className="step-product-summary">
             <img
               src={product.images[0]}
@@ -454,7 +544,6 @@ const ProductDetailPage = () => {
             </div>
           </div>
 
-          {/* Specifications Selection Block */}
           {product.specifications?.length > 0 && (
             <div className="step-section-box">
               <h4 className="step-section-heading">1. Select Specifications</h4>
@@ -488,7 +577,6 @@ const ProductDetailPage = () => {
             </div>
           )}
 
-          {/* Customization Inputs Block */}
           {product.isCustomizable && (
             <div className="step-section-box">
               <h4 className="step-section-heading">
@@ -562,23 +650,21 @@ const ProductDetailPage = () => {
             </div>
           )}
 
-          {/* Final Proceed Action Box */}
           <div className="step-action-bar">
             {isAnyFileUploading ? (
               <p style={{ color: "#007bff", textAlign: "center" }}>
                 Uploading file(s), please wait...
               </p>
             ) : (
-              <button className="step-proceed-btn" onClick={handleFinalCheckout}>
+              <button className="step-proceed-btn" onClick={handleFinalCustomCheckout}>
                 Confirm and proceed →
               </button>
             )}
           </div>
         </div>
       ) : (
-        /* SCREEN 1: MAIN PRODUCT DETAIL PAGE VIEW */
+        /* SCREEN 1: REDESIGNED MAIN PRODUCT PAGE */
         <div className="product-detail">
-          {/* IMAGE SLIDER */}
           <div className="product-image-slider-container">
             <div
               className="image-slide-wrapper"
@@ -603,7 +689,6 @@ const ProductDetailPage = () => {
               )}
             </div>
 
-            {/* Dots */}
             <div className="slider-dots">
               {slides.map((_, idx) => (
                 <span
@@ -621,7 +706,6 @@ const ProductDetailPage = () => {
             </div>
           </div>
 
-          {/* Swipeable Thumbnail Gallery */}
           <div className="thumbnail-container">
             <div className="thumbnail-scroll" id="thumbnailScroll">
               {slides.map((item, idx) => (
@@ -640,18 +724,18 @@ const ProductDetailPage = () => {
             </div>
           </div>
 
-          {/* PRODUCT INFO */}
           <div className="product-info">
-            <h2>{product.title}</h2>
+            <h2 className="tight-title">{product.title}</h2>
 
-            <div className="price-section-container enhanced">
+            {/* 1. PRICE SECTION */}
+            <div className="price-section-container tight-price">
               <div className="price-main-row">
                 <span className="current-price">₹{totalPrice}</span>
                 {product.comparePrice && product.comparePrice > product.price && (
                   <>
                     <span className="original-price">₹{product.comparePrice}</span>
                     <span className="discount-pill">
-                      Save{" "}
+                      SAVE{" "}
                       {Math.round(
                         ((product.comparePrice - product.price) /
                           product.comparePrice) *
@@ -665,37 +749,18 @@ const ProductDetailPage = () => {
 
               <div className="price-footer-meta">
                 <p className="inclusive-taxes">Inclusive of all taxes</p>
-
                 {paymentOptions?.partialPayment?.enabled && advance > 0 && (
                   <div className="advance-highlight-box">
                     <div className="advance-main">Pay only ₹{advance} Now</div>
                     <div className="advance-sub">₹{due} After delivery</div>
                   </div>
                 )}
-
-                
               </div>
             </div>
 
-            {/* Main Action Buttons */}
-            <div className="action-buttons">
-              {product.isCustomizable ? (
-                <button className="customize-btn" onClick={handleProceedClick}>
-                  ✨ Customize and Buy Now
-                </button>
-              ) : (
-                <>
-                  <button className="buy-now" onClick={handleProceedClick}>
-                    Buy Now
-                  </button>
-                </>
-              )}
-            </div>
-
-            {/* Specifications Preview Block */}
+            {/* 2. SPECIFICATIONS SELECTOR */}
             {product.specifications?.length > 0 && (
-              <div className="specifications-block">
-                <h4>Select Specifications</h4>
+              <div className="specifications-block compact-specs">
                 {product.specifications.map((spec, idx) => (
                   <div key={idx} className="spec-group">
                     <p className="spec-label">{spec.key}:</p>
@@ -727,6 +792,60 @@ const ProductDetailPage = () => {
                 ))}
               </div>
             )}
+
+            {/* 3. ACTION BUTTONS (Disabled if not chosen or stock is 0) */}
+            <div className="action-buttons tight-actions">
+              {product.isCustomizable ? (
+                <button 
+                  className="customize-btn" 
+                  onClick={handleCustomizeClick}
+                  disabled={!canProceed}
+                >
+                  {canProceed ? "✨ Customize and Buy Now" : "Out of Stock"}
+                </button>
+              ) : (
+                <div className="single-line-buttons">
+                  {/* LEFT: Add to Cart OR Interactive Stepper (+ / -) */}
+                  {currentQtyInCart > 0 ? (
+                    <div className="theme-stepper-box">
+                      <button 
+                        className="stepper-btn" 
+                        onClick={() => handleUpdateQuantity(-1)}
+                        title="Remove 1"
+                      >
+                        <FaMinus />
+                      </button>
+                      <span className="stepper-qty-num">{currentQtyInCart} in Cart</span>
+                      <button 
+                        className="stepper-btn" 
+                        onClick={() => handleUpdateQuantity(1)}
+                        disabled={!canProceed}
+                        title="Add 1 more"
+                      >
+                        <FaPlus />
+                      </button>
+                    </div>
+                  ) : (
+                    <button 
+                      className="custom-add-cart-btn" 
+                      onClick={() => handleUpdateQuantity(1)}
+                      disabled={!canProceed}
+                    >
+                      <FaShoppingBag className="btn-icon" /> {canProceed ? "ADD TO CART" : "OUT OF STOCK"}
+                    </button>
+                  )}
+
+                  {/* RIGHT: Buy Now */}
+                  <button 
+                    className="custom-buy-now-btn" 
+                    onClick={handleDirectBuyNow}
+                    disabled={!canProceed}
+                  >
+                    <FaBolt className="btn-icon" /> {canProceed ? "BUY NOW" : "OUT OF STOCK"}
+                  </button>
+                </div>
+              )}
+            </div>
 
             {/* Trust Badges */}
             <div className="trust-badges-section">
@@ -843,12 +962,57 @@ const ProductDetailPage = () => {
         </div>
       )}
 
+      {/* FLOATING BOTTOM CART BAR */}
+      {showFloatingCart && cartCount > 0 && (
+        <div className="floating-cart-overlay">
+          <div className="floating-cart-container" onClick={() => navigate("/cart")}>
+            <div className="floating-cart-left">
+              <div className="floating-img-wrapper">
+                <img 
+                  src={product.images[0]} 
+                  alt={product.title} 
+                  className="floating-cart-img" 
+                />
+                <span className="floating-check-badge">
+                  <FaCheckCircle />
+                </span>
+              </div>
+              <div className="floating-cart-info">
+                <span className="floating-title">{product.title}</span>
+                <span className="floating-specs">
+                  {Object.values(selectedSpecs).join(" • ") || "Selected"}
+                </span>
+              </div>
+            </div>
+
+            <div className="floating-cart-right">
+              <div className="floating-price-meta">
+                <span className="floating-qty-pill">{cartCount} ITEM{cartCount > 1 ? "S" : ""}</span>
+                <span className="floating-cart-total">₹{cartTotal}</span>
+              </div>
+              <button className="floating-cta-btn">
+                View Cart <FaArrowRight />
+              </button>
+              <button 
+                className="floating-close-btn"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowFloatingCart(false);
+                }}
+                title="Dismiss"
+              >
+                <FaTimes />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <Footer />
     </div>
   );
 };
 
-// Subcomponent for Expandable Descriptions
 const DescriptionSections = ({ parts }) => {
   const [expandedIndex, setExpandedIndex] = useState(0);
 
