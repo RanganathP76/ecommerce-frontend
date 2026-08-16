@@ -2946,3 +2946,177 @@ html, body, .product-detail {
     transform: rotate(360deg);
   }
 }
+
+/* ========================================================
+   DESKTOP ONLY VIEW FIX (Screen width 992px and above)
+======================================================== */
+@media (min-width: 992px) {
+  /* 1. Hide thumbnails on desktop */
+  .thumbnail-container {
+    display: none !important;
+  }
+
+  /* 2. Main Page Layout - Clean 2-column flex */
+  .product-detail {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    justify-content: space-between !important;
+    align-items: flex-start !important;
+    max-width: 1200px !important;
+    margin: 30px auto !important;
+    padding: 0 20px !important;
+    position: static !important;
+  }
+
+  /* 3. Left Image Container - Unfixed, normal scrolling flow */
+  .product-image-slider-container {
+    width: 48% !important;
+    max-width: 520px !important;
+    position: relative !important; /* Overrides position: fixed */
+    top: auto !important;
+    left: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    transform: none !important;
+    margin: 0 !important;
+    z-index: 1 !important;
+  }
+
+  .image-slide-wrapper {
+    width: 100% !important;
+    height: 520px !important;
+    max-height: 520px !important;
+    position: relative !important;
+    display: flex !important;
+    overflow-x: auto !important;
+    scroll-snap-type: x mandatory !important;
+    border-radius: 12px !important;
+    background: #f8fafc !important;
+    border: 1px solid #f1f5f9 !important;
+    margin: 0 !important;
+  }
+
+  .image-slide-wrapper img,
+  .image-slide-wrapper video {
+    width: 100% !important;
+    min-width: 100% !important;
+    height: 100% !important;
+    object-fit: contain !important;
+    border-radius: 12px !important;
+    position: static !important; /* Overrides fixed image positioning */
+    scroll-snap-align: start !important;
+  }
+
+  /* 4. Right Product Info Column */
+  .product-info {
+    width: 48% !important;
+    max-width: 550px !important;
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    z-index: 1 !important;
+  }
+
+  /* 5. Lower Content Sections (Full Width) */
+  .product-description-section,
+  .product-description,
+  .existing-reviews,
+  .review-section {
+    width: 100% !important;
+    margin-top: 40px !important;
+  }
+}
+
+/* ========================================================
+   DESKTOP ONLY VIEW: Fixed Right Side, Scrollable Left Side
+======================================================== */
+@media (min-width: 992px) {
+  /* 1. Hide thumbnails on desktop */
+  .thumbnail-container {
+    display: none !important;
+  }
+
+  /* 2. Main Page Layout */
+  .product-detail {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    justify-content: space-between !important;
+    align-items: flex-start !important;
+    max-width: 1200px !important;
+    margin: 30px auto !important;
+    padding: 0 20px !important;
+    position: relative !important;
+  }
+
+  /* 3. Left Side: Normal scrolling flow with room for all media */
+  .product-image-slider-container {
+    width: 48% !important;
+    max-width: 520px !important;
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    margin: 0 !important;
+    z-index: 1 !important;
+  }
+
+  .image-slide-wrapper {
+    width: 100% !important;
+    height: 520px !important;
+    max-height: 520px !important;
+    position: relative !important;
+    display: flex !important;
+    overflow-x: auto !important;
+    scroll-snap-type: x mandatory !important;
+    border-radius: 12px !important;
+    background: #f8fafc !important;
+    border: 1px solid #f1f5f9 !important;
+    margin: 0 !important;
+  }
+
+  .image-slide-wrapper img,
+  .image-slide-wrapper video {
+    width: 100% !important;
+    min-width: 100% !important;
+    height: 100% !important;
+    object-fit: contain !important;
+    border-radius: 12px !important;
+    position: static !important;
+    scroll-snap-align: start !important;
+  }
+
+  /* 4. Right Side: Sticky/Fixed on Screen while scrolling */
+  .product-info {
+    width: 48% !important;
+    max-width: 550px !important;
+    position: sticky !important;
+    top: 90px !important; /* Stays fixed below your header */
+    align-self: flex-start !important;
+    max-height: calc(100vh - 110px) !important;
+    overflow-y: auto !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    z-index: 2 !important;
+  }
+
+  /* Hide default scrollbar on the sticky right side for clean look */
+  .product-info::-webkit-scrollbar {
+    display: none;
+  }
+  .product-info {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  /* 5. Lower Content Sections */
+  .product-description-section,
+  .product-description,
+  .existing-reviews,
+  .review-section {
+    width: 100% !important;
+    margin-top: 40px !important;
+  }
+}
