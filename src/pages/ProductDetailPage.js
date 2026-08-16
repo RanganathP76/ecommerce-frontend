@@ -13,7 +13,8 @@ import {
   FaMinus,
   FaCheckCircle,
   FaMapMarkerAlt,
-  FaSpinner
+  FaSpinner,
+  FaCalendarAlt
 } from "react-icons/fa";
 import axiosInstance from "../axiosInstance";
 import "./ProductDetailPage.css";
@@ -22,6 +23,31 @@ import Footer from "../components/Footer";
 import PageLoader from "../components/PageLoader";
 import { Helmet } from "react-helmet-async";
 import { trackEvent } from "../utils/facebookPixel";
+
+// Helper function to calculate dynamic 4 to 6 day date range
+const getEstimatedDeliveryDateRange = () => {
+  const minDays = 3;
+  const maxDays = 6;
+  
+  const today = new Date();
+  
+  const startDate = new Date(today);
+  startDate.setDate(today.getDate() + minDays);
+  
+  const endDate = new Date(today);
+  endDate.setDate(today.getDate() + maxDays);
+  
+  const startDay = startDate.getDate();
+  const startMonth = startDate.toLocaleDateString("en-IN", { month: "short" });
+  
+  const endDay = endDate.getDate();
+  const endMonth = endDate.toLocaleDateString("en-IN", { month: "short" });
+
+  if (startMonth === endMonth) {
+    return `${startDay} - ${endDay} ${startMonth}`;
+  }
+  return `${startDay} ${startMonth} - ${endDay} ${endMonth}`;
+};
 
 const ProductDetailPage = () => {
   const { id } = useParams();
@@ -942,31 +968,34 @@ const ProductDetailPage = () => {
               )}
             </div>
 
-            {/* Trust Badges */}
-            <div className="trust-badges-section">
-              <div className="trust-badge">
-                <FaLock className="trust-icon" />
-                <p>Secure Payments</p>
-              </div>
-              <div className="trust-badge">
-                <FaShippingFast className="trust-icon" />
-                <p>Fast Shipping</p>
-              </div>
-              <div className="trust-badge">
-                <FaHeadset className="trust-icon" />
-                <p>24/7 Support</p>
-              </div>
-            </div>
-
-            {/* 🚚 3. SHIPROCKET LIVE DELIVERY & PINCODE CHECK */}
+             {/* 🚚 3. SHIPROCKET LIVE DELIVERY & PINCODE CHECK */}
             <div className="shiprocket-delivery-card">
               <div className="delivery-card-header">
                 <FaShippingFast className="delivery-fast-icon" />
                 <div>
                   <h4 className="delivery-heading">Estimated Delivery & Location</h4>
-                  <p className="delivery-subheading">Check courier serviceability for your pincode</p>
+                  <p className="delivery-subheading">Enter pincode for exact date & courier availability</p>
                 </div>
               </div>
+
+              {/* REAL-TIME DATES (Shown before user checks a specific pincode) */}
+              {!deliveryInfo?.serviceable && (
+                <div style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  backgroundColor: "#f8fafc",
+                  border: "1px dashed #cbd5e1",
+                  padding: "8px 12px",
+                  borderRadius: "6px",
+                  marginBottom: "12px",
+                  fontSize: "13px",
+                  color: "#334155"
+                }}>
+                  <FaCalendarAlt style={{ color: "#0284c7" }} />
+                  <span>Estimated Delivery by: <strong style={{ color: "#0f172a" }}>{getEstimatedDeliveryDateRange()}</strong></span>
+                </div>
+              )}
 
               <form className="pincode-search-form" onSubmit={handlePincodeSubmit}>
                 <div className="pincode-box-wrap">
@@ -989,8 +1018,9 @@ const ProductDetailPage = () => {
 
               {pincodeError && <p className="pincode-error-text">{pincodeError}</p>}
 
+              {/* LIVE SHIPROCKET RESULT (After user checks pincode) */}
               {deliveryInfo?.serviceable && (
-                <div className="serviceability-success-box">
+                <div className="serviceability-success-box" style={{ marginTop: "10px" }}>
                   <div className="edd-highlight">
                     <FaCheckCircle className="check-success-icon" />
                     <span>
@@ -1001,6 +1031,24 @@ const ProductDetailPage = () => {
                 </div>
               )}
             </div>
+
+            {/* Trust Badges */}
+            <div className="trust-badges-section">
+              <div className="trust-badge">
+                <FaLock className="trust-icon" />
+                <p>Secure Payments</p>
+              </div>
+              <div className="trust-badge">
+                <FaShippingFast className="trust-icon" />
+                <p>Fast Shipping</p>
+              </div>
+              <div className="trust-badge">
+                <FaHeadset className="trust-icon" />
+                <p>24/7 Support</p>
+              </div>
+            </div>
+
+           
 
             {/* Description */}
             {Array.isArray(product.description) && product.description.length > 0 ? (
