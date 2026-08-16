@@ -39,6 +39,9 @@ const ProductDetailPage = () => {
   const [uploadingFiles, setUploadingFiles] = useState({});
   const [highlightField, setHighlightField] = useState(null);
 
+  // 🚚 Shipping Rate State (Fetched like Checkout Page)
+  const [shippingPrice, setShippingPrice] = useState(null);
+
   // 📍 Shiprocket Live Pincode & Delivery State
   const [deliveryPincode, setDeliveryPincode] = useState(() => localStorage.getItem("user_pincode") || "");
   const [pincodeChecking, setPincodeChecking] = useState(false);
@@ -53,6 +56,24 @@ const ProductDetailPage = () => {
 
   // 🔄 VIEW SWITCHER STATE
   const [showCustomizationStep, setShowCustomizationStep] = useState(false);
+
+  // 🚚 Fetch Shipping Rates (like checkout)
+  useEffect(() => {
+    axiosInstance
+      .get("/shipping-rates")
+      .then((res) => {
+        const enabledRates = res.data.filter((rate) => rate.enabled);
+        if (enabledRates.length > 0) {
+          setShippingPrice(Number(enabledRates[0].rate || 0));
+        } else {
+          setShippingPrice(0);
+        }
+      })
+      .catch((err) => {
+        console.error("Failed to fetch shipping rates", err);
+        setShippingPrice(0);
+      });
+  }, []);
 
   // 🚚 Shiprocket Live Pincode Verification
   const checkPincodeServiceability = async (pin) => {
@@ -790,6 +811,39 @@ const ProductDetailPage = () => {
                 )}
               </div>
 
+              {/* 🚚 Dynamic Shipping Badge & Fee Info */}
+              {shippingPrice !== null && (
+                <div style={{ marginTop: "6px", display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
+                  {shippingPrice === 0 ? (
+                    <>
+                      <span
+                        style={{
+                          backgroundColor: "#e6f9ed",
+                          color: "#15803d",
+                          fontSize: "12px",
+                          fontWeight: "700",
+                          padding: "2px 8px",
+                          borderRadius: "4px",
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: "4px",
+                          border: "1px solid #bbf7d0",
+                        }}
+                      >
+                        <FaShippingFast /> FREE SHIPPING
+                      </span>
+                      <span style={{ fontSize: "13px", color: "#16a34a", fontWeight: "500" }}>
+                        Free Delivery on this order
+                      </span>
+                    </>
+                  ) : (
+                    <span style={{ fontSize: "13px", color: "#6b7280", fontWeight: "500" }}>
+                      + ₹{shippingPrice} Shipping Fee
+                    </span>
+                  )}
+                </div>
+              )}
+
               <div className="price-footer-meta">
                 <p className="inclusive-taxes">Inclusive of all taxes</p>
                 {paymentOptions?.partialPayment?.enabled && advance > 0 && (
@@ -835,8 +889,6 @@ const ProductDetailPage = () => {
                 ))}
               </div>
             )}
-
-            
 
             {/* 4. ACTION BUTTONS */}
             <div className="action-buttons tight-actions">
@@ -889,8 +941,6 @@ const ProductDetailPage = () => {
                 </div>
               )}
             </div>
-
-            
 
             {/* Trust Badges */}
             <div className="trust-badges-section">
@@ -948,8 +998,6 @@ const ProductDetailPage = () => {
                       {deliveryInfo.city && ` to ${deliveryInfo.city}, ${deliveryInfo.state}`}
                     </span>
                   </div>
-                  
-                  
                 </div>
               )}
             </div>
