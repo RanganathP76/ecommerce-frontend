@@ -11,7 +11,8 @@ import {
   FaTimes, 
   FaPlus, 
   FaMinus,
-  FaCheckCircle 
+  FaCheckCircle,
+  FaMapMarkerAlt
 } from "react-icons/fa";
 import axiosInstance from "../axiosInstance";
 import "./ProductDetailPage.css";
@@ -39,6 +40,13 @@ const ProductDetailPage = () => {
   const [uploadingFiles, setUploadingFiles] = useState({});
   const [highlightField, setHighlightField] = useState(null);
 
+  // 📍 Pincode & Delivery Date State
+  const [deliveryPincode, setDeliveryPincode] = useState(() => localStorage.getItem("user_pincode") || "");
+  const [pincodeStatus, setPincodeStatus] = useState(() => {
+    const saved = localStorage.getItem("user_pincode");
+    return saved && saved.length === 6 ? "checked" : "";
+  });
+
   // 🛒 Cart Quantity & Floating Bar State
   const [currentQtyInCart, setCurrentQtyInCart] = useState(0);
   const [showFloatingCart, setShowFloatingCart] = useState(false);
@@ -47,6 +55,32 @@ const ProductDetailPage = () => {
 
   // 🔄 VIEW SWITCHER STATE (Only for customizable products)
   const [showCustomizationStep, setShowCustomizationStep] = useState(false);
+
+  // 📅 Calculate Estimated Delivery Date Helper (4 - 7 Business Days)
+  const getEstimatedDeliveryDateRange = () => {
+    const today = new Date();
+    const minDays = 4;
+    const maxDays = 7;
+
+    const minDate = new Date(today);
+    minDate.setDate(today.getDate() + minDays);
+
+    const maxDate = new Date(today);
+    maxDate.setDate(today.getDate() + maxDays);
+
+    const options = { month: "short", day: "numeric" };
+    return `${minDate.toLocaleDateString("en-IN", options)} - ${maxDate.toLocaleDateString("en-IN", options)}`;
+  };
+
+  const handlePincodeCheck = (e) => {
+    e.preventDefault();
+    if (/^\d{6}$/.test(deliveryPincode)) {
+      localStorage.setItem("user_pincode", deliveryPincode);
+      setPincodeStatus("checked");
+    } else {
+      setPincodeStatus("error");
+    }
+  };
 
   // Sync overall cart summary
   const syncCartSummary = () => {
@@ -193,25 +227,23 @@ const ProductDetailPage = () => {
 
   const totalPrice = calculateTotalPrice();
 
-  // 🔍 Check if all specifications are chosen and in stock
   const isSelectionValidAndInStock = () => {
     if (!product) return false;
     if (Array.isArray(product.specifications) && product.specifications.length > 0) {
       for (const spec of product.specifications) {
         const chosenVal = selectedSpecs[spec.key];
-        if (!chosenVal) return false; // Spec not chosen
+        if (!chosenVal) return false;
         const matchedOption = spec.values?.find((v) => v.value === chosenVal);
-        if (!matchedOption || matchedOption.stock <= 0) return false; // Out of stock or invalid
+        if (!matchedOption || matchedOption.stock <= 0) return false;
       }
     }
     return true;
   };
 
-  // 🔄 Live Backend Stock Check on Click
   const verifyLatestStockBeforeProceeding = async () => {
     try {
       const { data } = await axiosInstance.get(`/products/${id}`);
-      setProduct(data); // update product in state
+      setProduct(data);
 
       if (Array.isArray(data.specifications) && data.specifications.length > 0) {
         for (const spec of data.specifications) {
@@ -354,7 +386,6 @@ const ProductDetailPage = () => {
     };
   };
 
-  // ➕ / ➖ Stepper Logic with Stock Re-verification
   const handleUpdateQuantity = async (delta) => {
     if (delta > 0) {
       const inStock = await verifyLatestStockBeforeProceeding();
@@ -406,7 +437,6 @@ const ProductDetailPage = () => {
     window.dispatchEvent(new Event("storage"));
   };
 
-  // ⚡ Direct Buy Now (Clears previous cart and adds only this fresh item to /cart)
   const handleDirectBuyNow = async () => {
     const inStock = await verifyLatestStockBeforeProceeding();
     if (!inStock) return;
@@ -420,12 +450,10 @@ const ProductDetailPage = () => {
       quantity: 1,
     });
     
-    // Clear old cart and add fresh product
     localStorage.setItem("cart", JSON.stringify([cartItem]));
     navigate("/cart");
   };
 
-  // Trigger customization view (Only for customizable items)
   const handleCustomizeClick = async () => {
     const inStock = await verifyLatestStockBeforeProceeding();
     if (!inStock) return;
@@ -663,7 +691,7 @@ const ProductDetailPage = () => {
           </div>
         </div>
       ) : (
-        /* SCREEN 1: REDESIGNED MAIN PRODUCT PAGE */
+        /* SCREEN 1: MAIN PRODUCT PAGE */
         <div className="product-detail">
           <div className="product-image-slider-container">
             <div
@@ -793,7 +821,8 @@ const ProductDetailPage = () => {
               </div>
             )}
 
-            {/* 3. ACTION BUTTONS (Disabled if not chosen or stock is 0) */}
+            
+            {/* 4. ACTION BUTTONS */}
             <div className="action-buttons tight-actions">
               {product.isCustomizable ? (
                 <button 
@@ -805,7 +834,6 @@ const ProductDetailPage = () => {
                 </button>
               ) : (
                 <div className="single-line-buttons">
-                  {/* LEFT: Add to Cart OR Interactive Stepper (+ / -) */}
                   {currentQtyInCart > 0 ? (
                     <div className="theme-stepper-box">
                       <button 
@@ -835,7 +863,6 @@ const ProductDetailPage = () => {
                     </button>
                   )}
 
-                  {/* RIGHT: Buy Now */}
                   <button 
                     className="custom-buy-now-btn" 
                     onClick={handleDirectBuyNow}
@@ -846,6 +873,50 @@ const ProductDetailPage = () => {
                 </div>
               )}
             </div>
+
+            {/* 🚚 3. ESTIMATED DELIVERY ESTIMATE WIDGET */}
+            <div className="estimated-delivery-box">
+              <div className="delivery-header-row">
+                <FaShippingFast className="delivery-icon" />
+                <div className="delivery-text-wrap">
+                  <span className="delivery-title">
+                    Estimated Delivery by: <strong>{getEstimatedDeliveryDateRange()}</strong>
+                  </span>
+                  <span className="delivery-subtitle">Dispatched in 24-48 hours via Express Courier</span>
+                </div>
+              </div>
+
+              <form className="pincode-check-form" onSubmit={handlePincodeCheck}>
+                <div className="pincode-input-group">
+                  <FaMapMarkerAlt className="pincode-marker-icon" />
+                  <input
+                    type="text"
+                    maxLength={6}
+                    placeholder="Enter 6-digit Pincode"
+                    value={deliveryPincode}
+                    onChange={(e) => {
+                      setDeliveryPincode(e.target.value.replace(/\D/g, ""));
+                      setPincodeStatus("");
+                    }}
+                  />
+                  <button type="submit" className="pincode-check-btn">
+                    Check
+                  </button>
+                </div>
+              </form>
+
+              {pincodeStatus === "checked" && (
+                <div className="pincode-success-msg">
+                  <FaCheckCircle /> Delivery available to <strong>{deliveryPincode}</strong>
+                </div>
+              )}
+              {pincodeStatus === "error" && (
+                <div className="pincode-error-msg">
+                  Please enter a valid 6-digit Pincode.
+                </div>
+              )}
+            </div>
+
 
             {/* Trust Badges */}
             <div className="trust-badges-section">
@@ -862,6 +933,8 @@ const ProductDetailPage = () => {
                 <p>24/7 Support</p>
               </div>
             </div>
+
+            
 
             {/* Description */}
             {Array.isArray(product.description) && product.description.length > 0 ? (

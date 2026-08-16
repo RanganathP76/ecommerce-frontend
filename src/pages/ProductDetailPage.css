@@ -2679,3 +2679,119 @@ html, body, .product-detail {
   cursor: not-allowed !important;
   transform: none !important;
 }
+
+/* ==========================================================================
+   ESTIMATED DELIVERY & PINCODE CHECKER WIDGET
+   ========================================================================== */
+.estimated-delivery-box {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin: 18px 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.delivery-header-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.delivery-icon {
+  font-size: 22px;
+  color: #2563eb;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.delivery-text-wrap {
+  display: flex;
+  flex-direction: column;
+}
+
+.delivery-title {
+  font-size: 14px;
+  color: #1e293b;
+}
+
+.delivery-title strong {
+  color: #16a34a;
+  font-weight: 700;
+}
+
+.delivery-subtitle {
+  font-size: 12px;
+  color: #64748b;
+  margin-top: 2px;
+}
+
+.pincode-check-form {
+  margin-top: 8px;
+}
+
+.pincode-input-group {
+  display: flex;
+  align-items: center;
+  position: relative;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 2px 4px 2px 10px;
+  max-width: 320px;
+  transition: border-color 0.2s;
+}
+
+.pincode-input-group:focus-within {
+  border-color: #2563eb;
+}
+
+.pincode-marker-icon {
+  color: #94a3b8;
+  font-size: 14px;
+  margin-right: 6px;
+}
+
+.pincode-input-group input {
+  border: none;
+  outline: none;
+  font-size: 13px;
+  flex: 1;
+  padding: 6px 0;
+  color: #1e293b;
+  background: transparent;
+}
+
+.pincode-check-btn {
+  background: #2563eb;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.pincode-check-btn:hover {
+  background: #1d4ed8;
+}
+
+.pincode-success-msg {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #15803d;
+  margin-top: 8px;
+  font-weight: 500;
+}
+
+.pincode-error-msg {
+  font-size: 12px;
+  color: #dc2626;
+  margin-top: 8px;
+  font-weight: 500;
+}
