@@ -12,7 +12,8 @@ import {
   FaPlus, 
   FaMinus,
   FaCheckCircle,
-  FaMapMarkerAlt
+  FaMapMarkerAlt,
+  FaSpinner
 } from "react-icons/fa";
 import axiosInstance from "../axiosInstance";
 import "./ProductDetailPage.css";
@@ -20,8 +21,6 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import PageLoader from "../components/PageLoader";
 import { Helmet } from "react-helmet-async";
-
-// ✅ Import Pixel tracking function
 import { trackEvent } from "../utils/facebookPixel";
 
 const ProductDetailPage = () => {
@@ -40,12 +39,11 @@ const ProductDetailPage = () => {
   const [uploadingFiles, setUploadingFiles] = useState({});
   const [highlightField, setHighlightField] = useState(null);
 
-  // 📍 Pincode & Delivery Date State
+  // 📍 Shiprocket Live Pincode & Delivery State
   const [deliveryPincode, setDeliveryPincode] = useState(() => localStorage.getItem("user_pincode") || "");
-  const [pincodeStatus, setPincodeStatus] = useState(() => {
-    const saved = localStorage.getItem("user_pincode");
-    return saved && saved.length === 6 ? "checked" : "";
-  });
+  const [pincodeChecking, setPincodeChecking] = useState(false);
+  const [deliveryInfo, setDeliveryInfo] = useState(null);
+  const [pincodeError, setPincodeError] = useState("");
 
   // 🛒 Cart Quantity & Floating Bar State
   const [currentQtyInCart, setCurrentQtyInCart] = useState(0);
@@ -53,36 +51,57 @@ const ProductDetailPage = () => {
   const [cartCount, setCartCount] = useState(0);
   const [cartTotal, setCartTotal] = useState(0);
 
-  // 🔄 VIEW SWITCHER STATE (Only for customizable products)
+  // 🔄 VIEW SWITCHER STATE
   const [showCustomizationStep, setShowCustomizationStep] = useState(false);
 
-  // 📅 Calculate Estimated Delivery Date Helper (4 - 7 Business Days)
-  const getEstimatedDeliveryDateRange = () => {
-    const today = new Date();
-    const minDays = 4;
-    const maxDays = 7;
+  // 🚚 Shiprocket Live Pincode Verification
+  const checkPincodeServiceability = async (pin) => {
+    const targetPin = pin || deliveryPincode;
+    if (!/^\d{6}$/.test(targetPin)) {
+      setPincodeError("Please enter a valid 6-digit Pincode.");
+      setDeliveryInfo(null);
+      return;
+    }
 
-    const minDate = new Date(today);
-    minDate.setDate(today.getDate() + minDays);
+    try {
+      setPincodeChecking(true);
+      setPincodeError("");
 
-    const maxDate = new Date(today);
-    maxDate.setDate(today.getDate() + maxDays);
+      const res = await axiosInstance.post("/orders/check-serviceability", {
+        delivery_postcode: targetPin,
+        weight: product?.weight || 0.5,
+      });
 
-    const options = { month: "short", day: "numeric" };
-    return `${minDate.toLocaleDateString("en-IN", options)} - ${maxDate.toLocaleDateString("en-IN", options)}`;
-  };
-
-  const handlePincodeCheck = (e) => {
-    e.preventDefault();
-    if (/^\d{6}$/.test(deliveryPincode)) {
-      localStorage.setItem("user_pincode", deliveryPincode);
-      setPincodeStatus("checked");
-    } else {
-      setPincodeStatus("error");
+      if (res.data?.serviceable) {
+        setDeliveryInfo(res.data);
+        localStorage.setItem("user_pincode", targetPin);
+      } else {
+        setDeliveryInfo(null);
+        setPincodeError(res.data?.message || "Delivery is currently unavailable to this pincode.");
+      }
+    } catch (err) {
+      console.error("Serviceability check failed:", err);
+      setPincodeError("Unable to verify pincode. Please try again.");
+      setDeliveryInfo(null);
+    } finally {
+      setPincodeChecking(false);
     }
   };
 
-  // Sync overall cart summary
+  const handlePincodeSubmit = (e) => {
+    e.preventDefault();
+    checkPincodeServiceability(deliveryPincode);
+  };
+
+  // Auto-check on load if user already has a saved valid pincode
+  useEffect(() => {
+    const saved = localStorage.getItem("user_pincode");
+    if (saved && /^\d{6}$/.test(saved)) {
+      checkPincodeServiceability(saved);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [product?._id]);
+
   const syncCartSummary = () => {
     try {
       const cart = JSON.parse(localStorage.getItem("cart")) || [];
@@ -98,7 +117,6 @@ const ProductDetailPage = () => {
     }
   };
 
-  // Check specific item's quantity for chosen variant
   const syncCurrentItemQty = (productId, specs) => {
     try {
       const cart = JSON.parse(localStorage.getItem("cart")) || [];
@@ -124,7 +142,6 @@ const ProductDetailPage = () => {
     }
   }, [selectedSpecs, product]);
 
-  // 📱 Mobile back button listener
   useEffect(() => {
     const handlePopState = () => {
       if (showCustomizationStep) {
@@ -142,7 +159,6 @@ const ProductDetailPage = () => {
     };
   }, [showCustomizationStep]);
 
-  // Fetch product details
   useEffect(() => {
     const fetchProduct = async () => {
       try {
@@ -546,7 +562,6 @@ const ProductDetailPage = () => {
 
       {/* VIEW SWITCHER */}
       {showCustomizationStep ? (
-        /* SCREEN 2: CUSTOMIZATION VIEW */
         <div className="customization-step-wrapper">
           <div className="step-header-bar">
             <button className="step-back-btn" onClick={handleBackButtonClick}>
@@ -822,6 +837,7 @@ const ProductDetailPage = () => {
             )}
 
             
+
             {/* 4. ACTION BUTTONS */}
             <div className="action-buttons tight-actions">
               {product.isCustomizable ? (
@@ -874,49 +890,7 @@ const ProductDetailPage = () => {
               )}
             </div>
 
-            {/* 🚚 3. ESTIMATED DELIVERY ESTIMATE WIDGET */}
-            <div className="estimated-delivery-box">
-              <div className="delivery-header-row">
-                <FaShippingFast className="delivery-icon" />
-                <div className="delivery-text-wrap">
-                  <span className="delivery-title">
-                    Estimated Delivery by: <strong>{getEstimatedDeliveryDateRange()}</strong>
-                  </span>
-                  <span className="delivery-subtitle">Dispatched in 24-48 hours via Express Courier</span>
-                </div>
-              </div>
-
-              <form className="pincode-check-form" onSubmit={handlePincodeCheck}>
-                <div className="pincode-input-group">
-                  <FaMapMarkerAlt className="pincode-marker-icon" />
-                  <input
-                    type="text"
-                    maxLength={6}
-                    placeholder="Enter 6-digit Pincode"
-                    value={deliveryPincode}
-                    onChange={(e) => {
-                      setDeliveryPincode(e.target.value.replace(/\D/g, ""));
-                      setPincodeStatus("");
-                    }}
-                  />
-                  <button type="submit" className="pincode-check-btn">
-                    Check
-                  </button>
-                </div>
-              </form>
-
-              {pincodeStatus === "checked" && (
-                <div className="pincode-success-msg">
-                  <FaCheckCircle /> Delivery available to <strong>{deliveryPincode}</strong>
-                </div>
-              )}
-              {pincodeStatus === "error" && (
-                <div className="pincode-error-msg">
-                  Please enter a valid 6-digit Pincode.
-                </div>
-              )}
-            </div>
-
+            
 
             {/* Trust Badges */}
             <div className="trust-badges-section">
@@ -934,7 +908,51 @@ const ProductDetailPage = () => {
               </div>
             </div>
 
-            
+            {/* 🚚 3. SHIPROCKET LIVE DELIVERY & PINCODE CHECK */}
+            <div className="shiprocket-delivery-card">
+              <div className="delivery-card-header">
+                <FaShippingFast className="delivery-fast-icon" />
+                <div>
+                  <h4 className="delivery-heading">Estimated Delivery & Location</h4>
+                  <p className="delivery-subheading">Check courier serviceability for your pincode</p>
+                </div>
+              </div>
+
+              <form className="pincode-search-form" onSubmit={handlePincodeSubmit}>
+                <div className="pincode-box-wrap">
+                  <FaMapMarkerAlt className="pincode-pin-icon" />
+                  <input
+                    type="text"
+                    maxLength={6}
+                    placeholder="Enter 6-digit Pincode"
+                    value={deliveryPincode}
+                    onChange={(e) => {
+                      setDeliveryPincode(e.target.value.replace(/\D/g, ""));
+                      setPincodeError("");
+                    }}
+                  />
+                  <button type="submit" className="pincode-submit-btn" disabled={pincodeChecking}>
+                    {pincodeChecking ? <FaSpinner className="spin-icon" /> : "Check"}
+                  </button>
+                </div>
+              </form>
+
+              {pincodeError && <p className="pincode-error-text">{pincodeError}</p>}
+
+              {deliveryInfo?.serviceable && (
+                <div className="serviceability-success-box">
+                  <div className="edd-highlight">
+                    <FaCheckCircle className="check-success-icon" />
+                    <span>
+                      Delivery by <strong>{deliveryInfo.edd}</strong>
+                      {deliveryInfo.city && ` to ${deliveryInfo.city}, ${deliveryInfo.state}`}
+                    </span>
+                  </div>
+                  
+                  
+                </div>
+              )}
+            </div>
 
             {/* Description */}
             {Array.isArray(product.description) && product.description.length > 0 ? (
