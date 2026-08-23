@@ -4,29 +4,6 @@
       "source": "/sitemap.xml",
       "destination": "https://ecommerce-backend-8wv0.onrender.com/api/sitemap.xml"
     },
-    
-    {
-      "source": "/product/:id",
-      "has": [
-        {
-          "type": "header",
-          "key": "user-agent",
-          "value": ".*(facebookexternalhit|Facebot|WhatsApp|Instagram|Twitterbot|TelegramBot|Slackbot|LinkedInBot|Pinterest).*"
-        }
-      ],
-      "destination": "https://your-backend-api-url.com/product/:id"
-    },
-    {
-      "source": "/collection/:id",
-      "has": [
-        {
-          "type": "header",
-          "key": "user-agent",
-          "value": ".*(facebookexternalhit|Facebot|WhatsApp|Instagram|Twitterbot|TelegramBot|Slackbot|LinkedInBot|Pinterest).*"
-        }
-      ],
-      "destination": "https://your-backend-api-url.com/collection/:id"
-    },
     {
       "source": "/(.*)",
       "destination": "/index.html"
