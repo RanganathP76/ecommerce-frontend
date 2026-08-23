@@ -24,11 +24,9 @@ import PageLoader from "../components/PageLoader";
 import { Helmet } from "react-helmet-async";
 import { trackEvent } from "../utils/facebookPixel";
 
-// Helper function to calculate dynamic 4 to 6 day date range
 const getEstimatedDeliveryDateRange = () => {
   const minDays = 3;
   const maxDays = 6;
-  
   const today = new Date();
   
   const startDate = new Date(today);
@@ -65,25 +63,20 @@ const ProductDetailPage = () => {
   const [uploadingFiles, setUploadingFiles] = useState({});
   const [highlightField, setHighlightField] = useState(null);
 
-  // 🚚 Shipping Rate State (Fetched like Checkout Page)
   const [shippingPrice, setShippingPrice] = useState(null);
 
-  // 📍 Shiprocket Live Pincode & Delivery State
   const [deliveryPincode, setDeliveryPincode] = useState(() => localStorage.getItem("user_pincode") || "");
   const [pincodeChecking, setPincodeChecking] = useState(false);
   const [deliveryInfo, setDeliveryInfo] = useState(null);
   const [pincodeError, setPincodeError] = useState("");
 
-  // 🛒 Cart Quantity & Floating Bar State
   const [currentQtyInCart, setCurrentQtyInCart] = useState(0);
   const [showFloatingCart, setShowFloatingCart] = useState(false);
   const [cartCount, setCartCount] = useState(0);
   const [cartTotal, setCartTotal] = useState(0);
 
-  // 🔄 VIEW SWITCHER STATE
   const [showCustomizationStep, setShowCustomizationStep] = useState(false);
 
-  // 🚚 Fetch Shipping Rates (like checkout)
   useEffect(() => {
     axiosInstance
       .get("/shipping-rates")
@@ -101,7 +94,6 @@ const ProductDetailPage = () => {
       });
   }, []);
 
-  // 🚚 Shiprocket Live Pincode Verification
   const checkPincodeServiceability = async (pin) => {
     const targetPin = pin || deliveryPincode;
     if (!/^\d{6}$/.test(targetPin)) {
@@ -140,13 +132,11 @@ const ProductDetailPage = () => {
     checkPincodeServiceability(deliveryPincode);
   };
 
-  // Auto-check on load if user already has a saved valid pincode
   useEffect(() => {
     const saved = localStorage.getItem("user_pincode");
     if (saved && /^\d{6}$/.test(saved)) {
       checkPincodeServiceability(saved);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [product?._id]);
 
   const syncCartSummary = () => {
@@ -272,20 +262,20 @@ const ProductDetailPage = () => {
   const advance = getAdvance();
   const due = productPrice - advance;
 
-  const calculateTotalPrice = () => {
-    if (!product) return 0;
+  const calculateTotalPrice = (prod = product, specs = selectedSpecs) => {
+    if (!prod) return 0;
 
     let extra = 0;
-    if (product.specifications && Object.keys(selectedSpecs).length > 0) {
-      product.specifications.forEach((spec) => {
-        const selectedValue = selectedSpecs[spec.key];
+    if (prod.specifications && Object.keys(specs).length > 0) {
+      prod.specifications.forEach((spec) => {
+        const selectedValue = specs[spec.key];
         const specOption = spec.values.find((v) => v.value === selectedValue);
         if (specOption && specOption.extraPrice) {
           extra += Number(specOption.extraPrice);
         }
       });
     }
-    return Number(product.price) + extra;
+    return Number(prod.price) + extra;
   };
 
   const totalPrice = calculateTotalPrice();
@@ -303,26 +293,41 @@ const ProductDetailPage = () => {
     return true;
   };
 
-  const verifyLatestStockBeforeProceeding = async () => {
+  // 🛡️ Live Server Verification on Add to Cart / Buy Now
+  const verifyLatestStockAndPrice = async (targetQty = 1) => {
     try {
-      const { data } = await axiosInstance.get(`/products/${id}`);
-      setProduct(data);
+      const { data: latestProduct } = await axiosInstance.get(`/products/${id}`);
+      if (!latestProduct) {
+        alert("This item is no longer available or has been removed.");
+        return null;
+      }
 
-      if (Array.isArray(data.specifications) && data.specifications.length > 0) {
-        for (const spec of data.specifications) {
+      setProduct(latestProduct);
+
+      if (Array.isArray(latestProduct.specifications) && latestProduct.specifications.length > 0) {
+        for (const spec of latestProduct.specifications) {
           const chosenVal = selectedSpecs[spec.key];
           const matchedOption = spec.values?.find((v) => v.value === chosenVal);
-          if (!matchedOption || matchedOption.stock <= 0) {
-            alert("Sorry, out of stock just now!");
-            return false;
+          if (!matchedOption || matchedOption.stock < targetQty) {
+            alert("Sorry, this item or variant is currently out of stock!");
+            return null;
           }
         }
       }
-      return true;
+
+      const calculatedLatestPrice = calculateTotalPrice(latestProduct, selectedSpecs);
+      if (totalPrice !== calculatedLatestPrice) {
+        alert(`Notice: The price has updated to ₹${calculatedLatestPrice}. Cart will reflect the latest price.`);
+      }
+
+      return {
+        latestProduct,
+        latestPrice: calculatedLatestPrice,
+      };
     } catch (err) {
-      console.error("Stock check failed:", err);
-      alert("Unable to verify stock. Please try again.");
-      return false;
+      console.error("Stock and price check failed:", err);
+      alert("Unable to verify item availability from server. Please try again.");
+      return null;
     }
   };
 
@@ -419,23 +424,23 @@ const ProductDetailPage = () => {
     }));
   };
 
-  const generateCartItem = (qty = 1) => {
+  const generateCartItem = (prod, calculatedPrice, qty = 1) => {
     return {
-      _id: product._id,
-      title: product.title,
-      price: totalPrice,
-      comparePrice: product.comparePrice || null,
-      image: product.images[0],
+      _id: prod._id,
+      title: prod.title,
+      price: calculatedPrice,
+      comparePrice: prod.comparePrice || null,
+      image: prod.images?.[0] || "",
       quantity: qty,
       specifications:
-        product.specifications?.length > 0
+        prod.specifications?.length > 0
           ? Object.entries(selectedSpecs).map(([key, value]) => ({
               key,
               value,
             }))
           : [],
-      customization: product.isCustomizable
-        ? product.customizationFields.map((field, idx) => {
+      customization: prod.isCustomizable
+        ? prod.customizationFields.map((field, idx) => {
             const key = `${field.label}-${idx}`;
             const val = customInputs[key];
             return {
@@ -450,9 +455,12 @@ const ProductDetailPage = () => {
   };
 
   const handleUpdateQuantity = async (delta) => {
+    const targetQty = currentQtyInCart + delta;
+
+    let verifiedData = null;
     if (delta > 0) {
-      const inStock = await verifyLatestStockBeforeProceeding();
-      if (!inStock) return;
+      verifiedData = await verifyLatestStockAndPrice(targetQty);
+      if (!verifiedData) return;
     }
 
     let currentCart = [];
@@ -470,28 +478,30 @@ const ProductDetailPage = () => {
         JSON.stringify(item.specifications || []) === JSON.stringify(currentFormattedSpecs)
     );
 
-    const newQty = currentQtyInCart + delta;
-
-    if (newQty <= 0) {
+    if (targetQty <= 0) {
       if (existingIndex > -1) {
         currentCart.splice(existingIndex, 1);
       }
       setCurrentQtyInCart(0);
     } else {
+      const activeProduct = verifiedData?.latestProduct || product;
+      const activePrice = verifiedData?.latestPrice || totalPrice;
+
       if (existingIndex > -1) {
-        currentCart[existingIndex].quantity = newQty;
+        currentCart[existingIndex].quantity = targetQty;
+        currentCart[existingIndex].price = activePrice;
       } else {
-        const newItem = generateCartItem(newQty);
+        const newItem = generateCartItem(activeProduct, activePrice, targetQty);
         currentCart.push(newItem);
         trackEvent("AddToCart", {
           content_name: newItem.title,
           content_ids: [newItem._id],
           value: newItem.price,
           currency: "INR",
-          quantity: newQty,
+          quantity: targetQty,
         });
       }
-      setCurrentQtyInCart(newQty);
+      setCurrentQtyInCart(targetQty);
       setShowFloatingCart(true);
     }
 
@@ -501,10 +511,10 @@ const ProductDetailPage = () => {
   };
 
   const handleDirectBuyNow = async () => {
-    const inStock = await verifyLatestStockBeforeProceeding();
-    if (!inStock) return;
+    const verifiedData = await verifyLatestStockAndPrice(1);
+    if (!verifiedData) return;
 
-    const cartItem = generateCartItem(1);
+    const cartItem = generateCartItem(verifiedData.latestProduct, verifiedData.latestPrice, 1);
     trackEvent("AddToCart", {
       content_name: cartItem.title,
       content_ids: [cartItem._id],
@@ -514,12 +524,12 @@ const ProductDetailPage = () => {
     });
     
     localStorage.setItem("cart", JSON.stringify([cartItem]));
-    navigate("/cart");
+    navigate("/checkoutStep1");
   };
 
   const handleCustomizeClick = async () => {
-    const inStock = await verifyLatestStockBeforeProceeding();
-    if (!inStock) return;
+    const verifiedData = await verifyLatestStockAndPrice(1);
+    if (!verifiedData) return;
 
     setShowCustomizationStep(true);
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -607,7 +617,6 @@ const ProductDetailPage = () => {
         />
       </Helmet>
 
-      {/* VIEW SWITCHER */}
       {showCustomizationStep ? (
         <div className="customization-step-wrapper">
           <div className="step-header-bar">
@@ -753,7 +762,6 @@ const ProductDetailPage = () => {
           </div>
         </div>
       ) : (
-        /* SCREEN 1: MAIN PRODUCT PAGE */
         <div className="product-detail">
           <div className="product-image-slider-container">
             <div
@@ -817,7 +825,6 @@ const ProductDetailPage = () => {
           <div className="product-info">
             <h2 className="tight-title">{product.title}</h2>
 
-            {/* 1. PRICE SECTION */}
             <div className="price-section-container tight-price">
               <div className="price-main-row">
                 <span className="current-price">₹{totalPrice}</span>
@@ -837,7 +844,6 @@ const ProductDetailPage = () => {
                 )}
               </div>
 
-              {/* 🚚 Dynamic Shipping Badge & Fee Info */}
               {shippingPrice !== null && (
                 <div style={{ marginTop: "6px", display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
                   {shippingPrice === 0 ? (
@@ -881,7 +887,6 @@ const ProductDetailPage = () => {
               </div>
             </div>
 
-            {/* 2. SPECIFICATIONS SELECTOR */}
             {product.specifications?.length > 0 && (
               <div className="specifications-block compact-specs">
                 {product.specifications.map((spec, idx) => (
@@ -916,7 +921,6 @@ const ProductDetailPage = () => {
               </div>
             )}
 
-            {/* 4. ACTION BUTTONS */}
             <div className="action-buttons tight-actions">
               {product.isCustomizable ? (
                 <button 
@@ -968,7 +972,6 @@ const ProductDetailPage = () => {
               )}
             </div>
 
-             {/* 🚚 3. SHIPROCKET LIVE DELIVERY & PINCODE CHECK */}
             <div className="shiprocket-delivery-card">
               <div className="delivery-card-header">
                 <FaShippingFast className="delivery-fast-icon" />
@@ -978,7 +981,6 @@ const ProductDetailPage = () => {
                 </div>
               </div>
 
-              {/* REAL-TIME DATES (Shown before user checks a specific pincode) */}
               {!deliveryInfo?.serviceable && (
                 <div style={{
                   display: "flex",
@@ -1018,7 +1020,6 @@ const ProductDetailPage = () => {
 
               {pincodeError && <p className="pincode-error-text">{pincodeError}</p>}
 
-              {/* LIVE SHIPROCKET RESULT (After user checks pincode) */}
               {deliveryInfo?.serviceable && (
                 <div className="serviceability-success-box" style={{ marginTop: "10px" }}>
                   <div className="edd-highlight">
@@ -1032,7 +1033,6 @@ const ProductDetailPage = () => {
               )}
             </div>
 
-            {/* Trust Badges */}
             <div className="trust-badges-section">
               <div className="trust-badge">
                 <FaLock className="trust-icon" />
@@ -1048,9 +1048,6 @@ const ProductDetailPage = () => {
               </div>
             </div>
 
-           
-
-            {/* Description */}
             {Array.isArray(product.description) && product.description.length > 0 ? (
               <DescriptionSections parts={product.description} />
             ) : (
@@ -1062,7 +1059,6 @@ const ProductDetailPage = () => {
               ></p>
             )}
 
-            {/* Reviews Section */}
             <div className="existing-reviews">
               <h2>Customer Reviews</h2>
               {!product.reviews || product.reviews.length === 0 ? (
@@ -1121,7 +1117,6 @@ const ProductDetailPage = () => {
               )}
             </div>
 
-            {/* Submit Review */}
             <div className="review-section">
               <h3>Give a Review</h3>
               <div className="rating-input">
@@ -1149,7 +1144,6 @@ const ProductDetailPage = () => {
         </div>
       )}
 
-      {/* FLOATING BOTTOM CART BAR */}
       {showFloatingCart && cartCount > 0 && (
         <div className="floating-cart-overlay">
           <div className="floating-cart-container" onClick={() => navigate("/cart")}>

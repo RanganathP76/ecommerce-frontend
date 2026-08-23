@@ -1,12 +1,15 @@
 import React, { useState, useEffect, useContext, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import axiosInstance from "../axiosInstance";
 import CartContext from "../context/CartContext";
 import "./CheckoutStep1.css";
 import Footer from "../components/Footer";
 import PageLoader from "../components/PageLoader";
+import { FaExclamationTriangle, FaArrowRight, FaTimes } from "react-icons/fa";
 
 const CheckoutStep1 = () => {
-  const { cartItems, clearCart } = useContext(CartContext);
+  const { cartItems, setCartItems, clearCart } = useContext(CartContext);
+  const navigate = useNavigate();
 
   const [shippingInfo, setShippingInfo] = useState({
     name: "",
@@ -27,17 +30,26 @@ const CheckoutStep1 = () => {
   const [processing, setProcessing] = useState(false);
   const clickedOnceRef = useRef(false);
 
+  // 🔔 UI Modal State for Price Changes & Stock Issues
+  const [priceChangeModal, setPriceChangeModal] = useState({
+    show: false,
+    title: "",
+    message: "",
+    oldPrice: null,
+    newPrice: null,
+    productTitle: "",
+  });
+
   const RAZORPAY_KEY = "rzp_live_HirbfaYGKt499v";
   const token = localStorage.getItem("token");
 
   const handlePhoneChange = (e) => {
-  const value = e.target.value.replace(/\D/g, ""); // Remove non-numeric characters
-  if (value.length <= 10) {
-    setShippingInfo({ ...shippingInfo, phone: value });
-  }
-};
+    const value = e.target.value.replace(/\D/g, "");
+    if (value.length <= 10) {
+      setShippingInfo({ ...shippingInfo, phone: value });
+    }
+  };
 
-  // --- Price Calculations ---
   const itemsPrice = cartItems.reduce((acc, item) => {
     const price = parseFloat(item.price || 0);
     return acc + (isNaN(price) ? 0 : price * (item.quantity || 1));
@@ -75,7 +87,6 @@ const CheckoutStep1 = () => {
       ? total
       : 0;
 
-  // --- Preview values (always visible regardless of selection) ---
   const previewFullPrepaidTotal = Math.round(
     itemsPrice + shippingPrice - getDiscount()
   );
@@ -84,7 +95,6 @@ const CheckoutStep1 = () => {
   const previewPartialLater = Math.round(itemsPrice + shippingPrice - getAdvance());
   const previewCOD = Math.round(itemsPrice + shippingPrice);
 
-  // --- Fetch Shipping & Payment Config ---
   useEffect(() => {
     axiosInstance
       .get("/shipping-rates")
@@ -107,7 +117,6 @@ const CheckoutStep1 = () => {
       .catch(console.error);
   }, []);
 
-  // --- Helpers ---
   const guardClick = () => {
     if (processing || clickedOnceRef.current) return false;
     clickedOnceRef.current = true;
@@ -115,29 +124,110 @@ const CheckoutStep1 = () => {
     return true;
   };
 
-  const validateStock = () => {
-    for (const item of cartItems) {
-      if (item.specifications?.length > 0) {
-        for (const spec of item.specifications) {
-          if (spec.stock !== undefined && spec.stock < (item.quantity || 1)) {
-            return false;
+  // 🛡️ Live Server Verification with Modal Notice
+  const verifyLatestCartData = async () => {
+    let updatedCart = [...cartItems];
+    let hasChanges = false;
+    const initialItemCount = cartItems.length;
+    let lastFailedProductId = null;
+
+    for (let i = updatedCart.length - 1; i >= 0; i--) {
+      const item = updatedCart[i];
+      try {
+        const { data: serverProd } = await axiosInstance.get(`/products/${item._id}`);
+        if (!serverProd) {
+          lastFailedProductId = item._id;
+          updatedCart.splice(i, 1);
+          hasChanges = true;
+          setPriceChangeModal({
+            show: true,
+            title: "Item Unavailable",
+            message: `"${item.title}" is no longer available and was removed from your cart.`,
+            oldPrice: null,
+            newPrice: null,
+            productTitle: item.title,
+          });
+          continue;
+        }
+
+        let extra = 0;
+        let inStock = true;
+
+        if (item.specifications && item.specifications.length > 0) {
+          for (const spec of item.specifications) {
+            const serverSpec = serverProd.specifications?.find((s) => s.key === spec.key);
+            const serverVal = serverSpec?.values?.find((v) => v.value === spec.value);
+
+            if (!serverVal || (serverVal.stock !== undefined && serverVal.stock < (item.quantity || 1))) {
+              inStock = false;
+              break;
+            }
+            if (serverVal.extraPrice) {
+              extra += Number(serverVal.extraPrice);
+            }
+          }
+        } else {
+          if (serverProd.stock !== undefined && serverProd.stock < (item.quantity || 1)) {
+            inStock = false;
           }
         }
-      } else {
-        if (item.stock !== undefined && item.stock < (item.quantity || 1)) {
-          return false;
+
+        if (!inStock) {
+          lastFailedProductId = item._id;
+          updatedCart.splice(i, 1);
+          hasChanges = true;
+          setPriceChangeModal({
+            show: true,
+            title: "Out of Stock",
+            message: `Sorry, "${item.title}" is out of stock and was removed from your cart.`,
+            oldPrice: null,
+            newPrice: null,
+            productTitle: item.title,
+          });
+          continue;
         }
+
+        const freshPrice = Number(serverProd.price) + extra;
+        if (Number(item.price) !== freshPrice) {
+          // 🎨 Trigger stylish Price Change modal
+          setPriceChangeModal({
+            show: true,
+            title: "Price Updated",
+            message: "The price for this item has been updated to reflect current pricing.",
+            oldPrice: Number(item.price),
+            newPrice: freshPrice,
+            productTitle: item.title,
+          });
+          updatedCart[i].price = freshPrice;
+          hasChanges = true;
+        }
+      } catch (err) {
+        lastFailedProductId = item._id;
+        updatedCart.splice(i, 1);
+        hasChanges = true;
       }
     }
+
+    if (hasChanges) {
+      setCartItems(updatedCart);
+      localStorage.setItem("cart", JSON.stringify(updatedCart));
+      window.dispatchEvent(new Event("storage"));
+
+      if (updatedCart.length === 0) {
+        if (initialItemCount === 1 && lastFailedProductId) {
+          navigate(`/product/${lastFailedProductId}`);
+        } else {
+          navigate("/");
+        }
+        return false;
+      }
+      return false;
+    }
+
     return true;
   };
 
-  // --- Create Order ---
-  // --- Updated Create Order Logic ---
-
-
-  // --- COD Checkout ---
-  const handleCOD = () => {
+  const handleCOD = async () => {
     if (!guardClick()) return;
 
     if (
@@ -157,216 +247,221 @@ const CheckoutStep1 = () => {
     }
 
     if (shippingInfo.phone.length !== 10) {
-  alert("Please enter a valid 10-digit mobile number.");
-  setProcessing(false);
-  clickedOnceRef.current = false;
-  return;
-}
+      alert("Please enter a valid 10-digit mobile number.");
+      setProcessing(false);
+      clickedOnceRef.current = false;
+      return;
+    }
 
-    if (!validateStock()) {
-      alert("Some items are out of stock.");
+    const isValid = await verifyLatestCartData();
+    if (!isValid) {
       setProcessing(false);
       clickedOnceRef.current = false;
       return;
     }
 
     const orderItems = cartItems.map((item) => ({
-  product: item._id,
-  name: item.title,
-  image: item.image || "",
-  price: Math.round(parseFloat(item.price)),
-  quantity: item.quantity ? Number(item.quantity) : 1,
-  customization: item.customization || [],
-  specifications: item.specifications || [],
-}));
+      product: item._id,
+      name: item.title,
+      image: item.image || "",
+      quantity: item.quantity ? Number(item.quantity) : 1,
+      customization: item.customization || [],
+      specifications: item.specifications || [],
+    }));
 
-axiosInstance
-  .post(
-    "/orders/create",
-    {
-      orderItems,
-      shippingInfo,
-      itemsPrice: Math.round(itemsPrice),
-      discount: Math.round(discount),
-      shippingPrice: Math.round(shippingPrice),
-      totalPrice: Math.round(total),
-      amountPaid: 0,
-      amountDue: Math.round(total),
-      paymentMethod: "COD",
-    },
-    { headers: token ? { Authorization: `Bearer ${token}` } : {} }
-  )
-  .then((res) => {
-    clearCart();   // ✅ CLEAR HERE
-    window.location.href = `/order-confirmation/${res.data.order._id}`;
-  })
-  .catch((err) => {
-    console.error(err);
-    alert("Order creation failed.");
-    setProcessing(false);
-    clickedOnceRef.current = false;
-  });
-  };
-
-  // --- Prepaid Checkout ---
-  const handlePrepaid = async () => {
-  if (!guardClick()) return;
-
-  if (
-    !shippingInfo.name ||
-    !shippingInfo.email ||
-    !shippingInfo.phone ||
-    !shippingInfo.address ||
-    !shippingInfo.city ||
-    !shippingInfo.state ||
-    !shippingInfo.postalCode ||
-    !selectedShipping
-  ) {
-    alert("Please fill in all required shipping fields (including email).");
-    setProcessing(false);
-    clickedOnceRef.current = false;
-    return;
-  }
-
-  if (!validateStock()) {
-    alert("Some items are out of stock.");
-    setProcessing(false);
-    clickedOnceRef.current = false;
-    return;
-  }
-
-  if (!razorpayLoaded) {
-    const script = document.createElement("script");
-    script.src = "https://checkout.razorpay.com/v1/checkout.js";
-    script.onload = () => setRazorpayLoaded(true);
-    document.body.appendChild(script);
-    // Wait a bit for script to load
-    await new Promise((resolve) => (script.onload = resolve));
-  }
-
-  if (shippingInfo.phone.length !== 10) {
-  alert("Please enter a valid 10-digit mobile number.");
-  setProcessing(false);
-  clickedOnceRef.current = false;
-  return;
-}
-  // --- Inside handlePrepaid function ---
-
-try {
-  const orderItems = cartItems.map((item) => ({
-    product: item._id,
-    name: item.title,
-    image: item.image || "",
-    price: Math.round(parseFloat(item.price)),
-    quantity: item.quantity ? Number(item.quantity) : 1,
-    customization: item.customization || [],
-    specifications: item.specifications || [],
-  }));
-
-  // 🔥 CREATE ORDER FIRST (ABANDONED)
-  const res = await axiosInstance.post(
-    "/orders/create",
-    {
-      orderItems,
-      shippingInfo,
-      itemsPrice: Math.round(itemsPrice),
-      discount: Math.round(discount),
-      shippingPrice: Math.round(shippingPrice),
-      totalPrice: Math.round(total),
-      amountPaid: Math.round(payableNow),
-      amountDue: Math.round(total - payableNow),
-      paymentMethod: "RAZORPAY",
-    },
-    { headers: token ? { Authorization: `Bearer ${token}` } : {} }
-  );
-
-  const { razorpayOrder, orderId } = res.data;
-
-  const rzp = new window.Razorpay({
-    key: RAZORPAY_KEY,
-    amount: razorpayOrder.amount,
-    currency: "INR",
-    name: "Cuztory",
-    description: "Order Payment",
-    order_id: razorpayOrder.id,
-
-  handler: async function (response) {
-
-  setProcessingPayment(true);
-
-  clearCart();
-
-  try {
-
-    let retries = 15;
-
-    while (retries--) {
-
-      const result = await axiosInstance.get(
-        `/orders/by-razorpay/${response.razorpay_order_id}`
-      );
-console.log("Lookup Result:", result.data);
-      if (result.data.success) {
-
-        window.location.replace(
-          `/order-confirmation/${result.data.orderId}`
-        );
-
-        return;
-      }
-
-      await new Promise(resolve => setTimeout(resolve, 500));
-
-    }
-
-    alert("Payment received. Your order is still being finalized.");
-
-    window.location.replace("/my-orders");
-
-  } catch (err) {
-
-    console.error(err);
-
-    window.location.replace("/my-orders");
-
-  }
-
-},
-
-    modal: {
-      ondismiss: function () {
+    axiosInstance
+      .post(
+        "/orders/create",
+        {
+          orderItems,
+          shippingInfo,
+          shippingId: selectedShipping._id,
+          paymentMethod: "COD",
+        },
+        { headers: token ? { Authorization: `Bearer ${token}` } : {} }
+      )
+      .then((res) => {
+        clearCart();
+        window.location.href = `/order-confirmation/${res.data.order._id}`;
+      })
+      .catch((err) => {
+        console.error(err);
+        alert(err.response?.data?.message || "Order creation failed.");
         setProcessing(false);
         clickedOnceRef.current = false;
-        alert("Payment cancelled, Please try again.");
-      },
-    },
-  });
+      });
+  };
 
-  rzp.open();
-} catch (err) {
-  console.error(err);
-  alert("Payment initiation failed.");
-  setProcessing(false);
-  clickedOnceRef.current = false;
-}
-};
+  const handlePrepaid = async () => {
+    if (!guardClick()) return;
 
-if (processingPayment) {
-  return <PageLoader />;
-}
+    if (
+      !shippingInfo.name ||
+      !shippingInfo.email ||
+      !shippingInfo.phone ||
+      !shippingInfo.address ||
+      !shippingInfo.city ||
+      !shippingInfo.state ||
+      !shippingInfo.postalCode ||
+      !selectedShipping
+    ) {
+      alert("Please fill in all required shipping fields (including email).");
+      setProcessing(false);
+      clickedOnceRef.current = false;
+      return;
+    }
+
+    if (shippingInfo.phone.length !== 10) {
+      alert("Please enter a valid 10-digit mobile number.");
+      setProcessing(false);
+      clickedOnceRef.current = false;
+      return;
+    }
+
+    const isValid = await verifyLatestCartData();
+    if (!isValid) {
+      setProcessing(false);
+      clickedOnceRef.current = false;
+      return;
+    }
+
+    if (!razorpayLoaded) {
+      const script = document.createElement("script");
+      script.src = "https://checkout.razorpay.com/v1/checkout.js";
+      script.onload = () => setRazorpayLoaded(true);
+      document.body.appendChild(script);
+      await new Promise((resolve) => (script.onload = resolve));
+    }
+
+    try {
+      const orderItems = cartItems.map((item) => ({
+        product: item._id,
+        name: item.title,
+        image: item.image || "",
+        quantity: item.quantity ? Number(item.quantity) : 1,
+        customization: item.customization || [],
+        specifications: item.specifications || [],
+      }));
+
+      const res = await axiosInstance.post(
+        "/orders/create",
+        {
+          orderItems,
+          shippingInfo,
+          shippingId: selectedShipping._id,
+          paymentMethod: selectedPayment === "partialPayment" ? "PARTIAL" : "RAZORPAY",
+        },
+        { headers: token ? { Authorization: `Bearer ${token}` } : {} }
+      );
+
+      const { razorpayOrder } = res.data;
+
+      const rzp = new window.Razorpay({
+        key: RAZORPAY_KEY,
+        amount: razorpayOrder.amount,
+        currency: "INR",
+        name: "Cuztory",
+        description: "Order Payment",
+        order_id: razorpayOrder.id,
+        handler: async function (response) {
+          setProcessingPayment(true);
+          clearCart();
+          try {
+            let retries = 15;
+            while (retries--) {
+              const result = await axiosInstance.get(
+                `/orders/by-razorpay/${response.razorpay_order_id}`
+              );
+              if (result.data.success) {
+                window.location.replace(
+                  `/order-confirmation/${result.data.orderId}`
+                );
+                return;
+              }
+              await new Promise((resolve) => setTimeout(resolve, 500));
+            }
+            alert("Payment received. Your order is still being finalized.");
+            window.location.replace("/my-orders");
+          } catch (err) {
+            console.error(err);
+            window.location.replace("/my-orders");
+          }
+        },
+        modal: {
+          ondismiss: function () {
+            setProcessing(false);
+            clickedOnceRef.current = false;
+            alert("Payment cancelled, Please try again.");
+          },
+        },
+      });
+
+      rzp.open();
+    } catch (err) {
+      console.error(err);
+      alert(err.response?.data?.message || "Payment initiation failed.");
+      setProcessing(false);
+      clickedOnceRef.current = false;
+    }
+  };
+
+  if (processingPayment) {
+    return <PageLoader />;
+  }
 
   return (  
     <div className="checkout-container">
-      {/* Simple Checkout Header */}
-<div className="checkout-header">
-  <div className="checkout-header-inner">
-    <span className="brand-name">Cuztory</span>
-  </div>
-</div>
+      {/* 🚀 PRICE CHANGE / OUT OF STOCK MODAL */}
+      {priceChangeModal.show && (
+        <div className="price-modal-overlay">
+          <div className="price-modal-card">
+            <button 
+              className="price-modal-close" 
+              onClick={() => setPriceChangeModal({ ...priceChangeModal, show: false })}
+            >
+              <FaTimes />
+            </button>
+            <div className="price-modal-icon-wrap">
+              <FaExclamationTriangle />
+            </div>
+            <h3>{priceChangeModal.title}</h3>
+            <p className="price-modal-prod">{priceChangeModal.productTitle}</p>
+            <p className="price-modal-msg">{priceChangeModal.message}</p>
+
+            {priceChangeModal.oldPrice !== null && priceChangeModal.newPrice !== null && (
+              <div className="price-shift-container">
+                <div className="price-shift-box old">
+                  <span className="price-shift-label">Previous</span>
+                  <span className="price-shift-val">₹{priceChangeModal.oldPrice}</span>
+                </div>
+                <div className="price-shift-arrow">
+                  <FaArrowRight />
+                </div>
+                <div className="price-shift-box new">
+                  <span className="price-shift-label">Updated</span>
+                  <span className="price-shift-val">₹{priceChangeModal.newPrice}</span>
+                </div>
+              </div>
+            )}
+
+            <button 
+              className="price-modal-btn" 
+              onClick={() => setPriceChangeModal({ ...priceChangeModal, show: false })}
+            >
+              Review & Continue
+            </button>
+          </div>
+        </div>
+      )}
+
+      <div className="checkout-header">
+        <div className="checkout-header-inner">
+          <span className="brand-name">Cuztory</span>
+        </div>
+      </div>
 
       <h2>Checkout</h2>
 
-      {/* Cart Items */}
       <div className="checkout-cart-wrapper">
         <h3>Your Cart</h3>
         <div className="checkout-cart-box">
@@ -384,7 +479,6 @@ if (processingPayment) {
                   ₹{item.price} x {item.quantity}
                 </span>
 
-                {/* Specifications */}
                 {item.specifications?.length > 0 && (
                   <div className="cart-specs">
                     {item.specifications.map((s, i) => (
@@ -395,7 +489,6 @@ if (processingPayment) {
                   </div>
                 )}
 
-                {/* Customization */}
                 {item.customization?.length > 0 &&
                   item.customization.map((c, i) => (
                     <div key={i}>
@@ -409,83 +502,74 @@ if (processingPayment) {
         </div>
       </div>
 
-      {/* Shipping Info */}
       <div className="shipping-info">
         <h3>Shipping Info</h3>
-        {/* Name */}
-<input
-  type="text"
-  placeholder="name"
-  value={shippingInfo.name}
-  onChange={(e) =>
-    setShippingInfo({ ...shippingInfo, name: e.target.value })
-  }
-/>
+        <input
+          type="text"
+          placeholder="name"
+          value={shippingInfo.name}
+          onChange={(e) =>
+            setShippingInfo({ ...shippingInfo, name: e.target.value })
+          }
+        />
 
-{/* Email */}
-<input
-  type="text"
-  placeholder="email"
-  value={shippingInfo.email}
-  onChange={(e) =>
-    setShippingInfo({ ...shippingInfo, email: e.target.value })
-  }
-/>
+        <input
+          type="text"
+          placeholder="email"
+          value={shippingInfo.email}
+          onChange={(e) =>
+            setShippingInfo({ ...shippingInfo, email: e.target.value })
+          }
+        />
 
-{/* Phone */}
-<div className="phone-input-container">
-  <span className="phone-prefix">+91</span>
-  <input
-    type="tel" // Changed to tel for better mobile keyboard
-    placeholder="Enter 10 digit mobile number"
-    value={shippingInfo.phone}
-    onChange={handlePhoneChange}
-    className="phone-field"
-  />
-</div>
+        <div className="phone-input-container">
+          <span className="phone-prefix">+91</span>
+          <input
+            type="tel"
+            placeholder="Enter 10 digit mobile number"
+            value={shippingInfo.phone}
+            onChange={handlePhoneChange}
+            className="phone-field"
+          />
+        </div>
 
-{/* DOUBLE-SIZE ADDRESS FIELD */}
-<textarea
-  placeholder="address"
-  className="big-address"
-  value={shippingInfo.address}
-  onChange={(e) =>
-    setShippingInfo({ ...shippingInfo, address: e.target.value })
-  }
-/>
+        <textarea
+          placeholder="address"
+          className="big-address"
+          value={shippingInfo.address}
+          onChange={(e) =>
+            setShippingInfo({ ...shippingInfo, address: e.target.value })
+          }
+        />
 
-{/* City */}
-<input
-  type="text"
-  placeholder="city"
-  value={shippingInfo.city}
-  onChange={(e) =>
-    setShippingInfo({ ...shippingInfo, city: e.target.value })
-  }
-/>
+        <input
+          type="text"
+          placeholder="city"
+          value={shippingInfo.city}
+          onChange={(e) =>
+            setShippingInfo({ ...shippingInfo, city: e.target.value })
+          }
+        />
 
-{/* State */}
-<input
-  type="text"
-  placeholder="state"
-  value={shippingInfo.state}
-  onChange={(e) =>
-    setShippingInfo({ ...shippingInfo, state: e.target.value })
-  }
-/>
+        <input
+          type="text"
+          placeholder="state"
+          value={shippingInfo.state}
+          onChange={(e) =>
+            setShippingInfo({ ...shippingInfo, state: e.target.value })
+          }
+        />
 
-{/* Pincode */}
-<input
-  type="text"
-  placeholder="postalCode"
-  value={shippingInfo.postalCode}
-  onChange={(e) =>
-    setShippingInfo({ ...shippingInfo, postalCode: e.target.value })
-  }
-/>
+        <input
+          type="text"
+          placeholder="postalCode"
+          value={shippingInfo.postalCode}
+          onChange={(e) =>
+            setShippingInfo({ ...shippingInfo, postalCode: e.target.value })
+          }
+        />
       </div>
 
-      {/* Shipping Rates */}
       <div className="shipping-method">
         <h3>Shipping Method</h3>
         {shippingRates.map((rate) => (
@@ -501,11 +585,10 @@ if (processingPayment) {
         ))}
       </div>
 
-      {/* Payment Methods */}
       <div className="payment-method">
         <h3>Payment Method</h3>
 
-         {paymentOptions?.partialPayment?.enabled && (
+        {paymentOptions?.partialPayment?.enabled && (
           <label>
             <input
               type="radio"
@@ -513,93 +596,79 @@ if (processingPayment) {
               checked={selectedPayment === "partialPayment"}
               onChange={() => setSelectedPayment("partialPayment")}
             />
+            <div className="payment-option-content">
+              <div className="payment-title-row">
+                <div className="payment-title">
+                  <strong>Partial payment (UPI / Card)</strong>
+                </div>
+              </div> 
 
-          <div className="payment-option-content">
-      {/* Header */}
-      <div className="payment-title-row">
-        <div className="payment-title">
-          <strong>Pratial payment (UPI / Card)</strong>
-        </div>
-        </div> 
+              <div className="payment-icons">
+                <img src="/payment-icons/gpay.png" alt="Google Pay" />
+                <img src="/payment-icons/phonepe.png" alt="PhonePe" />
+                <img src="/payment-icons/paytm.png" alt="Paytm" />
+                <img src="/payment-icons/card.png" alt="Card" />
+                <img src="/payment-icons/upi.png" alt="UPI" />
+              </div>
 
-      {/* Payment Icons */}
-      <div className="payment-icons">
-        <img src="/payment-icons/gpay.png" alt="Google Pay" />
-        <img src="/payment-icons/phonepe.png" alt="PhonePe" />
-        <img src="/payment-icons/paytm.png" alt="Paytm" />
-        <img src="/payment-icons/card.png" alt="Card" />
-        <img src="/payment-icons/upi.png" alt="UPI" />
-      </div>
-
-     <div className="payment-details">
-  <span className="price">
-    Pay now: ₹{previewPartialNow} | Pay after delivery: ₹{previewPartialLater}
-
-    
-  </span>
-  <small className="secure-text">🔒 Secure Razorpay checkout</small>
-</div>
-    </div>
+              <div className="payment-details">
+                <span className="price">
+                  Pay now: ₹{previewPartialNow} | Pay after delivery: ₹{previewPartialLater}
+                </span>
+                <small className="secure-text">🔒 Secure Razorpay checkout</small>
+              </div>
+            </div>
           </label>
         )}
 
-       {paymentOptions?.fullPrepaid?.enabled && (
-  <label
-    className={`payment-option prepaid-option ${
-      selectedPayment === "fullPrepaid" ? "selected" : ""
-    }`}
-  >
-    <input
-      type="radio"
-      name="payment"
-      checked={selectedPayment === "fullPrepaid"}
-      onChange={() => setSelectedPayment("fullPrepaid")}
-    />
+        {paymentOptions?.fullPrepaid?.enabled && (
+          <label
+            className={`payment-option prepaid-option ${
+              selectedPayment === "fullPrepaid" ? "selected" : ""
+            }`}
+          >
+            <input
+              type="radio"
+              name="payment"
+              checked={selectedPayment === "fullPrepaid"}
+              onChange={() => setSelectedPayment("fullPrepaid")}
+            />
 
-    <div className="payment-option-content">
-      {/* Header */}
-      <div className="payment-title-row">
-        <div className="payment-title">
-          <strong>Full payment (UPI / Card)</strong>
-        </div>
+            <div className="payment-option-content">
+              <div className="payment-title-row">
+                <div className="payment-title">
+                  <strong>Full payment (UPI / Card)</strong>
+                </div>
 
-        {previewFullPrepaidSave > 0 && (
-          <div className="discount-badge">
-            ₹{previewFullPrepaidSave} OFF
-          </div>
+                {previewFullPrepaidSave > 0 && (
+                  <div className="discount-badge">
+                    ₹{previewFullPrepaidSave} OFF
+                  </div>
+                )}
+              </div>
+
+              <div className="payment-icons">
+                <img src="/payment-icons/gpay.png" alt="Google Pay" />
+                <img src="/payment-icons/phonepe.png" alt="PhonePe" />
+                <img src="/payment-icons/paytm.png" alt="Paytm" />
+                <img src="/payment-icons/card.png" alt="Card" />
+                <img src="/payment-icons/upi.png" alt="UPI" />
+              </div>
+
+              <div className="payment-details">
+                <span className="price">
+                  Pay Full: ₹{previewFullPrepaidTotal}
+                  {previewFullPrepaidSave > 0 && (
+                    <span className="discount-info">
+                      {" "}(You save ₹{previewFullPrepaidSave})
+                    </span>
+                  )}
+                </span>
+                <small className="secure-text">Secure payment via Razorpay</small>
+              </div>
+            </div>
+          </label>
         )}
-      </div>
-
-      {/* Payment Icons */}
-      <div className="payment-icons">
-        <img src="/payment-icons/gpay.png" alt="Google Pay" />
-        <img src="/payment-icons/phonepe.png" alt="PhonePe" />
-        <img src="/payment-icons/paytm.png" alt="Paytm" />
-        <img src="/payment-icons/card.png" alt="Card" />
-        <img src="/payment-icons/upi.png" alt="UPI" />
-      </div>
-
-      {/* Details */}
-      <div className="payment-details">
-        <span className="price">
-          Pay Full: ₹{previewFullPrepaidTotal}
-
-          {previewFullPrepaidSave > 0 && (
-            <span className="discount-info">
-              {" "}(You save ₹{previewFullPrepaidSave})
-            </span>
-          )}
-
-          
-        </span>
-        <small className="secure-text">Secure payment via Razorpay</small>
-      </div>
-    </div>
-  </label>
-)}
-
-
-       
 
         {paymentOptions?.cod?.enabled && (
           <label>
@@ -615,81 +684,71 @@ if (processingPayment) {
         )}
       </div>
 
-    <div className="summary-card shadow-sm">
-  <div className="summary-header">
-    <div className="header-title">
-      <h4>Order Summary</h4>
-      <span className="item-count">{cartItems.length} Items</span>
-    </div>
-    <div className="secure-badge">
-      
-      <span>100% Secure</span>
-    </div>
-  </div>
-
-  <div className="summary-body">
-    {/* Financial Breakdown */}
-    <div className="price-lines">
-      <div className="price-row">
-        <span>Cart Subtotal</span>
-        <span>₹{Math.round(itemsPrice)}</span>
-      </div>
-
-      <div className="price-row">
-        <span>Shipping Charges</span>
-        <span className={shippingPrice === 0 ? "text-success" : ""}>
-          {shippingPrice === 0 ? "FREE" : `+ ₹${Math.round(shippingPrice)}`}
-        </span>
-      </div>
-
-      {discount > 0 && (
-        <div className="price-row discount-applied">
-          <span className="d-flex align-items-center">
-            <i className="tag-icon">🏷️</i> Prepaid Discount
-          </span>
-          <span>- ₹{Math.round(discount)}</span>
+      <div className="summary-card shadow-sm">
+        <div className="summary-header">
+          <div className="header-title">
+            <h4>Order Summary</h4>
+            <span className="item-count">{cartItems.length} Items</span>
+          </div>
+          <div className="secure-badge">
+            <span>100% Secure</span>
+          </div>
         </div>
-      )}
 
-      <hr className="summary-divider" />
+        <div className="summary-body">
+          <div className="price-lines">
+            <div className="price-row">
+              <span>Cart Subtotal</span>
+              <span>₹{Math.round(itemsPrice)}</span>
+            </div>
 
-      <div className="price-row total-order-row">
-        <strong>Grand Total</strong>
-        <strong>₹{Math.round(total)}</strong>
-      </div>
-    </div>
+            <div className="price-row">
+              <span>Shipping Charges</span>
+              <span className={shippingPrice === 0 ? "text-success" : ""}>
+                {shippingPrice === 0 ? "FREE" : `+ ₹${Math.round(shippingPrice)}`}
+              </span>
+            </div>
 
-    {/* Dynamic "Payable Now" Action Box */}
-    <div className={`action-payment-box ${selectedPayment}`}>
-      <div className="hero-content">
-        <p className="hero-label">
-          {selectedPayment === "COD" 
-            ? "Amount to pay at delivery" 
-            : selectedPayment === "partialPayment" 
-            ? "Payable today" 
-            : "Total amount to pay"}
-        </p>
-        <h2 className="hero-amount">
-          ₹{Math.round(payableNow || (selectedPayment === "COD" ? total : 0))}
-        </h2>
-      </div>
+            {discount > 0 && (
+              <div className="price-row discount-applied">
+                <span className="d-flex align-items-center">
+                  <i className="tag-icon">🏷️</i> Prepaid Discount
+                </span>
+                <span>- ₹{Math.round(discount)}</span>
+              </div>
+            )}
 
-      {selectedPayment === "partialPayment" && (
-        <div className="balance-notice">
-          <p>Remaining <strong>₹{Math.round(total - payableNow)}</strong> will be collected via Cash/QR, After delivery.</p>
+            <hr className="summary-divider" />
+
+            <div className="price-row total-order-row">
+              <strong>Grand Total</strong>
+              <strong>₹{Math.round(total)}</strong>
+            </div>
+          </div>
+
+          <div className={`action-payment-box ${selectedPayment}`}>
+            <div className="hero-content">
+              <p className="hero-label">
+                {selectedPayment === "COD" 
+                  ? "Amount to pay at delivery" 
+                  : selectedPayment === "partialPayment" 
+                  ? "Payable today" 
+                  : "Total amount to pay"}
+              </p>
+              <h2 className="hero-amount">
+                ₹{Math.round(payableNow || (selectedPayment === "COD" ? total : 0))}
+              </h2>
+            </div>
+
+            {selectedPayment === "partialPayment" && (
+              <div className="balance-notice">
+                <p>Remaining <strong>₹{Math.round(total - payableNow)}</strong> will be collected via Cash/QR, After delivery.</p>
+              </div>
+            )}
+          </div>
         </div>
-      )}
+      </div>
 
-      {selectedPayment === "fullPrepaid" && (
-        <div className="savings-celebration">
-        </div>
-      )}
-    </div>
-  </div>
-</div>
-
-
-      {/* Action Button */}
       {selectedPayment === "COD" ? (
         <button
           className="place-order-btn"
