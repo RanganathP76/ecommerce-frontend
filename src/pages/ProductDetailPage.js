@@ -605,17 +605,56 @@ const ProductDetailPage = () => {
   return (
     <div>
       <Header />
-      <Helmet>
-        <title>{product?.title ? `${product.title} | Cuztory` : "Cuztory Product"}</title>
-        <meta
-          name="description"
-          content={
-            typeof product?.description === "string"
-              ? `${product.description.substring(0, 150)}...`
-              : "Shop customized gifts from Cuztory."
+      
+
+<Helmet>
+  <title>{product?.title ? `${product.title} | Cuztory` : "Cuztory Product"}</title>
+  <meta
+    name="description"
+    content={
+      typeof product?.description === "string"
+        ? `${product.description.substring(0, 150)}...`
+        : "Nxt Gen Fashion Hub"
+    }
+  />
+  <meta property="og:title" content={product?.title} />
+  <meta property="og:image" content={product?.images?.[0]} />
+  <meta property="og:type" content="product" />
+
+  {/* Schema.org Rich Snippet for Google Search & Shopping */}
+  {product && (
+    <script type="application/ld+json">
+      {JSON.stringify({
+        "@context": "https://schema.org/",
+        "@type": "Product",
+        "name": product.title,
+        "image": product.images || [],
+        "description": typeof product.description === "string" ? product.description : product.title,
+        "sku": product._id,
+        "offers": {
+          "@type": "Offer",
+          "url": `https://cuztory.in/product/${product._id}`,
+          "priceCurrency": "INR",
+          "price": totalPrice || product.price,
+          "availability": canProceed
+            ? "https://schema.org/InStock"
+            : "https://schema.org/OutOfStock",
+          "itemCondition": "https://schema.org/NewCondition"
+        },
+        ...(product.reviews?.length > 0 && {
+          "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": (
+              product.reviews.reduce((acc, r) => acc + (r.rating || 5), 0) /
+              product.reviews.length
+            ).toFixed(1),
+            "reviewCount": product.reviews.length
           }
-        />
-      </Helmet>
+        })
+      })}
+    </script>
+  )}
+</Helmet>
 
       {showCustomizationStep ? (
         <div className="customization-step-wrapper">
