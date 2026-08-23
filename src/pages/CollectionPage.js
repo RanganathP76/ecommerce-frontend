@@ -29,14 +29,14 @@ const CollectionPage = () => {
 
       <Helmet>
   {/* ======= Basic SEO ======= */}
-  <title>Cuzto Collections | Explore Personalized Gift Categories</title>
+  <title>Cuztory Collections</title>
   <meta
     name="description"
-    content="Explore Cuzto’s personalized gift collections — from custom photo lamps and keychains to name boards and jerseys. Perfect gifts for every occasion!"
+    content="Explore Cuztory’s | Nxt Gen Fashion Hub |"
   />
   <meta
     name="keywords"
-    content="Cuzto collections, personalized gift categories, custom photo lamps, custom keychains, customized gifts, Cuzto store"
+    content="Cuztory | Nxt Gen Fashion Hub |"
   />
   <link rel="canonical" href="https://cuztory.in/collection" />
 
@@ -46,11 +46,11 @@ const CollectionPage = () => {
   <meta property="og:url" content="https://cuztory.in/collection" />
   <meta
     property="og:title"
-    content="Cuzto Collections | Custom Gifts & Personalized Products"
+    content="Cuztory Collections | Nxt Gen Fashion Hub |"
   />
   <meta
     property="og:description"
-    content="Discover unique personalized gift collections — photo lamps, keychains, frames, and more at Cuzto."
+    content="Explore Cuztory’s | Nxt Gen Fashion Hub |"
   />
   <meta property="og:image" content="https://cuztory.in/banner.png" />
 
@@ -59,7 +59,7 @@ const CollectionPage = () => {
   <meta name="twitter:title" content="Cuzto Collections | Personalized Gifts" />
   <meta
     name="twitter:description"
-    content="Explore all personalized collections — create gifts that tell your story at Cuzto."
+    content="Explore Cuztory’s | Nxt Gen Fashion Hub |"
   />
   <meta name="twitter:image" content="https://cuztory.in/banner.png" />
 
@@ -71,11 +71,11 @@ const CollectionPage = () => {
       name: "Cuzto Collections",
       url: "https://cuztory.in/collection",
       description:
-        "Browse all personalized gift collections available at Cuzto.",
+        "Explore Cuztory’s | Nxt Gen Fashion Hub |",
       mainEntity: collections.map((col) => ({
         "@type": "Collection",
         name: col.name,
-        url: `https://cuztory.in/collection/${col._id}`,
+        url: `https://cuztory.in/collection/${col.slug || col._id}`,
         image: col.image?.url || "https://cuztory.in/placeholder.png",
       })),
     })}
@@ -87,7 +87,7 @@ const CollectionPage = () => {
         <h2>All Collections</h2>
         <div className="grid">
           {collections.map((col) => (
-            <Link to={`/collection/${col._id}`} className="card" key={col._id}>
+            <Link to={`/collection/${col.slug || col._id}`} className="card" key={col.slug || col._id}>
                 <img
                   src={col.image?.url || '/placeholder.png'}
                   alt={col.name}

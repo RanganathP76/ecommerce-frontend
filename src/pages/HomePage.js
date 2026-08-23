@@ -99,14 +99,14 @@ if (loading) return <PageLoader text="Loading store..." />;
       
       <Helmet>
   {/* === Basic SEO === */}
-  <title>Cuzto | Custom Gifts, Personalized Lamps, Keychains & More</title>
+  <title>Cuztory |Nxt Gen Fashion Hub|</title>
   <meta
     name="description"
-    content="Shop personalized gifts at Cuzto — from custom photo lamps to keychains and name boards. Create your memories with high-quality personalized products."
+    content="Cuztory |Nxt Gen Fashion Hub|"
   />
   <meta
     name="keywords"
-    content="Cuzto, personalized gifts, custom gifts, custom photo lamps, custom keychains, personalized products India, Cuzto store"
+    content="Cuztory |Nxt Gen Fashion Hub|"
   />
   <link rel="canonical" href="https://cuztory.in/" />
 
@@ -248,7 +248,7 @@ if (loading) return <PageLoader text="Loading store..." />;
         : 0;
 
       return (
-        <a href={`/product/${prod._id}`} className="product-card" key={prod._id}>
+        <a href={`/product/${prod.slug || prod._id}`} className="product-card" key={prod.slug || prod._id}>
           <div className="media-wrapper">
             {prod.video ? (
               <video

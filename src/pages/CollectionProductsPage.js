@@ -5,8 +5,9 @@ import Footer from "../components/Footer";
 import axiosInstance from "../axiosInstance";
 import "./CollectionProductsPage.css";
 import PageLoader from "../components/PageLoader";
+import { Helmet } from "react-helmet-async";
 
-;
+
 
 
 const CollectionProductsPage = () => {
@@ -40,6 +41,33 @@ const CollectionProductsPage = () => {
     <div className="collection-products-page">
       <Header />
 
+<Helmet>
+  <title>{collection?.name ? `${collection.name} Collection | Cuztory` : "Collection | Cuztory"}</title>
+  <meta
+    name="description"
+    content={
+      collection?.description ||
+      `Explore our exclusive ${collection?.name || ""} collection at Cuztory. High-demand customized designs & fast shipping.`
+    }
+  />
+  <link rel="canonical" href={`https://cuztory.in/collection/${collection?.slug || id}`} />
+
+  {/* OpenGraph Link Previews */}
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content={`${collection?.name || "Collection"} — Cuztory`} />
+  <meta
+    property="og:description"
+    content={collection?.description || `Discover trending products in ${collection?.name} on Cuztory.`}
+  />
+  <meta property="og:url" content={`https://cuztory.in/collection/${collection?.slug || id}`} />
+  <meta property="og:image" content={collection?.image?.url || "https://cuztory.in/banner.png"} />
+
+  {/* Twitter Card */}
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content={`${collection?.name || "Collection"} | Cuztory`} />
+  <meta name="twitter:image" content={collection?.image?.url || "https://cuztory.in/banner.png"} />
+</Helmet>
+
       <div className="collection-header">
         <h2>{collection.name}</h2>
         <p>{collection.description}</p>
@@ -58,11 +86,7 @@ const CollectionProductsPage = () => {
                 : 0;
 
               return (
-                <Link
-                  to={`/product/${prod._id}`}
-                  className="product-card"
-                  key={prod._id}
-                >
+                <Link to={`/product/${prod.slug || prod._id}`}>
                   <div className="media-wrapper">
                     {prod.video ? (
                       <video

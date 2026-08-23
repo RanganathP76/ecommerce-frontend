@@ -607,21 +607,47 @@ const ProductDetailPage = () => {
       <Header />
       
 
+
+
 <Helmet>
-  <title>{product?.title ? `${product.title} | Cuztory` : "Cuztory Product"}</title>
+  {/* Standard Meta */}
+  <title>{product ? `${product.title} | Cuztory` : "Cuztory"}</title>
   <meta
     name="description"
     content={
-      typeof product?.description === "string"
-        ? `${product.description.substring(0, 150)}...`
-        : "Nxt Gen Fashion Hub"
+      product?.description && typeof product.description === "string"
+        ? product.description.substring(0, 155)
+        : `Shop ${product?.title || "custom apparel"} at Cuztory. High quality custom wear with fast delivery across India.`
     }
   />
-  <meta property="og:title" content={product?.title} />
-  <meta property="og:image" content={product?.images?.[0]} />
-  <meta property="og:type" content="product" />
+  <link rel="canonical" href={`https://cuztory.in/product/${product?.slug || id}`} />
 
-  {/* Schema.org Rich Snippet for Google Search & Shopping */}
+  {/* OpenGraph / WhatsApp / Facebook Preview Card */}
+  <meta property="og:type" content="product" />
+  <meta property="og:site_name" content="Cuztory" />
+  <meta property="og:title" content={product ? `${product.title} — ₹${totalPrice}` : "Cuztory"} />
+  <meta
+    property="og:description"
+    content={`Order ${product?.title || "custom items"} online at Cuztory. Special price: ₹${totalPrice}. Fast Delivery & Secure Checkout.`}
+  />
+  <meta property="og:url" content={`https://cuztory.in/product/${product?.slug || id}`} />
+  <meta property="og:image" content={product?.images?.[0] || "https://cuztory.in/banner.png"} />
+  <meta property="og:image:secure_url" content={product?.images?.[0] || "https://cuztory.in/banner.png"} />
+  <meta property="og:image:width" content="800" />
+  <meta property="og:image:height" content="800" />
+  <meta property="product:price:amount" content={String(totalPrice)} />
+  <meta property="product:price:currency" content="INR" />
+
+  {/* Twitter Card */}
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content={product?.title || "Cuztory"} />
+  <meta
+    name="twitter:description"
+    content={`Shop ${product?.title} on Cuztory for ₹${totalPrice}.`}
+  />
+  <meta name="twitter:image" content={product?.images?.[0] || "https://cuztory.in/banner.png"} />
+
+  {/* Schema.org Structured Data for Google Rich Snippets */}
   {product && (
     <script type="application/ld+json">
       {JSON.stringify({
@@ -629,13 +655,21 @@ const ProductDetailPage = () => {
         "@type": "Product",
         "name": product.title,
         "image": product.images || [],
-        "description": typeof product.description === "string" ? product.description : product.title,
+        "description":
+          typeof product.description === "string"
+            ? product.description
+            : product.title,
         "sku": product._id,
+        "brand": {
+          "@type": "Brand",
+          "name": "Cuztory"
+        },
         "offers": {
           "@type": "Offer",
-          "url": `https://cuztory.in/product/${product._id}`,
+          "url": `https://cuztory.in/product/${product.slug || product._id}`,
           "priceCurrency": "INR",
           "price": totalPrice || product.price,
+          "priceValidUntil": "2027-12-31",
           "availability": canProceed
             ? "https://schema.org/InStock"
             : "https://schema.org/OutOfStock",
