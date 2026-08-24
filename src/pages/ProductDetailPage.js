@@ -293,7 +293,6 @@ const ProductDetailPage = () => {
     return true;
   };
 
-  // 🛡️ Live Server Verification on Add to Cart / Buy Now
   const verifyLatestStockAndPrice = async (targetQty = 1) => {
     try {
       const { data: latestProduct } = await axiosInstance.get(`/products/${id}`);
@@ -317,7 +316,7 @@ const ProductDetailPage = () => {
 
       const calculatedLatestPrice = calculateTotalPrice(latestProduct, selectedSpecs);
       if (totalPrice !== calculatedLatestPrice) {
-        alert(`Notice: The price has updated to ₹${calculatedLatestPrice}. Cart will reflect the latest price.`);
+        alert(`Notice: The price has updated to ₹${calculatedLatestPrice}.`);
       }
 
       return {
@@ -514,17 +513,17 @@ const ProductDetailPage = () => {
     const verifiedData = await verifyLatestStockAndPrice(1);
     if (!verifiedData) return;
 
-    const cartItem = generateCartItem(verifiedData.latestProduct, verifiedData.latestPrice, 1);
-    trackEvent("AddToCart", {
-      content_name: cartItem.title,
-      content_ids: [cartItem._id],
-      value: cartItem.price,
+    const buyNowItem = generateCartItem(verifiedData.latestProduct, verifiedData.latestPrice, 1);
+    trackEvent("InitiateCheckout", {
+      content_name: buyNowItem.title,
+      content_ids: [buyNowItem._id],
+      value: buyNowItem.price,
       currency: "INR",
       quantity: 1,
     });
     
-    localStorage.setItem("cart", JSON.stringify([cartItem]));
-    navigate("/checkoutStep1");
+    // Navigate with item in state without touching the stored cart
+    navigate("/checkoutStep1", { state: { directBuyItem: buyNowItem } });
   };
 
   const handleCustomizeClick = async () => {
@@ -605,90 +604,83 @@ const ProductDetailPage = () => {
   return (
     <div>
       <Header />
-      
 
-
-
-<Helmet>
-  {/* Standard Meta */}
-  <title>{product ? `${product.title} | Cuztory` : "Cuztory"}</title>
-  <meta
-    name="description"
-    content={
-      product?.description && typeof product.description === "string"
-        ? product.description.substring(0, 155)
-        : `Shop ${product?.title || "custom apparel"} at Cuztory. High quality custom wear with fast delivery across India.`
-    }
-  />
-  <link rel="canonical" href={`https://cuztory.in/product/${product?.slug || id}`} />
-
-  {/* OpenGraph / WhatsApp / Facebook Preview Card */}
-  <meta property="og:type" content="product" />
-  <meta property="og:site_name" content="Cuztory" />
-  <meta property="og:title" content={product ? `${product.title} — ₹${totalPrice}` : "Cuztory"} />
-  <meta
-    property="og:description"
-    content={`Order ${product?.title || "custom items"} online at Cuztory. Special price: ₹${totalPrice}. Fast Delivery & Secure Checkout.`}
-  />
-  <meta property="og:url" content={`https://cuztory.in/product/${product?.slug || id}`} />
-  <meta property="og:image" content={product?.images?.[0] || "https://cuztory.in/banner.png"} />
-  <meta property="og:image:secure_url" content={product?.images?.[0] || "https://cuztory.in/banner.png"} />
-  <meta property="og:image:width" content="800" />
-  <meta property="og:image:height" content="800" />
-  <meta property="product:price:amount" content={String(totalPrice)} />
-  <meta property="product:price:currency" content="INR" />
-
-  {/* Twitter Card */}
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content={product?.title || "Cuztory"} />
-  <meta
-    name="twitter:description"
-    content={`Shop ${product?.title} on Cuztory for ₹${totalPrice}.`}
-  />
-  <meta name="twitter:image" content={product?.images?.[0] || "https://cuztory.in/banner.png"} />
-
-  {/* Schema.org Structured Data for Google Rich Snippets */}
-  {product && (
-    <script type="application/ld+json">
-      {JSON.stringify({
-        "@context": "https://schema.org/",
-        "@type": "Product",
-        "name": product.title,
-        "image": product.images || [],
-        "description":
-          typeof product.description === "string"
-            ? product.description
-            : product.title,
-        "sku": product._id,
-        "brand": {
-          "@type": "Brand",
-          "name": "Cuztory"
-        },
-        "offers": {
-          "@type": "Offer",
-          "url": `https://cuztory.in/product/${product.slug || product._id}`,
-          "priceCurrency": "INR",
-          "price": totalPrice || product.price,
-          "priceValidUntil": "2027-12-31",
-          "availability": canProceed
-            ? "https://schema.org/InStock"
-            : "https://schema.org/OutOfStock",
-          "itemCondition": "https://schema.org/NewCondition"
-        },
-        ...(product.reviews?.length > 0 && {
-          "aggregateRating": {
-            "@type": "AggregateRating",
-            "ratingValue": (
-              product.reviews.reduce((acc, r) => acc + (r.rating || 5), 0) /
-              product.reviews.length
-            ).toFixed(1),
-            "reviewCount": product.reviews.length
+      <Helmet>
+        <title>{product ? `${product.title} | Cuztory` : "Cuztory"}</title>
+        <meta
+          name="description"
+          content={
+            product?.description && typeof product.description === "string"
+              ? product.description.substring(0, 155)
+              : `Shop ${product?.title || "custom apparel"} at Cuztory. High quality custom wear with fast delivery across India.`
           }
-        })
-      })}
-    </script>
-  )}
-</Helmet>
+        />
+        <link rel="canonical" href={`https://cuztory.in/product/${product?.slug || id}`} />
+
+        <meta property="og:type" content="product" />
+        <meta property="og:site_name" content="Cuztory" />
+        <meta property="og:title" content={product ? `${product.title} — ₹${totalPrice}` : "Cuztory"} />
+        <meta
+          property="og:description"
+          content={`Order ${product?.title || "custom items"} online at Cuztory. Special price: ₹${totalPrice}. Fast Delivery & Secure Checkout.`}
+        />
+        <meta property="og:url" content={`https://cuztory.in/product/${product?.slug || id}`} />
+        <meta property="og:image" content={product?.images?.[0] || "https://cuztory.in/banner.png"} />
+        <meta property="og:image:secure_url" content={product?.images?.[0] || "https://cuztory.in/banner.png"} />
+        <meta property="og:image:width" content="800" />
+        <meta property="og:image:height" content="800" />
+        <meta property="product:price:amount" content={String(totalPrice)} />
+        <meta property="product:price:currency" content="INR" />
+
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={product?.title || "Cuztory"} />
+        <meta
+          name="twitter:description"
+          content={`Shop ${product?.title} on Cuztory for ₹${totalPrice}.`}
+        />
+        <meta name="twitter:image" content={product?.images?.[0] || "https://cuztory.in/banner.png"} />
+
+        {product && (
+          <script type="application/ld+json">
+            {JSON.stringify({
+              "@context": "https://schema.org/",
+              "@type": "Product",
+              "name": product.title,
+              "image": product.images || [],
+              "description":
+                typeof product.description === "string"
+                  ? product.description
+                  : product.title,
+              "sku": product._id,
+              "brand": {
+                "@type": "Brand",
+                "name": "Cuztory"
+              },
+              "offers": {
+                "@type": "Offer",
+                "url": `https://cuztory.in/product/${product.slug || product._id}`,
+                "priceCurrency": "INR",
+                "price": totalPrice || product.price,
+                "priceValidUntil": "2027-12-31",
+                "availability": canProceed
+                  ? "https://schema.org/InStock"
+                  : "https://schema.org/OutOfStock",
+                "itemCondition": "https://schema.org/NewCondition"
+              },
+              ...(product.reviews?.length > 0 && {
+                "aggregateRating": {
+                  "@type": "AggregateRating",
+                  "ratingValue": (
+                    product.reviews.reduce((acc, r) => acc + (r.rating || 5), 0) /
+                    product.reviews.length
+                  ).toFixed(1),
+                  "reviewCount": product.reviews.length
+                }
+              })
+            })}
+          </script>
+        )}
+      </Helmet>
 
       {showCustomizationStep ? (
         <div className="customization-step-wrapper">

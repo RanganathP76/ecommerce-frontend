@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import axiosInstance from "../axiosInstance";
 import CartContext from "../context/CartContext";
 import "./CheckoutStep1.css";
@@ -8,8 +8,19 @@ import PageLoader from "../components/PageLoader";
 import { FaExclamationTriangle, FaArrowRight, FaTimes } from "react-icons/fa";
 
 const CheckoutStep1 = () => {
-  const { cartItems, setCartItems, clearCart } = useContext(CartContext);
+  const { cartItems: contextCartItems, clearCart } = useContext(CartContext);
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // If a direct buy item was sent via route state, checkout ONLY that item; otherwise use the cart
+  const isDirectBuy = Boolean(location.state?.directBuyItem);
+  const [checkoutItems, setCheckoutItems] = useState(() => {
+    if (location.state?.directBuyItem) {
+      return [location.state.directBuyItem];
+    }
+    const saved = JSON.parse(localStorage.getItem("cart")) || [];
+    return saved.length > 0 ? saved : contextCartItems;
+  });
 
   const [shippingInfo, setShippingInfo] = useState({
     name: "",
@@ -30,7 +41,6 @@ const CheckoutStep1 = () => {
   const [processing, setProcessing] = useState(false);
   const clickedOnceRef = useRef(false);
 
-  // 🔔 UI Modal State for Price Changes & Stock Issues
   const [priceChangeModal, setPriceChangeModal] = useState({
     show: false,
     title: "",
@@ -50,7 +60,7 @@ const CheckoutStep1 = () => {
     }
   };
 
-  const itemsPrice = cartItems.reduce((acc, item) => {
+  const itemsPrice = checkoutItems.reduce((acc, item) => {
     const price = parseFloat(item.price || 0);
     return acc + (isNaN(price) ? 0 : price * (item.quantity || 1));
   }, 0);
@@ -124,25 +134,24 @@ const CheckoutStep1 = () => {
     return true;
   };
 
-  // 🛡️ Live Server Verification with Modal Notice
   const verifyLatestCartData = async () => {
-    let updatedCart = [...cartItems];
+    let updatedCheckout = [...checkoutItems];
     let hasChanges = false;
-    const initialItemCount = cartItems.length;
+    const initialItemCount = checkoutItems.length;
     let lastFailedProductId = null;
 
-    for (let i = updatedCart.length - 1; i >= 0; i--) {
-      const item = updatedCart[i];
+    for (let i = updatedCheckout.length - 1; i >= 0; i--) {
+      const item = updatedCheckout[i];
       try {
         const { data: serverProd } = await axiosInstance.get(`/products/${item._id}`);
         if (!serverProd) {
           lastFailedProductId = item._id;
-          updatedCart.splice(i, 1);
+          updatedCheckout.splice(i, 1);
           hasChanges = true;
           setPriceChangeModal({
             show: true,
             title: "Item Unavailable",
-            message: `"${item.title}" is no longer available and was removed from your cart.`,
+            message: `"${item.title}" is no longer available and was removed.`,
             oldPrice: null,
             newPrice: null,
             productTitle: item.title,
@@ -174,12 +183,12 @@ const CheckoutStep1 = () => {
 
         if (!inStock) {
           lastFailedProductId = item._id;
-          updatedCart.splice(i, 1);
+          updatedCheckout.splice(i, 1);
           hasChanges = true;
           setPriceChangeModal({
             show: true,
             title: "Out of Stock",
-            message: `Sorry, "${item.title}" is out of stock and was removed from your cart.`,
+            message: `Sorry, "${item.title}" is out of stock.`,
             oldPrice: null,
             newPrice: null,
             productTitle: item.title,
@@ -189,7 +198,6 @@ const CheckoutStep1 = () => {
 
         const freshPrice = Number(serverProd.price) + extra;
         if (Number(item.price) !== freshPrice) {
-          // 🎨 Trigger stylish Price Change modal
           setPriceChangeModal({
             show: true,
             title: "Price Updated",
@@ -198,22 +206,24 @@ const CheckoutStep1 = () => {
             newPrice: freshPrice,
             productTitle: item.title,
           });
-          updatedCart[i].price = freshPrice;
+          updatedCheckout[i].price = freshPrice;
           hasChanges = true;
         }
       } catch (err) {
         lastFailedProductId = item._id;
-        updatedCart.splice(i, 1);
+        updatedCheckout.splice(i, 1);
         hasChanges = true;
       }
     }
 
     if (hasChanges) {
-      setCartItems(updatedCart);
-      localStorage.setItem("cart", JSON.stringify(updatedCart));
-      window.dispatchEvent(new Event("storage"));
+      setCheckoutItems(updatedCheckout);
+      if (!isDirectBuy) {
+        localStorage.setItem("cart", JSON.stringify(updatedCheckout));
+        window.dispatchEvent(new Event("storage"));
+      }
 
-      if (updatedCart.length === 0) {
+      if (updatedCheckout.length === 0) {
         if (initialItemCount === 1 && lastFailedProductId) {
           navigate(`/product/${lastFailedProductId}`);
         } else {
@@ -260,7 +270,7 @@ const CheckoutStep1 = () => {
       return;
     }
 
-    const orderItems = cartItems.map((item) => ({
+    const orderItems = checkoutItems.map((item) => ({
       product: item._id,
       name: item.title,
       image: item.image || "",
@@ -281,7 +291,9 @@ const CheckoutStep1 = () => {
         { headers: token ? { Authorization: `Bearer ${token}` } : {} }
       )
       .then((res) => {
-        clearCart();
+        if (!isDirectBuy) {
+          clearCart();
+        }
         window.location.href = `/order-confirmation/${res.data.order._id}`;
       })
       .catch((err) => {
@@ -334,7 +346,7 @@ const CheckoutStep1 = () => {
     }
 
     try {
-      const orderItems = cartItems.map((item) => ({
+      const orderItems = checkoutItems.map((item) => ({
         product: item._id,
         name: item.title,
         image: item.image || "",
@@ -365,7 +377,9 @@ const CheckoutStep1 = () => {
         order_id: razorpayOrder.id,
         handler: async function (response) {
           setProcessingPayment(true);
-          clearCart();
+          if (!isDirectBuy) {
+            clearCart();
+          }
           try {
             let retries = 15;
             while (retries--) {
@@ -411,7 +425,6 @@ const CheckoutStep1 = () => {
 
   return (  
     <div className="checkout-container">
-      {/* 🚀 PRICE CHANGE / OUT OF STOCK MODAL */}
       {priceChangeModal.show && (
         <div className="price-modal-overlay">
           <div className="price-modal-card">
@@ -463,9 +476,9 @@ const CheckoutStep1 = () => {
       <h2>Checkout</h2>
 
       <div className="checkout-cart-wrapper">
-        <h3>Your Cart</h3>
+        <h3>{isDirectBuy ? "Order Summary" : "Your Cart"}</h3>
         <div className="checkout-cart-box">
-          {cartItems.map((item, idx) => (
+          {checkoutItems.map((item, idx) => (
             <div key={idx} className="checkout-cart-item">
               <img
                 src={item.image || "/placeholder.png"}
@@ -688,7 +701,7 @@ const CheckoutStep1 = () => {
         <div className="summary-header">
           <div className="header-title">
             <h4>Order Summary</h4>
-            <span className="item-count">{cartItems.length} Items</span>
+            <span className="item-count">{checkoutItems.length} Items</span>
           </div>
           <div className="secure-badge">
             <span>100% Secure</span>
