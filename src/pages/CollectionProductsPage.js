@@ -47,7 +47,7 @@ const CollectionProductsPage = () => {
     name="description"
     content={
       collection?.description ||
-      `Explore our exclusive ${collection?.name || ""} collection at Cuztory. High-demand customized designs & fast shipping.`
+      `Explore our exclusive ${collection?.name || ""} collections of Cuztory | Nxt Gen Fashion Hub |.`
     }
   />
   <link rel="canonical" href={`https://cuztory.in/collection/${collection?.slug || id}`} />

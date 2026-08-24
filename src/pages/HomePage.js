@@ -116,20 +116,20 @@ if (loading) return <PageLoader text="Loading store..." />;
   <meta property="og:url" content="https://cuztory.in/" />
   <meta
     property="og:title"
-    content="Cuzto | Custom Gifts & Personalized Products"
+    content="Cuztory | Nxt Gen Fashion Hub |"
   />
   <meta
     property="og:description"
-    content="Shop custom photo lamps, personalized keychains, and gifts for every occasion at Cuzto."
+    content="Cuztory | Nxt Gen Fashion Hub |"
   />
   <meta property="og:image" content="https://cuztory.in/banner.png" />
 
   {/* === Twitter Card === */}
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Cuzto | Personalized Gifts Store" />
+  <meta name="twitter:title" content="Cuztory | Nxt Gen Fashion Hub |" />
   <meta
     name="twitter:description"
-    content="Create your own personalized gifts with Cuzto. Unique, memorable, and made just for you."
+    content="Cuztory | Nxt Gen Fashion Hub |"
   />
   <meta name="twitter:image" content="https://cuztory.in/banner.png" />
 
@@ -142,7 +142,7 @@ if (loading) return <PageLoader text="Loading store..." />;
       url: "https://cuztory.in/",
       logo: "https://cuztory.in/logo.png",
       description:
-        "Cuzto offers personalized gifts like photo lamps, keychains, name boards, and more. Customize your gifts easily online.",
+        "Cuztory | Nxt Gen Fashion Hub |",
       sameAs: [
         "https://www.instagram.com/cuzto_official",
         "https://www.facebook.com/CuztoOfficial",

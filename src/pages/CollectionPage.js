@@ -56,7 +56,7 @@ const CollectionPage = () => {
 
   {/* ======= Twitter Card ======= */}
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Cuzto Collections | Personalized Gifts" />
+  <meta name="twitter:title" content="Cuztory Collections | Nxt Gen Fashion Hub |" />
   <meta
     name="twitter:description"
     content="Explore Cuztory’s | Nxt Gen Fashion Hub |"
