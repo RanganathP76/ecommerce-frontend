@@ -14,8 +14,7 @@ import {
   FaCheckCircle,
   FaMapMarkerAlt,
   FaSpinner,
-  FaCalendarAlt,
-  FaExternalLinkAlt
+  FaCalendarAlt
 } from "react-icons/fa";
 import axiosInstance from "../axiosInstance";
 import "./ProductDetailPage.css";
@@ -77,14 +76,6 @@ const ProductDetailPage = () => {
   const [cartTotal, setCartTotal] = useState(0);
 
   const [showCustomizationStep, setShowCustomizationStep] = useState(false);
-  const [isInstagramBrowser, setIsInstagramBrowser] = useState(false);
-
-  // Detect Instagram In-App Browser on load
-  useEffect(() => {
-    const userAgent = navigator.userAgent || navigator.vendor || window.opera;
-    const isInsta = userAgent.includes("Instagram") || userAgent.includes("FB_IAB") || userAgent.includes("FBAN");
-    setIsInstagramBrowser(isInsta);
-  }, []);
 
   useEffect(() => {
     axiosInstance
@@ -531,7 +522,7 @@ const ProductDetailPage = () => {
       quantity: 1,
     });
     
-    // Smoothly route to checkout without clearing or altering the active cart
+    // Navigate with item in state without touching the stored cart
     navigate("/checkoutStep1", { state: { directBuyItem: buyNowItem } });
   };
 
@@ -611,77 +602,85 @@ const ProductDetailPage = () => {
   const canProceed = isSelectionValidAndInStock();
 
   return (
-    <div className="product-page-main-container">
+    <div>
       <Header />
 
-      {/* Helper Bar for Instagram In-App Browser */}
-      {isInstagramBrowser && (
-        <div style={{
-          backgroundColor: "#1e293b",
-          color: "#ffffff",
-          padding: "8px 14px",
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          fontSize: "12px",
-          fontWeight: "500"
-        }}>
-          <span>Viewing in Instagram. For the smoothest checkout:</span>
-          <a
-            href={window.location.href}
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{
-              color: "#38bdf8",
-              textDecoration: "underline",
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "4px",
-              fontWeight: "600"
-            }}
-          >
-            Open in Browser <FaExternalLinkAlt size={10} />
-          </a>
-        </div>
-      )}
-
       <Helmet>
-  {/* Standard Meta */}
-  <title>{product ? `${product.title} | Cuztory` : "Cuztory"}</title>
-  <meta
-    name="description"
-    content={
-      product?.description && typeof product.description === "string"
-        ? product.description.substring(0, 155)
-        : `Shop ${product?.title || "custom apparel"} at Cuztory. High quality custom wear with fast delivery across India.`
-    }
-  />
-  <link rel="canonical" href={`https://cuztory.in/product/${product?.slug || id}`} />
+        <title>{product ? `${product.title} | Cuztory` : "Cuztory"}</title>
+        <meta
+          name="description"
+          content={
+            product?.description && typeof product.description === "string"
+              ? product.description.substring(0, 155)
+              : `Shop ${product?.title || "custom apparel"} at Cuztory. High quality custom wear with fast delivery across India.`
+          }
+        />
+        <link rel="canonical" href={`https://cuztory.in/product/${product?.slug || id}`} />
 
-  {/* OpenGraph / WhatsApp / Facebook Preview - Use 'website' instead of 'product' to prevent native card lock */}
-  <meta property="og:type" content="website" />
-  <meta property="og:site_name" content="Cuztory" />
-  <meta property="og:title" content={product ? `${product.title} — ₹${totalPrice}` : "Cuztory"} />
-  <meta
-    property="og:description"
-    content={`Order ${product?.title || "custom items"} online at Cuztory. Fast Delivery & Secure Checkout across India.`}
-  />
-  <meta property="og:url" content={`https://cuztory.in/product/${product?.slug || id}`} />
-  <meta property="og:image" content={product?.images?.[0] || "https://cuztory.in/banner.png"} />
-  <meta property="og:image:secure_url" content={product?.images?.[0] || "https://cuztory.in/banner.png"} />
-  <meta property="og:image:type" content="image/jpeg" />
-  <meta property="og:image:width" content="1200" />
-  <meta property="og:image:height" content="630" />
+        <meta property="og:type" content="product" />
+        <meta property="og:site_name" content="Cuztory" />
+        <meta property="og:title" content={product ? `${product.title} — ₹${totalPrice}` : "Cuztory"} />
+        <meta
+          property="og:description"
+          content={`Order ${product?.title || "custom items"} online at Cuztory. Special price: ₹${totalPrice}. Fast Delivery & Secure Checkout.`}
+        />
+        <meta property="og:url" content={`https://cuztory.in/product/${product?.slug || id}`} />
+        <meta property="og:image" content={product?.images?.[0] || "https://cuztory.in/banner.png"} />
+        <meta property="og:image:secure_url" content={product?.images?.[0] || "https://cuztory.in/banner.png"} />
+        <meta property="og:image:width" content="800" />
+        <meta property="og:image:height" content="800" />
+        <meta property="product:price:amount" content={String(totalPrice)} />
+        <meta property="product:price:currency" content="INR" />
 
-  {/* Twitter Card */}
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content={product ? `${product.title} — ₹${totalPrice}` : "Cuztory"} />
-  <meta
-    name="twitter:description"
-    content={`Shop ${product?.title} on Cuztory for ₹${totalPrice}.`}
-  />
-  <meta name="twitter:image" content={product?.images?.[0] || "https://cuztory.in/banner.png"} />
-</Helmet>
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={product?.title || "Cuztory"} />
+        <meta
+          name="twitter:description"
+          content={`Shop ${product?.title} on Cuztory for ₹${totalPrice}.`}
+        />
+        <meta name="twitter:image" content={product?.images?.[0] || "https://cuztory.in/banner.png"} />
+
+        {product && (
+          <script type="application/ld+json">
+            {JSON.stringify({
+              "@context": "https://schema.org/",
+              "@type": "Product",
+              "name": product.title,
+              "image": product.images || [],
+              "description":
+                typeof product.description === "string"
+                  ? product.description
+                  : product.title,
+              "sku": product._id,
+              "brand": {
+                "@type": "Brand",
+                "name": "Cuztory"
+              },
+              "offers": {
+                "@type": "Offer",
+                "url": `https://cuztory.in/product/${product.slug || product._id}`,
+                "priceCurrency": "INR",
+                "price": totalPrice || product.price,
+                "priceValidUntil": "2027-12-31",
+                "availability": canProceed
+                  ? "https://schema.org/InStock"
+                  : "https://schema.org/OutOfStock",
+                "itemCondition": "https://schema.org/NewCondition"
+              },
+              ...(product.reviews?.length > 0 && {
+                "aggregateRating": {
+                  "@type": "AggregateRating",
+                  "ratingValue": (
+                    product.reviews.reduce((acc, r) => acc + (r.rating || 5), 0) /
+                    product.reviews.length
+                  ).toFixed(1),
+                  "reviewCount": product.reviews.length
+                }
+              })
+            })}
+          </script>
+        )}
+      </Helmet>
 
       {showCustomizationStep ? (
         <div className="customization-step-wrapper">
