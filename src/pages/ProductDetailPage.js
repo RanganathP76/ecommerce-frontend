@@ -14,7 +14,8 @@ import {
   FaCheckCircle,
   FaMapMarkerAlt,
   FaSpinner,
-  FaCalendarAlt
+  FaCalendarAlt,
+  FaExternalLinkAlt
 } from "react-icons/fa";
 import axiosInstance from "../axiosInstance";
 import "./ProductDetailPage.css";
@@ -76,6 +77,14 @@ const ProductDetailPage = () => {
   const [cartTotal, setCartTotal] = useState(0);
 
   const [showCustomizationStep, setShowCustomizationStep] = useState(false);
+  const [isInstagramBrowser, setIsInstagramBrowser] = useState(false);
+
+  // Detect Instagram In-App Browser on load
+  useEffect(() => {
+    const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+    const isInsta = userAgent.includes("Instagram") || userAgent.includes("FB_IAB") || userAgent.includes("FBAN");
+    setIsInstagramBrowser(isInsta);
+  }, []);
 
   useEffect(() => {
     axiosInstance
@@ -522,7 +531,7 @@ const ProductDetailPage = () => {
       quantity: 1,
     });
     
-    // Navigate with item in state without touching the stored cart
+    // Smoothly route to checkout without clearing or altering the active cart
     navigate("/checkoutStep1", { state: { directBuyItem: buyNowItem } });
   };
 
@@ -602,8 +611,39 @@ const ProductDetailPage = () => {
   const canProceed = isSelectionValidAndInStock();
 
   return (
-    <div>
+    <div className="product-page-main-container">
       <Header />
+
+      {/* Helper Bar for Instagram In-App Browser */}
+      {isInstagramBrowser && (
+        <div style={{
+          backgroundColor: "#1e293b",
+          color: "#ffffff",
+          padding: "8px 14px",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          fontSize: "12px",
+          fontWeight: "500"
+        }}>
+          <span>Viewing in Instagram. For the smoothest checkout:</span>
+          <a
+            href={window.location.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              color: "#38bdf8",
+              textDecoration: "underline",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "4px",
+              fontWeight: "600"
+            }}
+          >
+            Open in Browser <FaExternalLinkAlt size={10} />
+          </a>
+        </div>
+      )}
 
       <Helmet>
         <title>{product ? `${product.title} | Cuztory` : "Cuztory"}</title>
