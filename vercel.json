@@ -10,7 +10,7 @@
         {
           "type": "header",
           "key": "user-agent",
-          "value": ".*(facebookexternalhit|Facebot|WhatsApp|Instagram|Twitterbot|TelegramBot|Slackbot|LinkedInBot|Pinterest).*"
+          "value": ".*(facebookexternalhit|Facebot|Twitterbot|TelegramBot|Slackbot|LinkedInBot|Pinterestbot|WhatsApp).* "
         }
       ],
       "destination": "https://ecommerce-backend-8wv0.onrender.com/product/:id"
@@ -21,7 +21,7 @@
         {
           "type": "header",
           "key": "user-agent",
-          "value": ".*(facebookexternalhit|Facebot|WhatsApp|Instagram|Twitterbot|TelegramBot|Slackbot|LinkedInBot|Pinterest).*"
+          "value": ".*(facebookexternalhit|Facebot|Twitterbot|TelegramBot|Slackbot|LinkedInBot|Pinterestbot|WhatsApp).*"
         }
       ],
       "destination": "https://ecommerce-backend-8wv0.onrender.com/collection/:id"
