@@ -364,7 +364,7 @@ export default function HomePage() {
               </div>
               <div className="faq-panel">
                 <h4>What is the return & exchange process?</h4>
-                <p>We provide a 7-day doorstep size replacement policy for any fit adjustments.</p>
+                <p>We provide a 7-day doorstep replacement policy</p>
               </div>
             </div>
           </div>
