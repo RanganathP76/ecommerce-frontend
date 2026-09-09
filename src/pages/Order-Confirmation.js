@@ -21,7 +21,7 @@ const OrderConfirmation = () => {
         const orderData = res.data;
         setOrder(orderData);
 
-        // ✅ Fire Purchase event
+        // ✅ 1. Fire Meta Pixel Purchase event
         if (orderData?.orderItems?.length > 0) {
           orderData.orderItems.forEach((item) => {
             trackEvent("Purchase", {
@@ -31,6 +31,16 @@ const OrderConfirmation = () => {
               currency: "INR",
               quantity: item.quantity,
             });
+          });
+        }
+
+        // ✅ 2. Fire Google Ads Purchase Conversion
+        if (window.gtag && orderData) {
+          window.gtag("event", "conversion", {
+            send_to: "AW-XXXXXXXXX/YOUR_PURCHASE_CONVERSION_LABEL", // 👈 Paste your Ads ID & Label here
+            value: orderData.totalPrice || orderData.amountPaid || 0,
+            currency: "INR",
+            transaction_id: orderData._id, // Prevents duplicate count if page refreshes
           });
         }
       } catch (err) {
