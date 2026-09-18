@@ -339,8 +339,8 @@ export default function HomePage() {
               <div className="pillar-entry">
                 <div className="pillar-icon">🔄</div>
                 <div className="pillar-content">
-                  <h4>Easy 7-Day Swap</h4>
-                  <p>Hassle-free size replacement at your doorstep.</p>
+                  <h4>Easy 3-Day Exchange</h4>
+                  <p>Hassle-free replacement at your doorstep.</p>
                 </div>
               </div>
             </div>
