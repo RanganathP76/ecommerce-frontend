@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { 
   FaStar, 
@@ -14,7 +14,10 @@ import {
   FaCheckCircle,
   FaMapMarkerAlt,
   FaSpinner,
-  FaCalendarAlt
+  FaCalendarAlt,
+  FaFire,
+  FaBoxOpen,
+  FaExclamationTriangle
 } from "react-icons/fa";
 import axiosInstance from "../axiosInstance";
 import "./ProductDetailPage.css";
@@ -87,6 +90,11 @@ const ProductDetailPage = () => {
   // Recommendations state
   const [relatedProducts, setRelatedProducts] = useState([]);
   const [relatedSectionTitle, setRelatedSectionTitle] = useState("MORE FROM THIS COLLECTION");
+
+  // Consistent random sold count (5 - 20) per product session
+  const randomSoldCount = useMemo(() => {
+    return Math.floor(Math.random() * (20 - 5 + 1)) + 5;
+  }, [id]);
 
   useEffect(() => {
     axiosInstance
@@ -236,13 +244,14 @@ const ProductDetailPage = () => {
             const firstAvailable = (spec.values || []).find((v) => v.stock > 0);
             if (firstAvailable) {
               autoSpecs[spec.key] = firstAvailable.value;
+            } else if (spec.values?.length > 0) {
+              autoSpecs[spec.key] = spec.values[0].value;
             }
           });
           setSelectedSpecs(autoSpecs);
         }
         syncCurrentItemQty(currentProd._id, autoSpecs);
 
-        // Fetch related products (From Collection -> Fallback to Latest Products)
         const collectionId = currentProd.collection?._id || currentProd.collection || currentProd.collectionId;
 
         let itemsFound = [];
@@ -266,7 +275,6 @@ const ProductDetailPage = () => {
               : "MORE FROM THIS COLLECTION"
           );
         } else {
-          // Fallback: Fetch latest drops catalog
           try {
             const allProdRes = await axiosInstance.get("/products");
             const allProds = allProdRes.data || [];
@@ -346,6 +354,16 @@ const ProductDetailPage = () => {
       }
     }
     return true;
+  };
+
+  // Helper to retrieve live stock for a chosen specification option
+  const getSelectedSpecStock = (specKey) => {
+    if (!product || !Array.isArray(product.specifications)) return null;
+    const spec = product.specifications.find((s) => s.key === specKey);
+    if (!spec) return null;
+    const chosenVal = selectedSpecs[specKey];
+    const matched = spec.values?.find((v) => v.value === chosenVal);
+    return matched ? Number(matched.stock) : null;
   };
 
   const verifyLatestStockAndPrice = async (targetQty = 1) => {
@@ -682,7 +700,6 @@ const ProductDetailPage = () => {
         <meta property="og:image" content={product?.images?.[0] || "https://cuztory.in/banner.png"} />
       </Helmet>
 
-      {/* 0.3cm Top Spacing Gap */}
       <main className="product-details-page-wrapper">
         {showCustomizationStep ? (
           <div className="customization-step-wrapper">
@@ -713,33 +730,55 @@ const ProductDetailPage = () => {
             {product.specifications?.length > 0 && (
               <div className="step-section-box">
                 <h4 className="step-section-heading">1. Select Specifications</h4>
-                {product.specifications.map((spec, idx) => (
-                  <div key={idx} className="spec-group">
-                    <p className="spec-label">{spec.key}:</p>
-                    <div className="spec-options">
-                      {spec.values.map((option, vIdx) => (
-                        <label key={vIdx} className="spec-option">
-                          <input
-                            type="radio"
-                            name={`step-${spec.key}`}
-                            value={option.value}
-                            checked={selectedSpecs[spec.key] === option.value}
-                            disabled={option.stock <= 0}
-                            onChange={() => handleSpecChange(spec.key, option.value)}
-                          />
-                          <span className="spec-option-text">
-                            <span className="spec-main-value">{option.value}</span>
-                            {option.extraPrice > 0 && (
-                              <span className="extra-price-tag">
-                                (+₹{option.extraPrice})
-                              </span>
+                {product.specifications.map((spec, idx) => {
+                  const currentStock = getSelectedSpecStock(spec.key);
+                  return (
+                    <div key={idx} className="spec-group">
+                      <div className="spec-header-row">
+                        <p className="spec-label">{spec.key}:</p>
+                        {currentStock !== null && (
+                          <div className={`live-stock-badge ${currentStock === 0 ? "out" : currentStock <= 5 ? "low" : "in"}`}>
+                            {currentStock === 0 ? (
+                              <>
+                                <FaExclamationTriangle /> Out of Stock
+                              </>
+                            ) : currentStock <= 5 ? (
+                              <>
+                                <FaExclamationTriangle /> Only {currentStock} left!
+                              </>
+                            ) : (
+                              <>
+                                <FaBoxOpen /> {currentStock} units in stock
+                              </>
                             )}
-                          </span>
-                        </label>
-                      ))}
+                          </div>
+                        )}
+                      </div>
+                      <div className="spec-options">
+                        {spec.values.map((option, vIdx) => (
+                          <label key={vIdx} className="spec-option">
+                            <input
+                              type="radio"
+                              name={`step-${spec.key}`}
+                              value={option.value}
+                              checked={selectedSpecs[spec.key] === option.value}
+                              disabled={option.stock <= 0}
+                              onChange={() => handleSpecChange(spec.key, option.value)}
+                            />
+                            <span className="spec-option-text">
+                              <span className="spec-main-value">{option.value}</span>
+                              {option.extraPrice > 0 && (
+                                <span className="extra-price-tag">
+                                  (+₹{option.extraPrice})
+                                </span>
+                              )}
+                            </span>
+                          </label>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
 
@@ -895,6 +934,16 @@ const ProductDetailPage = () => {
               <span className="product-kicker">NXT GEN EXCLUSIVE</span>
               <h2 className="tight-title">{product.title}</h2>
 
+              {/* Urgency Sales Count Banner */}
+              <div className="live-sold-banner">
+                <span className="sold-pulse-ring">
+                  <FaFire className="sold-fire-icon" />
+                </span>
+                <span className="sold-text">
+                  <strong>{randomSoldCount} sold</strong> in the last 2 hours
+                </span>
+              </div>
+
               <div className="price-section-container tight-price">
                 <div className="price-main-row">
                   <span className="current-price">₹{totalPrice}</span>
@@ -959,35 +1008,59 @@ const ProductDetailPage = () => {
 
               {product.specifications?.length > 0 && (
                 <div className="specifications-block compact-specs">
-                  {product.specifications.map((spec, idx) => (
-                    <div key={idx} className="spec-group">
-                      <p className="spec-label">{spec.key}:</p>
-                      <div className="spec-options">
-                        {spec.values.map((option, vIdx) => (
-                          <label key={vIdx} className="spec-option">
-                            <input
-                              type="radio"
-                              name={spec.key}
-                              value={option.value}
-                              checked={selectedSpecs[spec.key] === option.value}
-                              disabled={option.stock <= 0}
-                              onChange={() =>
-                                handleSpecChange(spec.key, option.value)
-                              }
-                            />
-                            <span className="spec-option-text">
-                              <span className="spec-main-value">{option.value}</span>
-                              {option.extraPrice > 0 && (
-                                <span className="extra-price-tag">
-                                  (+₹{option.extraPrice})
-                                </span>
+                  {product.specifications.map((spec, idx) => {
+                    const currentStock = getSelectedSpecStock(spec.key);
+
+                    return (
+                      <div key={idx} className="spec-group">
+                        <div className="spec-header-row">
+                          <p className="spec-label">{spec.key}:</p>
+                          {currentStock !== null && (
+                            <div className={`live-stock-badge ${currentStock === 0 ? "out" : currentStock <= 5 ? "low" : "in"}`}>
+                              {currentStock === 0 ? (
+                                <>
+                                  <FaExclamationTriangle /> Out of Stock
+                                </>
+                              ) : currentStock <= 5 ? (
+                                <>
+                                  <FaExclamationTriangle /> Only {currentStock} left!
+                                </>
+                              ) : (
+                                <>
+                                  <FaBoxOpen /> {currentStock} in stock
+                                </>
                               )}
-                            </span>
-                          </label>
-                        ))}
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="spec-options">
+                          {spec.values.map((option, vIdx) => (
+                            <label key={vIdx} className="spec-option">
+                              <input
+                                type="radio"
+                                name={spec.key}
+                                value={option.value}
+                                checked={selectedSpecs[spec.key] === option.value}
+                                disabled={option.stock <= 0}
+                                onChange={() =>
+                                  handleSpecChange(spec.key, option.value)
+                                }
+                              />
+                              <span className="spec-option-text">
+                                <span className="spec-main-value">{option.value}</span>
+                                {option.extraPrice > 0 && (
+                                  <span className="extra-price-tag">
+                                    (+₹{option.extraPrice})
+                                  </span>
+                                )}
+                              </span>
+                            </label>
+                          ))}
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
 
