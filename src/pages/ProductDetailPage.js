@@ -940,7 +940,7 @@ const ProductDetailPage = () => {
                   <FaFire className="sold-fire-icon" />
                 </span>
                 <span className="sold-text">
-                  <strong>{randomSoldCount} sold</strong> in the last 2 hours
+                  <strong>{randomSoldCount} sold</strong> in the last 3 hours
                 </span>
               </div>
 
