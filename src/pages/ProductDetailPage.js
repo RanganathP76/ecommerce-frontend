@@ -1023,11 +1023,11 @@ const ProductDetailPage = () => {
                                 </>
                               ) : currentStock <= 5 ? (
                                 <>
-                                  <FaExclamationTriangle /> Only {currentStock} left!
+                                  
                                 </>
                               ) : (
                                 <>
-                                  <FaBoxOpen /> {currentStock} in stock
+                                  
                                 </>
                               )}
                             </div>
