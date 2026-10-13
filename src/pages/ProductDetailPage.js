@@ -91,10 +91,7 @@ const ProductDetailPage = () => {
   const [relatedProducts, setRelatedProducts] = useState([]);
   const [relatedSectionTitle, setRelatedSectionTitle] = useState("MORE FROM THIS COLLECTION");
 
-  // Consistent random sold count (5 - 20) per product session
-  const randomSoldCount = useMemo(() => {
-    return Math.floor(Math.random() * (20 - 5 + 1)) + 5;
-  }, [id]);
+
 
   useEffect(() => {
     axiosInstance
@@ -934,16 +931,7 @@ const ProductDetailPage = () => {
               <span className="product-kicker">NXT GEN EXCLUSIVE</span>
               <h2 className="tight-title">{product.title}</h2>
 
-              {/* Urgency Sales Count Banner */}
-              <div className="live-sold-banner">
-                <span className="sold-pulse-ring">
-                  <FaFire className="sold-fire-icon" />
-                </span>
-                <span className="sold-text">
-                  <strong>{randomSoldCount} sold</strong> in the last 3 hours
-                </span>
-              </div>
-
+             
               <div className="price-section-container tight-price">
                 <div className="price-main-row">
                   <span className="current-price">₹{totalPrice}</span>
